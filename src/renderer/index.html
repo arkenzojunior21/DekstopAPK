@@ -19,6 +19,7 @@
       <nav>
         <button class="nav-aktif" data-halaman="pelanggan">Pelanggan</button>
         <button data-halaman="layanan">Layanan</button>
+        <button data-halaman="transaksi">Transaksi</button>
       </nav>
     </aside>
 
@@ -110,12 +111,74 @@
           </div>
         </div>
       </section>
+      <section class="halaman" id="halaman-transaksi" hidden>
+        <div class="kartu">
+          <div class="kartu-kepala">
+            <h2>Terima Cucian</h2>
+          </div>
+          <form class="form" id="form-transaksi">
+            <div class="form-grid">
+              <label>Pelanggan
+                <select id="tr-pelanggan"></select>
+              </label>
+              <label>Tanggal Masuk
+                <input type="date" id="tr-masuk" required />
+              </label>
+              <label>Tanggal Estimasi Selesai
+                <input type="date" id="tr-estimasi" required />
+              </label>
+            </div>
+
+            <h3>Rincian Layanan</h3>
+            <div id="tr-items"></div>
+            <button type="button" class="btn polos" id="tr-tambah">+ Tambah Baris</button>
+
+            <div class="ringkasan">
+              <div>
+                <span>Total Bayar</span>
+                <strong id="tr-total">Rp0</strong>
+              </div>
+              <label>DP (Rp)
+                <input type="number" id="tr-dp" min="0" step="500" value="0" required />
+              </label>
+              <div>
+                <span>Sisa Bayar</span>
+                <strong id="tr-sisa">Rp0</strong>
+              </div>
+            </div>
+
+            <div class="form-aksi">
+              <button type="submit" class="btn utama">Simpan Transaksi</button>
+              <span class="error" id="tr-error"></span>
+            </div>
+          </form>
+        </div>
+
+        <div class="kartu">
+          <div class="kartu-kepala">
+            <h2>Riwayat Transaksi</h2>
+          </div>
+          <div class="tabel-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>Pelanggan</th><th>Masuk</th><th>Estimasi</th>
+                  <th>Total</th><th>DP</th><th>Sisa</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-transaksi"></tbody>
+            </table>
+            <p id="kosong-transaksi" hidden>Belum ada transaksi.</p>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
   <script src="js/util.js"></script>
   <script src="js/pelanggan.js"></script>
   <script src="js/layanan.js"></script>
+  <script src="js/transaksi.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

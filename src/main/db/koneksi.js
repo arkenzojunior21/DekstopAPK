@@ -35,13 +35,21 @@ db.exec(`
   );
 
   CREATE TABLE IF NOT EXISTS detail_transaksi (
-    id_detail    INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_transaksi INTEGER NOT NULL REFERENCES transaksi(id_transaksi),
-    id_layanan   INTEGER NOT NULL REFERENCES layanan(id_layanan),
-    jumlah       REAL NOT NULL,
-    subtotal     INTEGER NOT NULL
+    id_detail            INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_transaksi         INTEGER NOT NULL REFERENCES transaksi(id_transaksi),
+    id_layanan           INTEGER NOT NULL REFERENCES layanan(id_layanan),
+    jumlah               REAL NOT NULL,
+    subtotal             INTEGER NOT NULL,
+    nama_layanan_snapshot TEXT NOT NULL DEFAULT '',
+    harga_snapshot       INTEGER NOT NULL DEFAULT 0
   );
 `);
+
+const kolomDetail = db.prepare('PRAGMA table_info(detail_transaksi)').all().map((k) => k.name);
+if (!kolomDetail.includes('harga_snapshot')) {
+  db.exec(`ALTER TABLE detail_transaksi ADD COLUMN nama_layanan_snapshot TEXT NOT NULL DEFAULT ''`);
+  db.exec(`ALTER TABLE detail_transaksi ADD COLUMN harga_snapshot INTEGER NOT NULL DEFAULT 0`);
+}
 
 const jumlahLayanan = db.prepare('SELECT COUNT(*) AS n FROM layanan').get().n;
 if (jumlahLayanan === 0) {
