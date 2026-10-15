@@ -1,0 +1,17 @@
+{
+  "name": "laundryflow-desk",
+  "version": "1.0.0",
+  "description": "Aplikasi kasir & manajemen laundry",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "smoke": "electron . --smoke"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^13.0.3"
+  },
+  "devDependencies": {
+    "electron": "^44.7.2"
+  }
+}
