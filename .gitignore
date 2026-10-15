@@ -1,3 +1,21 @@
-node_modules/
+# .gitignore — Laundry (C#/.NET)
+
+# Build output
+bin/
+obj/
 dist/
 *.log
+
+# IDE
+.vs/
+*.user
+*.suo
+
+# Data & rahasia lokal
+pgdata/
+data/
+.env
+*.pem
+
+# Hasil ekspor yang diunduh tangan saat memeriksa laporan di viewer
+tmp-verifikasi/

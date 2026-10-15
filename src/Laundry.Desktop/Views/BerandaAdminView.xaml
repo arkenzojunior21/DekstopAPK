@@ -1,0 +1,128 @@
+<UserControl x:Class="Laundry.Desktop.Views.BerandaAdminView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:svc="clr-namespace:Laundry.Desktop.Services">
+    <ScrollViewer Style="{StaticResource Gulir}">
+        <StackPanel>
+            <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
+                            Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
+
+            <ItemsControl ItemsSource="{Binding Kartu}" Margin="0,0,0,4">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource Kartu}" Width="212" Margin="0,0,12,12" Padding="14,12,14,12">
+                            <StackPanel>
+                                <Border Width="34" Height="3" CornerRadius="2" Background="{Binding Aksen}"
+                                        HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding Nilai}" Style="{StaticResource TeksAngka}"
+                                           FontSize="21" Margin="0,8,0,0" />
+                                <TextBlock Text="{Binding Judul}" Style="{StaticResource TeksData}"
+                                           FontWeight="SemiBold" Margin="0,2,0,0" />
+                                <TextBlock Text="{Binding Keterangan}" Style="{StaticResource TeksKecil}"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource Kartu}">
+                    <StackPanel>
+                        <TextBlock Text="PESANAN TERAKHIR" Style="{StaticResource TeksLabel}" />
+                        <DataGrid Style="{StaticResource TabelData}" ItemsSource="{Binding Terbaru}"
+                                  MaxHeight="290" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Nomor" Binding="{Binding OrderNumber}" Width="*" MinWidth="160"
+                                                    ElementStyle="{StaticResource SelPotong}" />
+                                <DataGridTextColumn Header="Status" Binding="{Binding Status, Converter={StaticResource Label}}"
+                                                    Width="155" ElementStyle="{StaticResource SelPotong}" />
+                                <DataGridTextColumn Header="Bayar" Binding="{Binding Payment, Converter={StaticResource Label}}"
+                                                    Width="130" ElementStyle="{StaticResource SelPotong}" />
+                                <DataGridTextColumn Header="Total"
+                                                    Binding="{Binding FinalTotal, Converter={StaticResource Rupiah}}"
+                                                    Width="92" />
+                                <DataGridTextColumn Header="Dibuat"
+                                                    Binding="{Binding CreatedAtUtc, Converter={StaticResource Tanggal}, ConverterParameter=relatif}"
+                                                    Width="116" ElementStyle="{StaticResource SelPotong}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Button Content="Buka semua pesanan" Style="{StaticResource TombolGaris}" Margin="0,12,0,0"
+                                HorizontalAlignment="Left" Command="{Binding BukaCommand}" CommandParameter="Pesanan" />
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Grid.Column="2">
+                    <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="KONDISI SISTEM" Style="{StaticResource TeksLabel}" />
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Pekerja sinkronisasi" Style="{StaticResource TeksData}" />
+                                <TextBlock Grid.Column="1" Style="{StaticResource TeksData}" FontWeight="SemiBold"
+                                           Text="{Binding Kondisi.PekerjaSinkronisasiAktif, Converter={StaticResource YaTidak}, ConverterParameter=Berjalan|Tidak berjalan}" />
+                            </Grid>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Backup terakhir" Style="{StaticResource TeksData}" />
+                                <TextBlock Grid.Column="1" Style="{StaticResource TeksData}" FontWeight="SemiBold"
+                                           Text="{Binding Kondisi.Backup.BackupSuksesTerakhirUtc, Converter={StaticResource Tanggal}, ConverterParameter=relatif}" />
+                            </Grid>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Antrean notifikasi" Style="{StaticResource TeksData}" />
+                                <TextBlock Grid.Column="1" Style="{StaticResource TeksData}" FontWeight="SemiBold"
+                                           Text="{Binding Kondisi.Notifikasi.Menunggu, StringFormat={}{0} menunggu}" />
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Pemeriksaan versi" Style="{StaticResource TeksData}" />
+                                <TextBlock Grid.Column="1" Style="{StaticResource TeksData}" FontWeight="SemiBold"
+                                           Text="{Binding Kondisi.Update.Status, Converter={StaticResource Label}}" />
+                            </Grid>
+                            <TextBlock Style="{StaticResource TeksKecil}" Margin="0,10,0,0" TextWrapping="Wrap"
+                                       Text="Rincian lengkap dan kunci yang belum diisi ada di halaman Sistem." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Kartu}">
+                        <StackPanel>
+                            <TextBlock Text="AKSI CEPAT" Style="{StaticResource TeksLabel}" />
+                            <Button Content="Buat pesanan walk-in" Style="{StaticResource Tombol}" Margin="0,0,0,8"
+                                    Command="{Binding BukaCommand}" CommandParameter="Buat Pesanan" />
+                            <Button Content="Tambah layanan / tarif" Style="{StaticResource TombolGaris}" Margin="0,0,0,8"
+                                    Command="{Binding BukaCommand}" CommandParameter="Katalog" />
+                            <Button Content="Laporan &amp; ekspor" Style="{StaticResource TombolGaris}" Margin="0,0,0,8"
+                                    Command="{Binding BukaCommand}" CommandParameter="Laporan" />
+                            <Button Content="Backup admin sekarang" Style="{StaticResource TombolGaris}"
+                                    Command="{Binding BackupCommand}" CommandParameter="admin" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,155 @@
+<Window x:Class="Laundry.Desktop.Views.JendelaLogin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svc="clr-namespace:Laundry.Desktop.Services"
+        Title="Laundry — Masuk" Height="680" Width="1040" MinHeight="560" MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource KuasLatar}"
+        FontFamily="{StaticResource FontUtama}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="380" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Panel kiri: identitas aplikasi, bukan sekadar hiasan. Di sini juga status server. -->
+        <Border Grid.Column="0" Padding="34,32,34,26">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FF0F1B2D" Offset="0" />
+                    <GradientStop Color="#FF1B3A6B" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <StackPanel VerticalAlignment="Stretch">
+                <Border Width="46" Height="46" CornerRadius="12" Background="#FF2563EB">
+                    <TextBlock Text="L" Foreground="White" FontSize="24" FontWeight="Bold"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <TextBlock Text="Laundry Desk" Foreground="White" FontSize="26" FontWeight="Bold" Margin="0,18,0,4" />
+                <TextBlock Text="Kasir, pesanan, dan laporan dalam satu jendela. Bekerja offline, data tetap tersimpan."
+                           Foreground="#FFB9C8E2" FontSize="13" TextWrapping="Wrap" Margin="0,0,0,26" />
+                <TextBlock Text="MASUK" Foreground="#FF7E94B8" FontSize="10.5" FontWeight="SemiBold" Margin="0,0,0,6" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="Admin toko" Foreground="White" FontSize="13" FontWeight="SemiBold" />
+                    <Border Background="#33FFFFFF" CornerRadius="9" Padding="8,2,8,2" Margin="8,0,0,0">
+                        <TextBlock Text="operasional &amp; laporan" Foreground="#FFCBD8EE" FontSize="11" />
+                    </Border>
+                </StackPanel>
+                <TextBlock Text="Pesanan walk-in, timbang, status, pembayaran tunai/kredit, komplain, backup."
+                           Foreground="#FF9FB2D0" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,18" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="Pelanggan" Foreground="White" FontSize="13" FontWeight="SemiBold" />
+                    <Border Background="#33FFFFFF" CornerRadius="9" Padding="8,2,8,2" Margin="8,0,0,0">
+                        <TextBlock Text="pesan &amp; lacak" Foreground="#FFCBD8EE" FontSize="11" />
+                    </Border>
+                </StackPanel>
+                <TextBlock Text="Pesan online, pilih slot antar-jemput, lihat tagihan dan status cucian."
+                           Foreground="#FF9FB2D0" FontSize="12" TextWrapping="Wrap" />
+                <StackPanel VerticalAlignment="Bottom" Margin="0,26,0,0">
+                    <Border Background="#22FFFFFF" CornerRadius="8" Padding="12,9,12,9">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="SERVER" Foreground="#FF7E94B8" FontSize="10" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding Server}" Foreground="White" FontSize="12"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding StatusServer}" Foreground="#FF9FB2D0" FontSize="11"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                            <Button Grid.Column="1" Content="Periksa" Command="{Binding CekServerCommand}"
+                                    Style="{StaticResource TombolGaris}" VerticalAlignment="Center" Padding="12,6,12,6" />
+                        </Grid>
+                    </Border>
+                    <TextBlock Text="Semua data dibaca dari Laundry.Api — aplikasi ini tidak membuka database."
+                               Foreground="#FF7E94B8" FontSize="10.5" TextWrapping="Wrap" Margin="0,10,0,0" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Panel kanan: form. -->
+        <Grid Grid.Column="1" Margin="40,0">
+            <StackPanel VerticalAlignment="Center" MaxWidth="400">
+                <TextBlock Text="Masuk ke akun kamu" Style="{StaticResource TeksJudul}" FontSize="24" />
+                <TextBlock Text="{Binding PesanUmum}" Style="{StaticResource TeksSub}" Margin="0,6,0,0"
+                           Visibility="{Binding PesanUmum, Converter={StaticResource Kosong}}" />
+
+                <Border Style="{StaticResource KartuLembut}" Padding="4" Margin="0,18,0,18">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="Masuk" Command="{Binding PilihModeCommand}"
+                                CommandParameter="Masuk" Style="{StaticResource TombolHalus}" />
+                        <Button Grid.Column="1" Content="Daftar" Command="{Binding PilihModeCommand}"
+                                CommandParameter="Daftar" Style="{StaticResource TombolHalus}" />
+                        <Button Grid.Column="2" Content="Lupa sandi" Command="{Binding PilihModeCommand}"
+                                CommandParameter="Lupa" Style="{StaticResource TombolHalus}" />
+                    </Grid>
+                </Border>
+
+                <ContentControl Visibility="{Binding Galat, Converter={StaticResource Kosong}}"
+                                Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}" />
+                <ContentControl Visibility="{Binding Info, Converter={StaticResource Kosong}}"
+                                Content="{Binding Info}" ContentTemplate="{StaticResource BarisHasil}" />
+
+                <TextBlock Text="NOMOR TELEPON" Style="{StaticResource TeksLabel}" />
+                <TextBox Style="{StaticResource KotakTeks}" Margin="0,0,0,12"
+                         Text="{Binding Nomor, UpdateSourceTrigger=PropertyChanged}" />
+
+                <StackPanel Visibility="{Binding LagiMasuk, Converter={StaticResource BoolKasus}}">
+                    <TextBlock Text="KATA SANDI" Style="{StaticResource TeksLabel}" />
+                    <PasswordBox x:Name="KotakSandi" Style="{StaticResource KotakSandi}" Margin="0,0,0,6"
+                                 PasswordChanged="KotakSandi_Changed" />
+                    <Button Content="Masuk" Style="{StaticResource Tombol}" Command="{Binding MasukCommand}"
+                            Margin="0,12,0,0" Height="40" IsDefault="True" />
+                    <TextBlock Margin="0,14,0,0" FontSize="12" Foreground="{DynamicResource KuasTeksDua}">
+                        <Hyperlink Command="{Binding BootstrapCommand}">
+                            Database masih kosong? Buat admin pertama
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding LagiDaftar, Converter={StaticResource BoolKasus}}">
+                    <TextBlock Text="NAMA USAHA / NAMA KAMU" Style="{StaticResource TeksLabel}" />
+                    <TextBox Style="{StaticResource KotakTeks}" Margin="0,0,0,12"
+                             Text="{Binding Nama, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Content="Kirim kode verifikasi" Style="{StaticResource TombolGaris}"
+                            Command="{Binding DaftarMulaiCommand}" Margin="0,0,0,12" />
+                    <TextBlock Text="KODE DARI WHATSAPP" Style="{StaticResource TeksLabel}" />
+                    <TextBox Style="{StaticResource KotakTeks}" Margin="0,0,0,6"
+                             Text="{Binding KodeOtp, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="{Binding KodeDev, StringFormat=Kode pengembangan: {0}}" Style="{StaticResource TeksKecil}"
+                               Visibility="{Binding KodeDev, Converter={StaticResource Kosong}}" Margin="0,0,0,6" />
+                    <TextBlock Text="KATA SANDI BARU" Style="{StaticResource TeksLabel}" Margin="0,6,0,0" />
+                    <PasswordBox x:Name="KotakSandiBaru" Style="{StaticResource KotakSandi}"
+                                 PasswordChanged="KotakSandiBaru_Changed" />
+                    <Button Content="Selesaikan pendaftaran" Style="{StaticResource Tombol}"
+                            Command="{Binding DaftarSelesaiCommand}" Margin="0,14,0,0" Height="40" IsDefault="True" />
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding LagiLupa, Converter={StaticResource BoolKasus}}">
+                    <Button Content="Kirim kode reset" Style="{StaticResource TombolGaris}"
+                            Command="{Binding LupaMulaiCommand}" Margin="0,0,0,12" />
+                    <TextBlock Text="KODE RESET" Style="{StaticResource TeksLabel}" />
+                    <TextBox Style="{StaticResource KotakTeks}" Margin="0,0,0,6"
+                             Text="{Binding KodeOtp, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="{Binding KodeDev, StringFormat=Kode pengembangan: {0}}" Style="{StaticResource TeksKecil}"
+                               Visibility="{Binding KodeDev, Converter={StaticResource Kosong}}" Margin="0,0,0,6" />
+                    <TextBlock Text="KATA SANDI BARU" Style="{StaticResource TeksLabel}" Margin="0,6,0,0" />
+                    <PasswordBox x:Name="KotakSandiReset" Style="{StaticResource KotakSandi}"
+                                 PasswordChanged="KotakSandiReset_Changed" />
+                    <Button Content="Ganti kata sandi" Style="{StaticResource Tombol}"
+                            Command="{Binding LupaSelesaiCommand}" Margin="0,14,0,0" Height="40" IsDefault="True" />
+                </StackPanel>
+
+                <ProgressBar Margin="0,18,0,0" Width="120" HorizontalAlignment="Left" Style="{StaticResource Progres}"
+                             Visibility="{Binding Sibuk, Converter={StaticResource BoolKasus}}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

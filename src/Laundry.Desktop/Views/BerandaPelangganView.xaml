@@ -1,0 +1,68 @@
+<UserControl x:Class="Laundry.Desktop.Views.BerandaPelangganView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer Style="{StaticResource Gulir}">
+        <StackPanel>
+            <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
+                            Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="220" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Style="{StaticResource Kartu}">
+                    <StackPanel>
+                        <TextBlock Text="SALDO KREDIT" Style="{StaticResource TeksLabel}" />
+                        <TextBlock Text="{Binding Saldo}" Style="{StaticResource TeksAngka}" />
+                        <TextBlock Text="Bisa dipakai membayar pesanan berikutnya."
+                                   Style="{StaticResource TeksKecil}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Style="{StaticResource Kartu}">
+                    <StackPanel>
+                        <TextBlock Text="TAGIHAN BERJALAN" Style="{StaticResource TeksLabel}" />
+                        <TextBlock Text="{Binding Tagihan}" Style="{StaticResource TeksAngka}" />
+                        <TextBlock Text="Sisa yang belum dibayar dari pesanan aktif."
+                                   Style="{StaticResource TeksKecil}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="4" Style="{StaticResource KartuAksen}">
+                    <StackPanel>
+                        <TextBlock Text="AKSI" Style="{StaticResource TeksLabel}" />
+                        <Button Content="Pesan baru" Style="{StaticResource Tombol}" Margin="0,0,0,8"
+                                Command="{Binding BukaCommand}" CommandParameter="Pesan" />
+                        <Button Content="Pesanan saya" Style="{StaticResource TombolGaris}" Margin="0,0,0,8"
+                                Command="{Binding BukaCommand}" CommandParameter="Pesanan saya" />
+                        <Button Content="Komplain" Style="{StaticResource TombolGaris}"
+                                Command="{Binding BukaCommand}" CommandParameter="Komplain" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border Style="{StaticResource Kartu}" Margin="0,12,0,0">
+                <StackPanel>
+                    <TextBlock Text="PESANAN AKTIF" Style="{StaticResource TeksLabel}" />
+                    <DataGrid Style="{StaticResource TabelData}" ItemsSource="{Binding Aktif}" MaxHeight="330"
+                              BorderThickness="0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Nomor" Binding="{Binding OrderNumber}" Width="176" />
+                            <DataGridTextColumn Header="Status"
+                                                Binding="{Binding Status, Converter={StaticResource Label}}" Width="170" />
+                            <DataGridTextColumn Header="Pembayaran"
+                                                Binding="{Binding Payment, Converter={StaticResource Label}}" Width="140" />
+                            <DataGridTextColumn Header="Perkiraan selesai"
+                                                Binding="{Binding EstimatedFinishUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap}"
+                                                Width="160" />
+                            <DataGridTextColumn Header="Total"
+                                                Binding="{Binding FinalTotal, Converter={StaticResource Rupiah}}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Text="{Binding Catatan}" Style="{StaticResource TeksKecil}" Margin="0,10,0,0" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,110 @@
+<UserControl x:Class="Laundry.Desktop.Views.PelangganView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="460" />
+            <ColumnDefinition Width="14" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Grid.Column="0" LastChildFill="True">
+            <Border DockPanel.Dock="Top" Style="{StaticResource Kartu}" Padding="14,12,14,12" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Style="{StaticResource KotakTeks}"
+                             Text="{Binding Cari, UpdateSourceTrigger=PropertyChanged}"
+                             Tag="cari nama / nomor" />
+                    <Button Grid.Column="1" Content="Cari" Style="{StaticResource Tombol}" Margin="8,0,0,0"
+                            Command="{Binding CariCommand}" />
+                </Grid>
+            </Border>
+
+            <Border DockPanel.Dock="Bottom" Style="{StaticResource Kartu}" Padding="12,8,12,8" Margin="0,12,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="&lt; Sebelumnya" Style="{StaticResource TombolHalus}"
+                            Command="{Binding HalamanSebelumnyaCommand}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Halaman, Converter={StaticResource Tambah}, StringFormat=Halaman {0}}"
+                               Style="{StaticResource TeksKecil}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Button Grid.Column="2" Content="Berikutnya &gt;" Style="{StaticResource TombolHalus}"
+                            Command="{Binding HalamanBerikutnyaCommand}" />
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource Kartu}" Padding="0">
+                <Grid>
+                    <DataGrid Style="{StaticResource TabelData}" ItemsSource="{Binding Daftar}"
+                              SelectedItem="{Binding Terpilih}" BorderThickness="0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Nama" Binding="{Binding Nama}" Width="*" />
+                            <DataGridTextColumn Header="Nomor" Binding="{Binding Phone}" Width="140" />
+                            <DataGridTextColumn Header="Aktif" Binding="{Binding Aktif, Converter={StaticResource YaTidak}}" Width="70" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Text="Belum ada pelanggan. Tambahkan lewat panel kanan, atau pelanggan mendaftar sendiri lewat OTP."
+                               Style="{StaticResource TeksKecil}" TextWrapping="Wrap" Margin="18,56,18,18"
+                               Visibility="{Binding Daftar.Count, Converter={StaticResource Kosong}, ConverterParameter=balik}" />
+                </Grid>
+            </Border>
+        </DockPanel>
+
+        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}">
+            <StackPanel>
+                <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
+                                Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
+                <ContentControl Content="{Binding Hasil}" ContentTemplate="{StaticResource BarisHasil}"
+                                Visibility="{Binding Hasil, Converter={StaticResource Kosong}}" />
+
+                <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{Binding Terpilih.Nama, FallbackValue=Pelanggan baru}" Style="{StaticResource TeksBagian}" />
+                        <StackPanel Margin="0,10,0,0"
+                                    Visibility="{Binding SedangMemperbaiki, Converter={StaticResource BoolKasus}}">
+                            <TextBlock Text="NAMA" Style="{StaticResource TeksLabel}" />
+                            <TextBox Style="{StaticResource KotakTeks}"
+                                     Text="{Binding Nama, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="NOMOR HP (tetap — dipakai untuk login OTP)" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
+                            <TextBox Style="{StaticResource KotakTeks}" Text="{Binding Nomor}" IsReadOnly="True" />
+                            <TextBlock Text="ALAMAT" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
+                            <TextBox Style="{StaticResource KotakTeksBesar}" Height="60" TextWrapping="Wrap"
+                                     AcceptsReturn="True" Text="{Binding Alamat, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Style="{StaticResource TeksKecil}" Margin="0,10,0,0"
+                                       Text="{Binding Saldo, StringFormat=Saldo kredit: {0}}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                                <Button Content="Simpan perubahan" Style="{StaticResource Tombol}" Margin="0,0,8,0"
+                                        Height="34" Command="{Binding SimpanCommand}" />
+                                <Button Content="Aktif / nonaktif" Style="{StaticResource TombolGaris}"
+                                        Command="{Binding GantiAktifCommand}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,10,0,0"
+                                    Visibility="{Binding SedangMemperbaiki, Converter={StaticResource BoolKasus}, ConverterParameter=balik}">
+                            <TextBlock Text="NAMA" Style="{StaticResource TeksLabel}" />
+                            <TextBox Style="{StaticResource KotakTeks}"
+                                     Text="{Binding Nama, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="NOMOR HP (628…)" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
+                            <TextBox Style="{StaticResource KotakTeks}"
+                                     Text="{Binding Nomor, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="ALAMAT" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
+                            <TextBox Style="{StaticResource KotakTeksBesar}" Height="60" TextWrapping="Wrap"
+                                     AcceptsReturn="True" Text="{Binding Alamat, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
+                                       Text="Nomor sama yang dipakai akun pelanggan terdaftar; sistem mencocokkan lewat nomor, bukan nama." />
+                            <Button Content="Simpan pelanggan" Style="{StaticResource Tombol}" Margin="0,14,0,0"
+                                    Height="34" Command="{Binding SimpanCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

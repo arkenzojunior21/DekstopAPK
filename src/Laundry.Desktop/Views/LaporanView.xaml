@@ -1,0 +1,180 @@
+<UserControl x:Class="Laundry.Desktop.Views.LaporanView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <!-- Kepala kolom tabel dinamis. -->
+        <Style x:Key="KepalaSel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource KuasTeksDua}" />
+            <Setter Property="Margin" Value="6,0,6,6" />
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel LastChildFill="True">
+        <!-- Atas: filter tanggal + jenis + ekspor. -->
+        <Border DockPanel.Dock="Top" Style="{StaticResource Kartu}" Padding="14,12,14,12" Margin="0,0,0,12">
+            <WrapPanel>
+                <StackPanel Margin="0,0,12,0">
+                    <TextBlock Text="DARI" Style="{StaticResource TeksLabel}" />
+                    <DatePicker SelectedDate="{Binding Dari}" FontSize="12" />
+                </StackPanel>
+                <StackPanel Margin="0,0,12,0">
+                    <TextBlock Text="SAMPAI" Style="{StaticResource TeksLabel}" />
+                    <DatePicker SelectedDate="{Binding Sampai}" FontSize="12" />
+                </StackPanel>
+                <StackPanel Margin="0,0,12,0">
+                    <TextBlock Text="LAPORAN" Style="{StaticResource TeksLabel}" />
+                    <ComboBox Style="{StaticResource KotakPilih}" Width="170" ItemsSource="{Binding SemuaJenis}"
+                              SelectedItem="{Binding Jenis}" ItemTemplate="{StaticResource TemplateEnum}" />
+                </StackPanel>
+                <StackPanel VerticalAlignment="Bottom" Orientation="Horizontal">
+                    <Button Content="Muat" Style="{StaticResource Tombol}" Margin="0,0,8,0"
+                            Command="{Binding SegarkanCommand}" />
+                    <Button Content="PDF" Style="{StaticResource TombolGaris}" Margin="0,0,6,0"
+                            Command="{Binding UnduhCommand}" CommandParameter="pdf" />
+                    <Button Content="XLSX" Style="{StaticResource TombolGaris}" Margin="0,0,6,0"
+                            Command="{Binding UnduhCommand}" CommandParameter="xlsx" />
+                    <Button Content="CSV" Style="{StaticResource TombolGaris}"
+                            Command="{Binding UnduhCommand}" CommandParameter="csv" />
+                </StackPanel>
+            </WrapPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Top" Style="{StaticResource KartuLembut}" Padding="14,8,14,8" Margin="0,0,0,12"
+                BorderThickness="0">
+            <StackPanel>
+                <TextBlock Text="{Binding Rentang}" Style="{StaticResource TeksLabel}" />
+                <TextBlock Text="{Binding Catatan}" Style="{StaticResource TeksKecil}" TextWrapping="Wrap"
+                           Margin="0,3,0,0" />
+            </StackPanel>
+        </Border>
+
+        <ContentControl DockPanel.Dock="Top" Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
+                        Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
+        <ContentControl DockPanel.Dock="Top" Content="{Binding Hasil}" ContentTemplate="{StaticResource BarisHasil}"
+                        Visibility="{Binding Hasil, Converter={StaticResource Kosong}}" />
+
+        <!-- Enam angka yang tidak boleh digabung. -->
+        <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+            <Border Style="{StaticResource Kartu}" Width="200" Margin="0,0,10,10">
+                <StackPanel>
+                    <TextBlock Text="OMZET" Style="{StaticResource TeksLabel}" />
+                    <TextBlock Text="{Binding Omzet}" Style="{StaticResource TeksAngka}" />
+                    <TextBlock Text="Nilai pesanan hidup di rentang" Style="{StaticResource TeksKecil}" />
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Kartu}" Width="200" Margin="0,0,10,10">
+                <StackPanel>
+                    <TextBlock Text="PENERIMAAN" Style="{StaticResource TeksLabel}" />
+                    <TextBlock Text="{Binding Penerimaan}" Style="{StaticResource TeksAngka}" />
+                    <TextBlock Text="Uang yang benar-benar masuk" Style="{StaticResource TeksKecil}" />
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Kartu}" Width="200" Margin="0,0,10,10">
+                <StackPanel>
+                    <TextBlock Text="DP / PELUNASAN" Style="{StaticResource TeksLabel}" />
+                    <TextBlock Text="{Binding Dp}" Style="{StaticResource TeksAngka}" />
+                    <TextBlock Text="{Binding Pelunasan, StringFormat=Pelunasan {0}}"
+                               Style="{StaticResource TeksKecil}" />
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Kartu}" Width="200" Margin="0,0,10,10">
+                <StackPanel>
+                    <TextBlock Text="REFUND" Style="{StaticResource TeksLabel}" />
+                    <TextBlock Text="{Binding Refund}" Style="{StaticResource TeksAngka}" />
+                    <TextBlock Text="Dikeluarkan lagi ke pelanggan" Style="{StaticResource TeksKecil}" />
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Kartu}" Width="200" Margin="0,0,10,10">
+                <StackPanel>
+                    <TextBlock Text="PIUTANG (POSISI)" Style="{StaticResource TeksLabel}" />
+                    <TextBlock Text="{Binding Piutang}" Style="{StaticResource TeksAngka}" />
+                    <TextBlock Text="{Binding TagihanTerbuka, StringFormat={}{0} tagihan terbuka}"
+                               Style="{StaticResource TeksKecil}" />
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Kartu}" Width="200" Margin="0,0,10,10">
+                <StackPanel>
+                    <TextBlock Text="SALDO KREDIT (POSISI)" Style="{StaticResource TeksLabel}" />
+                    <TextBlock Text="{Binding SaldoKredit}" Style="{StaticResource TeksAngka}" />
+                    <TextBlock Text="{Binding JumlahPesanan, StringFormat={}{0} pesanan di rentang}"
+                               Style="{StaticResource TeksKecil}" />
+                </StackPanel>
+            </Border>
+        </WrapPanel>
+
+        <!-- Grafik batang harian, digambar sendiri tanpa pustaka. -->
+        <Border DockPanel.Dock="Top" Style="{StaticResource Kartu}" Padding="14,12,14,12" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock Text="OMZET HARIAN" Style="{StaticResource TeksLabel}" />
+                <ScrollViewer x:Name="Grafik" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Height="168">
+                    <ItemsControl ItemsSource="{Binding Deret}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Width="42" Margin="0,0,6,0" VerticalAlignment="Bottom">
+                                    <Border Height="{Binding Tinggi}" Background="{DynamicResource KuasAksen}"
+                                            CornerRadius="4,4,0,0" MinHeight="2" VerticalAlignment="Bottom"
+                                            ToolTip="{Binding OmzetTeks}" />
+                                    <TextBlock Text="{Binding Label}" FontSize="9.5" HorizontalAlignment="Center"
+                                               Foreground="{DynamicResource KuasTeksDua}" Margin="0,6,0,0" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+        </Border>
+
+        <!-- Tabel netral: jenis laporan terpilih. -->
+        <Border Style="{StaticResource Kartu}" Padding="14,12,14,12">
+            <ScrollViewer Style="{StaticResource Gulir}" HorizontalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="{Binding Tabel.Judul}" Style="{StaticResource TeksBagian}" />
+                    <TextBlock Text="{Binding Tabel.Subjudul}" Style="{StaticResource TeksKecil}" Margin="0,2,0,10" />
+                    <ItemsControl ItemsSource="{Binding Tabel.Kolom}" Margin="0,0,0,6">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="1" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Style="{StaticResource KepalaSel}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <ItemsControl ItemsSource="{Binding Tabel.Baris}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{DynamicResource KuasGaris}" BorderThickness="0,1,0,0"
+                                        Padding="0,4,0,4">
+                                    <ItemsControl ItemsSource="{Binding}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Rows="1" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Isi}" FontSize="12" TextTrimming="CharacterEllipsis"
+                                                           Foreground="{DynamicResource KuasTeks}" Margin="6,0,6,0" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
+                               Text="Tabel di layar ini adalah tabel yang sama yang dipakai mesin PDF/XLSX/CSV, jadi angkanya tidak bisa berbeda antar format." />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </DockPanel>
+</UserControl>

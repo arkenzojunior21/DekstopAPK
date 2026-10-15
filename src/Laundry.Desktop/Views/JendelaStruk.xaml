@@ -1,0 +1,91 @@
+<Window x:Class="Laundry.Desktop.Views.JendelaStruk"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Struk pesanan" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource KuasLatar}" FontFamily="{StaticResource FontUtama}">
+    <StackPanel Margin="22">
+        <Border x:Name="Kertas" Background="White" BorderBrush="#FFCCCCCC" BorderThickness="1"
+                Padding="26,22,26,22" Width="360">
+            <StackPanel>
+                <TextBlock x:Name="JudulUsaha" TextWrapping="Wrap" FontSize="15" FontWeight="Bold"
+                           Foreground="Black" HorizontalAlignment="Center" />
+                <TextBlock Text="STRUK PELANGGAN" FontSize="10.5" Foreground="#FF555555"
+                           HorizontalAlignment="Center" Margin="0,4,0,10" />
+                <Separator Background="#FFDDDDDD" Height="1" Margin="0,0,0,10" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Nomor" Foreground="#FF555555" FontSize="11.5" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding OrderNumber}" Foreground="Black"
+                               FontSize="11.5" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Pelanggan" Foreground="#FF555555" FontSize="11.5" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CustomerName}" Foreground="Black"
+                               FontSize="11.5" />
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Dibuat" Foreground="#FF555555" FontSize="11.5" />
+                    <TextBlock Grid.Row="2" Grid.Column="1"
+                               Text="{Binding CreatedAtUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap}"
+                               Foreground="Black" FontSize="11.5" />
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Petugas" Foreground="#FF555555" FontSize="11.5" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Petugas}" Foreground="Black"
+                               FontSize="11.5" />
+                </Grid>
+                <Separator Background="#FFDDDDDD" Height="1" Margin="0,10,0,10" />
+                <StackPanel x:Name="IsiItem" />
+                <Separator Background="#FFDDDDDD" Height="1" Margin="10,10,10,10" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Subtotal layanan" Foreground="#FF555555" FontSize="11.5" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ItemsSubtotal, Converter={StaticResource Rupiah}}"
+                               Foreground="Black" FontSize="11.5" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Ongkos antar-jemput" Foreground="#FF555555" FontSize="11.5" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DeliveryFee, Converter={StaticResource Rupiah}}"
+                               Foreground="Black" FontSize="11.5" />
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Total akhir" FontWeight="Bold" Foreground="Black"
+                               FontSize="13" Margin="0,4,0,0" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" FontWeight="Bold" Foreground="Black" FontSize="13"
+                               Margin="0,4,0,0" Text="{Binding FinalTotal, Converter={StaticResource Rupiah}}" />
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Kredit terpakai" Foreground="#FF555555" FontSize="11.5" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding AppliedCredit, Converter={StaticResource Rupiah}}"
+                               Foreground="Black" FontSize="11.5" />
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Refund" Foreground="#FF555555" FontSize="11.5" />
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Refunded, Converter={StaticResource Rupiah}}"
+                               Foreground="Black" FontSize="11.5" />
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Sisa tagihan" FontWeight="Bold" Foreground="Black"
+                               FontSize="13" Margin="0,4,0,0" />
+                    <TextBlock Grid.Row="5" Grid.Column="1" FontWeight="Bold" Foreground="Black" FontSize="13"
+                               Margin="0,4,0,0" Text="{Binding Remaining, Converter={StaticResource Rupiah}}" />
+                </Grid>
+                <Separator Background="#FFDDDDDD" Height="1" Margin="0,10,0,10" />
+                <TextBlock Text="PEMBAYARAN" FontSize="10.5" Foreground="#FF555555" Margin="0,0,0,4" />
+                <StackPanel x:Name="IsiPembayaran" />
+                <TextBlock Text="Terima kasih. Simpan struk ini untuk mengambil cucian."
+                           FontSize="10.5" Foreground="#FF777777" TextWrapping="Wrap" Margin="0,12,0,0"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button Content="Tutup" Style="{StaticResource TombolGaris}" Margin="0,0,8,0"
+                    Click="Tutup_Click" />
+            <Button Content="Cetak" Style="{StaticResource Tombol}" Click="Cetak_Click" />
+        </StackPanel>
+    </StackPanel>
+</Window>

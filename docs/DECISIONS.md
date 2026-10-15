@@ -1,0 +1,141 @@
+# Keputusan Arsitektur
+
+Dokumentasi keputusan teknis yang diambil untuk bisa maju, sesuai aturan prompt (opsi aman & sederhana, tidak mengubah aturan bisnis inti).
+
+## D-01 — .NET 8 LTS
+
+**Keputusan:** Semua project memakai .NET 8 LTS.
+**Alasan:** LTS didukung sampai November 2026 (masa dukungan panjang untuk siklus tugas), dokumentasi WPF/EF Core paling matang, Npgsql stabil.
+**Konsekuensi:** Upgrade ke .NET 10 LTS dapat dilakukan lewat perubahan TargetFramework tunggal per project.
+
+## D-02 — "Cloud" PostgreSQL pada lingkungan pengembangan = instance terpisah di mesin yang sama
+
+**Keputusan:** Dalam pengembangan, PostgreSQL "cloud" dijalankan sebagai database/instance terpisah di laptop yang sama, diakses lewat TCP oleh `Laundry.Api`. Skema koneksi & konfigurasi dibuat sehingga memindahkan API + database cloud ke server sungguhan tinggal ganti connection string.
+**Alasan:** Tidak ada anggaran hosting cloud untuk proyek sekolah (Q13 terbuka); PRD mensyaratkan arsitektur cloud tapi tidak melarang pembangunan bertahap; aturan bisnis (outbox, idempotensi, sync) tetap diuji nyata karena dua sisi (lokal & "cloud") adalah dua database yang benar-benar terpisah.
+**Batasan:** Status = replika arsitektur penuh di单机. Saat Q13 dijawab, deployment nyata menyusul tanpa perubahan kode.
+
+## D-03 — PostgreSQL level pengguna tanpa admin
+
+**Keputusan:** PostgreSQL dipakai dari distribusi binari resmi (zip), di-`initdb` ke folder data di luar repo, dijalankan via `pg_ctl` pada port 5433 (lokal-admin) dan 5434 ("cloud"). Tidak memasang service Windows.
+**Alasan:** Lingkungan laptop tanpa hak admin; hindari memodifikasi sistem bersama.
+**Konsekuensi:** Ada skrip `scripts/db.ps1` untuk start/stop/status/backup.
+
+## D-04 — Provider WhatsApp & payment gateway: abstraksi + mock
+
+**Keputusan:** `Laundry.Application` mendefinisikan interface (`IWhatsAppClient`, `IPaymentGateway`); `Laundry.Infrastructure` menyediakan `MockWhatsAppClient`/`MockPaymentGateway` untuk development & tests. Production adapter TIDAK dibuat sampai kredensial sah tersedia (Q7, Q10).
+**Alasan:** PRD melarang mengarang provider/credential dan melarang klaim integrasi aktif tanpa sandbox nyata.
+
+## D-05 — OTP pada development
+
+**Keputusan:** Kode OTP tetap di-hash di database; salinan plaintext hanya dikembalikan di respons API ketika `Environment=Development` dan dicatat ke log. Pada konfigurasi produksi perilaku ini mati.
+**Alasan:** Tanpa provider WhatsApp, flow registrasi/reset harus tetap bisa diuji end-to-end; tidak ada data fiktif production.
+
+## D-06 — Pemisahan frontend/backend
+
+**Keputusan:** Mengikuti aturan 2.1 prompt: `Laundry.Desktop` = seluruh file tampilan; `Laundry.Api`/`Domain`/`Application`/`Infrastructure`/`Sync` = backend. Desktop client TIDAK punya connection string PostgreSQL untuk operasi rutin — baca/tulis via API; mode offline admin memakai lokalitas melalui `Laundry.Sync` yang tetap menyimpan di PostgreSQL lokal (bukan di client).
+**Catatan:** Ini memenuhi aturan "frontend tidak menyentuh database langsung" sekaligus mematuhi batasan PRD (satu-satunya DB = PostgreSQL).
+
+## D-07 — Aplikasi JavaScript lama diarsipkan di riwayat git
+
+**Keputusan:** Implementasi Electron (LaundryFlow Desk) dihapus dari working tree atas permintaan; seluruh kodenya tetap tersedia pada commit `b722d54` dan dapat dipulihkan dengan `git checkout b722d54 -- src build README.md package.json`.
+**Alasan:** Instruksi langsung pemilik repo; baseline baru = stack PRD (WPF/API/PostgreSQL).
+
+## D-08 — Skema sesi autentikasi
+
+**Keputusan:** Access token JWT HMAC-SHA256 berumur 30 menit (klaim sub + role). Refresh token acak 256-bit, disimpan hanya sebagai hash SHA-256, umur 30 hari, single-use dengan rotasi; logout dan reset password mencabut seluruh refresh token user. Lockout 5 gagal / 15 menit dan batas OTP (expiry 5 menit, cooldown 60 detik, maks 5 percobaan) dievaluasi server-side; ditambah rate limiter `auth` 30 req/menit per proses (dapat diturunkan via `AUTH_RATE_LIMIT_PER_MENIT` untuk test).
+**Alasan:** Memenuhi PRD 6.1 (sesi dapat dicabut, rotasi aman, bukan UI-based) tanpa dependensi identity server; angka umur token = rekomendasi implementasi, tercatat di sini.
+
+## D-09 — Refund kasir
+
+**Keputusan:** Refund dicatat sebagai baris `Refunds` append-only yang menunjuk pembayaran asal (`PaymentId`) dan pesanannya (`OrderId`); pembayaran lama tidak pernah diubah atau dihapus. Aturan server: nominal > 0, alasan wajib, batas maksimum = sisa nominal pembayaran asal yang belum di-refund, dan idempoten lewat `IdempotencyKey`. Status pesanan berubah menjadi `RefundSebagian`/`RefundPenuh`, dan semua perhitungan memakai `BillCalculator.Paid` = pembayaran lunas − total refund (+ kredit terpakai), sehingga sisa tagihan, dashboard, dan gerbang "belum lunas tidak boleh diserahkan" otomatis ikut turun. Bila pesanan ini pernah menyumbang saldo kredit dari kelebihan bayar, sistem menarik kembali kredit tersebut dengan entry ledger negatif (baru) pada transaksi yang sama; kalau kreditnya sudah terpakai dan saldo tidak cukup, refund ditolak. Refund tunai di sini adalah pengembalian uang di kasir — refund lewat QRIS/transfer baru ada bersama adapter gateway (fase 7).
+**Alasan:** PRD 6.6/6.9 menuntut jejak uang yang tidak bisa diedit; aturan penarikan kredit mencegah pelanggan menerima uang dua kali (kas + saldo).
+**Cara pakai:** `POST /api/payments/refund` (role Admin). Semua jalur perhitungan uang memakai helper yang sama agar tidak ada yang lupa mengurangi refund.
+
+## D-10 — Struk, data contoh dev, dan port API
+
+**Keputusan:** (a) Struk diambil lewat `GET /api/orders/{id}/receipt` dan disimpan sebagai `ReceiptSnapshot` (`STRUK-{nomorPesanan}`) pada permintaan pertama; cetak ulang selalu mengembalikan isi yang sama meski total/refund berubah setelahnya — PDF dirender di sisi `Laundry.Desktop` dari struktur JSON ini. (b) Data contoh tidak pernah dibuat otomatis; aktif hanya bila `SEED_DEV_CONTOH=1` dan environment Development, dengan nama layanan berlabel `(CONTOH)`. (c) API development listened di `http://localhost:5104` (profile `http` di launchSettings).
+**Alasan:** Struk adalah bukti transaksi — isinya tidak boleh berubah setelah dicetak; tarif asli usaha tidak boleh ditebak sistem (lihat OPEN_QUESTIONS); port lama di README (5080) tidak pernah dipakai profil mana pun.
+**Cara pakai:** nama usaha untuk struk diisi lewat `PUT /api/settings/business-name`; selama kosong, struk menampilkan `null` dan UI menampilkan penanda "nama usaha belum diatur".
+
+## D-11 — Arsitektur sinkronisasi offline-first (dua database)
+
+**Keputusan:** Sinkronisasi dikerjakan `Laundry.Sync` sebagai proses worker terpisah (`SyncEngine` + `SyncApplier`), bukan di dalam API. Arahnya dua arah (admin ⇄ cloud) lewat transactional outbox di sisi pengirim dan inbox di sisi penerima:
+- **EventId** unik per perubahan → pengiriman ulang didedup, tidak ada order/payment/refund/ledger ganda.
+- **Payload bertipe** (`CustomerEvent`, `OrderEvent`, `PaymentEvent`, `RefundEvent`, `CreditLedgerEvent`) — `EventWriter` hanya membuka method typed, jadi tidak ada objek anonim yang lolos ke antrean.
+- **Dependency rank** Customer(0) → Order(1) → Payment(2) → Refund(3) → CreditLedger(4), lalu sequence; event yang induknya belum tiba dilempar sebagai `SyncRetryableException` dan tetap mengantre. Saat order diantrekan, pelanggannya ikut diantrekan bila belum pernah (`EnqueueOrderSnapshotAsync`), jadi sisi tujuan tidak menggantung selamanya.
+- **Backoff** `2^n` detik (maksimum 15 menit) lewat kolom `NextRetryAtUtc`; setelah 5 percobaan (`SyncConfig.MaksimumRetry`) baris ditandai `Gagal` dengan `LastError` dan tetap muncul di `GET /api/sync/failed` + retry manual `POST /api/sync/retry-failed`.
+- **Checkpoint per arah** di `SyncCheckpoints` (sisi penerima) dan **detak** di `AppSettings["sync_detak_utc"]` → `pekerjaAktif` pada `GET /api/sync/status` = detak lebih muda dari 3× interval.
+- **Aturan finansial:** pembayaran/refund/ledger bersifat insert-once. Event dengan `IdempotencyKey`+nominal sama → dilewati; beda isi → `SyncConflictException` → baris `SyncConflict` berstatus `PerluRekonsiliasi`, data lama tidak pernah ditimpa. Latest-wins hanya dipakai untuk profil pelanggan dan field status pesanan yang bukan jejak uang (dengan guard replay: riwayat lokal yang lebih baru tidak dimundurkan).
+- **Jam:** event dengan `CreatedAtUtc` lebih dari 300 detik di depan jam penerima ditolak sementara (retryable), bukan diterapkan.
+- **Password hash tidak pernah direplikasi**; akun hasil sync dibuat dengan `PasswordHash` kosong dan harus registrasi OTP sendiri.
+- Offline ditegaskan lewat `Database.CanConnectAsync`: kalau sisi tujuan tidak terjangkau, siklus berhenti sebelum mengubah apa pun dan antrean lokal tetap utuh (tidak ada "sukses palsu").
+**Alasan:** PROMPT_AGENT fase 6 melarang last-write-wins buta pada catatan uang dan melarang event gagal hilang diam-diam; memisahkan worker dari API membuat UI tetap responsif dan memungkinkan siklus panjang tanpa menahan request.
+**Cara pakai:** `dotnet run --project src/Laundry.Sync`. Konfigurasi via `.env`: `SYNC_BATCH` (default 100, maks 500), `SYNC_INTERVAL_DETIK` (default 15). Catatan: antrean lama buatan pra-D-11 (payload objek anonim) tidak bisa dibaca format baru — `SyncOutbox/SyncInbox/SyncCheckpoints/SyncConflicts` di database dev sudah dikosongkan (data pesanan dan pembayaran tetap utuh); payload yang tidak lengkap kini tercatat sebagai konflik, bukan crash.
+
+## D-12 — Adapter provider (payment gateway & WhatsApp) dan antrean notifikasi
+
+**Keputusan:** Semua interaksi ke dunia luar berdiri di atas dua interface di `Laundry.Application.Abstractions` — `IPaymentGateway` dan `IWhatsAppSender` — dan implementasi yang ada sekarang **hanya mock**: `MockPaymentGateway` (`mock-gateway`) dan `MockWhatsAppSender` (`mock-whatsapp`). Kedua adapter melaporkan `IsLive=false`, dan `GET /api/providers/status` menampilkannya apa adanya beserta catatan "tidak ada interaksi sungguhan". Nama vendor, endpoint, dan tarif asli tidak ditebak (lihat OPEN_QUESTIONS).
+- **Tagihan QRIS simulasi:** `POST /api/payments/gateway/quote` (Admin) membuat baris `Payment` berstatus `MenungguKonfirmasi` dengan `IdempotencyKey` `qris:{orderId}:{guid}` dan reference `MOCK-QRIS-{paymentId}`; ditolak bila pesanan dibatalkan atau sisa tagihan nol.
+- **Webhook:** `POST /api/payments/gateway/webhook` (anonim) membaca body mentah, memverifikasi HMAC-SHA256 pada header `X-Mock-Signature` (`sha256=<hex>`), lalu `ParseUpdate`. Bodinya adalah kontrak lokal, bukan format vendor mana pun. Status balasan: 401 tanda tangan salah/rahasia belum diisi, 400 body tidak terbaca, 422 ditolak secara bisnis, 200 + `{status, paymentId, catatan}` untuk `Disimpan`/`Duplikat`.
+- **Uang tidak pernah ditimpa diam-diam:** reference tidak cocok → `Ditolak`; status lunas/gagal yang sudah final → `Duplikat` (idempoten); nominal webhook berbeda dari tagihan → audit `webhook-nominal-bedanya` + `Ditolak`, pembayaran tidak disentuh.
+- **Antrean notifikasi:** `NotificationDispatcher` (dijalankan `NotificationWorker` di `Laundry.Sync`, satu siklus bersama `SyncEngine`; bisa juga dipaksa lewat `POST /api/providers/notifications/drain`). Nomor tujuan tidak sah atau adapter yang belum punya credential → `DitundaPerluKoneksi` + `LastError`, **bukan** `Terkirim`; sender tidak pernah dipanggil. Kegagalan biasa menaikkan `RetryCount` dan setelah 5 percobaan jadi `Gagal` yang tetap muncul di `GET /api/providers/status` (`contohMacet`). `EventId` antrean unik (dicek juga di change tracker) supaya satu kejadian tidak terkirim dua kali.
+- Notifikasi yang diantrekan sekarang: order dibuat, komplain baru/berubah status, pembatalan diminta/disetujui/ditolak, pembayaran diterima.
+**Alasan:** PROMPT_AGENT fase 7 mengharuskan integrasi provider tanpa credential asli; satu-satunya cara yang jujur adalah adapter mock yang menandai dirinya tidak live dan antrean yang menyimpan status "belum bisa" alih-alih berpura-pura sukses.
+**Cara pakai:** isi `WEBHOOK_SECRET` (≥16 karakter, bukan `CHANGE_ME`) di `.env`; tanpa itu semua webhook ditolak. Adapter asli nanti tinggal di-di DI-kan tanpa mengubah `PaymentService`/`NotificationDispatcher`.
+
+## D-13 — Nomor antrean sync dari sequence database, dipetakan sesuai urutan pembuatan
+
+**Keputusan:** `SyncOutbox.Sequence` diisi `LaundryDbContext` saat `SaveChanges`, bukan oleh kolom ber-default `nextval` dan bukan oleh `MAX+1` di aplikasi. Dalam satu simpanan, semua nomor diambil sekali jalan (`select nextval('sync_event_sequence') from generate_series(1, n)`), diurutkan naik, lalu dipetakan ke baris baru menurut `UrutanLokal` — pencacah proses yang diisi `EventWriter` saat event dibuat. Sequence `sync_event_sequence` dibuat migration `20261015163600_SyncEventSequence` yang sekaligus menomor-ulang baris lama; default kolom `nextval(...)` dibiarkan sebagai jaring pengaman.
+**Alasan:** `MAX+1` memberi nomor kembar untuk beberapa baris dalam satu transaksi. Sebaliknya, menyerahkan nomor ke default kolom juga salah: Postgres tidak menjamin urutan evaluasi `nextval` antar baris dalam satu INSERT multi-baris (EF memakai bulk insert), dan urutan enumerasi change tracker pun bukan urutan pembuatan — akibatnya event anak bisa bernomor lebih kecil dari induknya, lalu ditolak berulang sampai ditandai `Gagal` padahal tidak ada yang rusak. Test `NomorEventTidakKembarUntukBeberapaPerubahanSekaligus` mengunci keduanya.
+**Cara pakai:** tidak ada langkah tambahan; `UrutanLokal` property tidak dipetakan ke database (`Ignore`).
+
+## D-14 — Backup, pemulihan, pemeriksaan versi, dan konfigurasi tanpa rahasia
+
+**Keputusan:** Fase 8 dikerjakan tanpa satu pun endpoint yang bisa merusak data dan tanpa satu nilai rahasia yang ditulis ke dalam repo.
+- **Dump:** `pg_dump -F c -w` (format custom, tanpa interaktif) dipanggil sebagai proses anak dari `BackupService`; password hanya lewat environment proses anak (`PGPASSWORD`), dihapus lagi setelah selesai, dan tidak pernah masuk daftar argumen. Batas waktu `BACKUP_TIMEOUT_DETIK` (bawaan 300) membunuh proses yang macet, bukan menggantung selamanya.
+- **Verifikasi = baca arsip.** sebuah dump baru dicatat sukses kalau `pg_restore --list` bisa membaca isinya dan ada objek di dalamnya. Nama berkas absolut terhadap `BACKUP_DIR` dan diberi penanda acak 8 karakter: dump kedua di detik yang sama tidak menimpa arsip pertama, dan pg_dump (yang bekerja dengan direktori proses induk) tidak menulis arsip ke folder berjalan.
+- **Retensi:** keputusan murni (`RetensiBackup.YangBolehDihapus`, tanpa IO supaya bisa diuji) — berkas tua boleh pergi hanya kalau pernah sukses, terverifikasi, dan bukan yang terbaru per target. Sebelum satu berkas benar-benar dihapus, ia diverifikasi ulang; yang tidak lolos dibiarkan dan riwayatnya ditandai `IsVerified=false` + `Error`. Berkas di folder yang tidak tercatat di riwayat muncul di daftar dengan catatan "tidak tercatat", tidak pernah dianggap terverifikasi dan tidak pernah dihapus.
+- **Restore tidak lewat HTTP.** Menimpa database tidak bisa dibatalkan, jadi jalurnya hanya `scripts/restore.ps1`: target harus `admin`/`cloud`, arsip harus terbaca `pg_restore --list`, dan nama target harus diketik ulang sebagai konfirmasi (`pg_restore --clean --if-exists --no-owner --no-privileges`). Skrip menutup dengan saran memeriksa `/api/sync/status` dan `/api/backup/status`, karena satu sisi yang dipulihkan bisa lebih tua dari sisi lainnya. `scripts/db.ps1` dan `scripts/pg-env.ps1` tidak lagi memuat password bawaan; keduanya membaca `.env`.
+- **Pemeriksaan versi:** `GET /api/app/update-check` membaca manifest JSON `{versi,url,sha256,catatan}` dari `UPDATE_CHECK_URL` dan hanya membandingkan angka (0.10.0 > 0.9.0). Tidak ada unduhan otomatis dan tidak ada instalasi otomatis. Statusnya jujur: tanpa URL `belum_dikonfigurasi`, jaringan/HTTP bermasalah `gagal_diperiksa`, manifest tanpa versi atau versi yang tidak bisa dibandingkan `manifest_tidak_sah`. `POST /api/app/update-verifikasi` menghitung sha256 installer yang diunduh manual di `UPDATE_DIR` lalu mencocokkan dengan manifest; nama berkas yang mengandung path, `..`, atau bukan `.exe` ditolak sebelum sistem file disentuh, dan perbandingan memakai `FixedTimeEquals`.
+- **Konfigurasi hybrid (Q14):** `GET /api/config/status` mendaftar 14 kunci yang dibaca sistem beserta kategori dan catatannya, tetapi yang dilaporkan hanya `terisi` (boolean) — nilainya tidak pernah dikirim ke klien, termasuk connection string, `JWT_KEY`, dan `WEBHOOK_SECRET`. Retensi dan backup harian berpindah lewat `AppSettings` (`backup_retensi_hari`, `backup_harian`) sehingga admin bisa mengubahnya dari aplikasi; lokasi folder dan binari tetap dari environment karena menyangkut mesin, bukan preferensi toko.
+**Alasan:** PROMPT_AGENT fase 8 menuntut backup harian + retensi + verifikasi, restore terkendali, pemeriksaan update dengan verifikasi hash, dan konfigurasi tanpa rahasia di repo. Bentuk yang paling mudah salah di fase ini adalah "sukses palsu": dump yang tidak pernah dibaca, berkas yang dihapus karena umur saja, atau laporan "sudah versi terbaru" yang sebenarnya berarti "tidak ada data".
+**Cara pakai:** `dotnet run --project src/Laundry.Api` menjalankan pekerja backup otomatis (nonaktif di tes lewat `BACKUP_AUTO=0`); dump manual `powershell -File scripts/db.ps1 backup`; pulihkan `powershell -File scripts/restore.ps1 -File <arsip> -Target admin`. Konfigurasi di `.env`: `PG_BIN`, `BACKUP_DIR`, `BACKUP_TIMEOUT_DETIK`, `BACKUP_AUTO`, `BACKUP_CEK_MENIT`, `UPDATE_CHECK_URL`, `UPDATE_DIR`. URL rilis/manifest publik masih belum ada (OPEN_QUESTIONS Q13), jadi pemeriksaan versi berhenti di `belum_dikonfigurasi` — bukan hasil yang dikarang.
+
+## D-15 — Laporan: satu tabel netral, PDF tulisan tangan, angka aliran vs posisi dipisah
+
+**Keputusan:** Fase 9 dibangun dalam tiga lapis yang tidak boleh bertukar tempat.
+- **Matematika murni** di `Laundry.Domain/Reporting.cs` (`LaporanAngka`, `RentangLaporan`): perataan rentang (tanpa tanggal = 30 hari terakhir, terbalik ditukar, lebar di atas `MaksimumHari` 366 hari dipotong dari sisi tertua), deret harian yang tetap menyertakan hari kosong, dan enam angka yang tidak saling menggantikan — omzet, penerimaan tunai, DP/pelunasan, refund, piutang, saldo kredit. Piutang dan saldo kredit adalah **posisi** (piutang ikut membawa tagihan yang sudah terbuka sebelum periode), sisanya **aliran**; aturan ini punya test sendiri supaya tidak "dibetulkan" jadi satu kolom.
+- **Proyeksi baris** di `ReportService`: EF hanya mengambil baris, tidak menghitung uang; hasil akhirnya `TabelLaporan` — struktur kolom + sel yang netral.
+- **Tiga mesin ekspor** (`PdfLaporan`, `ExcelLaporan`, `CsvLaporan`) membaca `TabelLaporan` yang sama, begitu juga layar, jadi tidak ada jalur hitung kedua yang bisa membuat berkas berbeda dari tampilan (test `SatuTabelTigaFormatJumlahBarisnyaIdentik`).
+- **PDF tanpa library.** `PdfLaporan` menulis PDF 1.4 sendiri: base-14 Helvetica + tabel lebar AFM (WinAnsi), offset xref dihitung byte-per-byte, header `%PDF-1.4` + baris komentar biner, dan pemecahan halaman yang mengulang baris kepala. Kalau total lebar alami kolom melebihi A4 portrait, kertas berganti ke **lanskap** dan font per sel dikecilkan sampai 5,2 pt **sebelum** teks dipotong `..` — nomor pesanan `LR-20261015181447-6168` tidak boleh hilang di laporan transaksi. Tabel kosong tetap menghasilkan berkas sah (kepala kolom + "Tidak ada data pada periode ini."), bukan 0 byte.
+- **XLSX/CSV.** ClosedXML (MIT) menulis sel uang sebagai angka berformat `"Rp"#,##0`/`#,##0`, membekukan baris kepala, dan memotong nama sheet ke 31 karakter. CSV memakai `sep=;` + BOM UTF-8, angka datar invariant (tanpa pemisah ribuan), dan mengutip teks berawalan `= + - @` agar tidak jadi rumus saat dibuka Excel.
+- **Audit tetap hanya-baca.** `GET /api/audit` (cari, filter entitas, paginasi) dan ekspor lewat jalur yang sama (`/api/reports/export?jenis=audit`); tidak ada endpoint tulis/ubah/hapus — test POST/PUT/PATCH/DELETE ke `/api/audit` mengharapkan 404/405 dan jumlah baris audit tidak berubah.
+- **Filter salah ditolak, tidak ditebak.** Tanggal tidak sah, jenis/format tidak dikenal, atau filter lebih dari 64 karakter → 400 dengan pesan yang menyebut pilihannya; nama berkas ekspor disanitasi ke huruf/angka/tanda-hubung supaya aman di header `Content-Disposition`.
+**Alasan:** PRD menuntut ekspor "sesuai filter" dan audit append-only. Risiko terbesarnya adalah dua sumber kebenaran (layar vs berkas) dan PDF yang tampak jadi padahal rusak — maka bentuknya satu tabel netral dan validasi PDF diuji pada level byte, bukan dengan mata.
+**Cara pakai:** `GET /api/reports/laporan?dari=&sampai=`, `GET /api/reports/tabel?jenis=transaksi`, unduh `GET /api/reports/export?jenis=transaksi&format=pdf|xlsx|csv` — khusus Admin (pelanggan tidak melihat omzet/piutang). Yang sudah dijalankan betulan terhadap API hidup: tiga berkas terunduh (164.941 / 17.688 / 23.400 bait), 259 baris data identik di CSV dan XLSX (`dimension A1:J259`), dan PDF-nya bisa di-parse mesin PDF lain (poppler `pdftotext`) dengan koordinat sel yang benar. **Yang belum diverifikasi:** tampilan hasil render — `pdftoppm`/`mutool`/Ghostscript tidak terpasang di mesin ini dan Chrome headless tidak merender plugin PDF, jadi membuka berkas di viewer sungguhan masih pekerjaan manusia (hasil unduhan ada di `tmp-verifikasi/`, di luar git).
+
+## D-16 — UI desktop: tema, kontrol, dan navigasi yang dikunci test
+
+**Keputusan:** UI digambar sendiri (tanpa library kontrol) dan dikunci oleh test, bukan diperiksa dengan mata saja.
+- **Satu set kunci, dua tema.** `Themes/Terang.xaml` dan `Themes/Gelap.xaml` wajib punya nama kunci yang sama persis; test `TemaSamaKunciTest` membandingkan kedua kamus dan gagal kalau ada warna yang cuma ada di satu tema (gejalanya kontrol "hilang" saat pindah tema). `Themes/Kontrol.xaml` berisi style bersama: `Kartu`, `Tombol`/`TombolHalus`, `TeksLabel`, `BarisGalat`/`BarisHasil`, `KepalaTabel` (`12,9,12,9`), `SelTabel` (`12,8,12,8`), dan `TabelData`.
+- **Kontrol bawaan yang tidak bisa di-thema dibuat ulang template-nya.** `ComboBox` (`WajahKotakPilih` + `PART_Popup`) dan `DatePicker` di-restyle penuh. Watermark `DatePickerTextBox` tidak bisa diset dari XAML (`MC4005`), jadi teks petunjuk digambar `TextBlock` (`Petunjuk`) sendiri yang di-`Binding` ke `Tag` induknya — karena itu `Tag="mis. nama pelanggan"` di layar Audit benar-benar muncul di dalam kotak, bukan hilang.
+- **Teks panjang dipotong, kolom tidak dilebarkan.** `SelPotong` = `TextTrimming=CharacterEllipsis` + `ToolTip` berisi teks penuh. Melebarkan kolom bukan solusi: `TabelData` memakai `HorizontalScrollBarVisibility=Auto`, jadi `MinWidth` yang terlalu besar justru memunculkan scrollbar horizontal dan memotong kolom sebelahnya (pernah terjadi di grid Arsip Backup). Angka nominal (`Total`, `Perkiraan`) tidak boleh terpotong — hanya teks bebas (nomor pesanan, nama layanan, status, berkas) yang dipotong, dan semua kolom teks panjangnya `Width="*"` + `MinWidth`.
+- **Navigasi ditentukan server, bukan tebakan klien.** `ShellViewModel` menyusun menu dari peran yang dikembalikan `/api/auth/me`: Admin 10 butir (Beranda, Pesanan, Buat Pesanan, Katalog, Pelanggan, Slot, Komplain, Laporan, Audit, Sistem), Pelanggan 4 butir (Beranda, Pesan, Pesanan saya, Komplain). Halaman selalu mengikuti `MenuAktif`, termasuk saat berpindah dipicu tombol di dalam halaman (`_konteks.Navigasi`).
+- **Klik ganda tidak menggandakan aksi.** `ViewModelDasar.JalankanAsync` menjaga state `Sibuk`; yang diblokir hanya aksi paralel, sedangkan aksi bersarang (muat ulang setelah simpan, buka detail dari seleksi baris) tetap jalan. Setiap `catch` menulis pesan ke `Galat` dan tidak ada jalur yang memanggil `MessageBox` perkecualian — `DispatcherUnhandledException` di `App` menjadi jaring terakhir.
+- **Frontend tidak menyentuh database.** Satu-satunya pintu keluar adalah `KlienApi` (HTTP + JWT, refresh otomatis); koneksi PostgreSQL tidak pernah dibuka dari proses desktop.
+- **Grafik omzet digulir ke hari terbaru.** `LaporanView` memantau perubahan properti `Deret` lalu `ScrollToHorizontalOffset(ScrollableWidth)` — tanpa itu bar omzet yang ada di ujung kanan terlihat sebagai grafik kosong.
+- **Mode software render untuk pemeriksaan.** `WPF_PERANGKAT_LUNAK=1` memaksa `RenderMode.SoftwareOnly`; dipakai saat mengambil tangkapan layar, bukan sebagai syarat pemakaian.
+**Alasan:** PRD menuntut dua role dalam satu aplikasi dengan light/dark. Titik rawan fase UI adalah hal-hal yang tidak terlihat dari test API: kunci tema yang tidak sepadan, teks terpotong tanpa jalan keluar, klik ganda bikin dua pesanan, dan halaman yang menyebut dirinya selesai padahal belum pernah dibuka.
+**Cara pakai:** `dotnet run --project src/Laundry.Desktop` (butuh API hidup di `API_URL`, bawaan dev `http://localhost:5104`). Preferensi (alamat server + tema) disimpan di `%LOCALAPPDATA%\LaundryDesk\preferensi.json`, bukan di registry; isinya tidak ada rahasia — token hanya hidup di memori proses. Test tampilan ada di `tests/Laundry.Tests.Desktop` (17 test: kecocokan kunci tema, konverter rupiah/tanggal/relatif, pesan kosong, keterbacaan kontras).
+
+## D-17 — Verifikasi UI dijalankan lewat automasi layar, bukan dibaca dari kode
+
+**Keputusan:** Setiap layar fase 4 dibuka, diisi, dan dikirim lewat automasi UI Automation terhadap aplikasi sungguhan yang terhubung ke API dan PostgreSQL dev, lalu hasilnya dicocokkan dengan isi database.
+- **Isi database dev** dirapikan lebih dulu (`tmp-verifikasi/bersih-db.ps1`) supaya layar tidak kosong dan tidak berisi sampah; skrip ini ada di luar git (`tmp-verifikasi/` masuk `.gitignore`).
+- **Yang dibuktikan sampai baris database:** pesanan dibuat dari layar "Buat Pesanan" pelanggan tercatat di `Orders` (`LR-20261015205839-2607`, status `MenungguKonfirmasi`, `BelumBayar`, `EstimatedTotal 32000.00`, item `Kilo Reguler 4` kg), dan komplain dari layar Komplain tercatat di `Complaints` (`Kualitas` · "Ada kemeja yang masih kusut setelah disetrika." · status `Baru` · terhubung ke order yang sama).
+- **Validasi sisi klien ikut dilihat langsung:** keranjang kosong ditolak ("Tambahkan minimal satu layanan."), berat layanan kilo yang kosong ditolak ("… 'Kilo Reguler' wajib diisi.") — permintaan tidak dikirim ke API.
+- **Tema gelap dicek di layar nyata** (pill status, tombol, kartu tetap terbaca). **Batas yang diketahui dan diterima:** popup kalender `DatePicker` tetap bertema terang saat aplikasi gelap, karena `Calendar` bawaan WPF butuh restyle menyeluruh; perubahan ini sengaja tidak dilakukan di fase 4 dan dicatat, bukan disembunyikan.
+- **Ukuran & posisi dibaca dalam piksel fisik.** Machine ini 125%, jadi `BoundingRectangle`, `SetCursorPos`, dan `CopyFromScreen` semua satuan fisik dan tidak bisa dicampur langsung dengan koordinat XAML. Popup `ComboBox` dan kalender `DatePicker` hidup di HWND sendiri sehingga harus dicari dari `AutomationElement.RootElement`, bukan dari elemen jendela.
+- **Yang belum dan tidak klaim sudah:** tidak ada installer bersertifikat, tidak ada uji di mesin lain/versi Windows lain, dan tidak ada uji multi-monitor atau DPI berbeda.
+**Alasan:** Fase 4 adalah satu-satunya fase yang galatnya tidak muncul di test API. Tanpa membuka aplikasinya, "layar selesai" hanya berarti "XAML-nya bisa dikompil".
+**Cara pakai:** jalankan API + desktop, lalu skrip verifikasi di `tmp-verifikasi/` (sweep menu, tangkapan layar per menu, alur pesan & komplain). Hasil dan tangkapan layar tidak ikut ke repo.

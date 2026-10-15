@@ -1,0 +1,128 @@
+<UserControl x:Class="Laundry.Desktop.Views.AuditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="14" />
+            <ColumnDefinition Width="360" />
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Grid.Column="0" LastChildFill="True">
+            <Border DockPanel.Dock="Top" Style="{StaticResource Kartu}" Padding="14,12,14,12" Margin="0,0,0,12">
+                <WrapPanel>
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Text="KATA KUNCI" Style="{StaticResource TeksLabel}" />
+                        <TextBox Style="{StaticResource KotakTeks}" Width="190" Tag="mis. nama pelanggan"
+                                 Text="{Binding Cari, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Text="ENTITAS" Style="{StaticResource TeksLabel}" />
+                        <TextBox Style="{StaticResource KotakTeks}" Width="130" Tag="mis. Order"
+                                 Text="{Binding Entitas, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Text="DARI" Style="{StaticResource TeksLabel}" />
+                        <DatePicker SelectedDate="{Binding Dari}" FontSize="12" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Text="SAMPAI" Style="{StaticResource TeksLabel}" />
+                        <DatePicker SelectedDate="{Binding Sampai}" FontSize="12" />
+                    </StackPanel>
+                    <StackPanel VerticalAlignment="Bottom" Orientation="Horizontal">
+                        <Button Content="Cari" Style="{StaticResource Tombol}" Margin="0,0,8,0"
+                                Command="{Binding CariCommand}" />
+                        <Button Content="PDF" Style="{StaticResource TombolGaris}" Margin="0,0,6,0"
+                                Command="{Binding EksporCommand}" CommandParameter="pdf" />
+                        <Button Content="XLSX" Style="{StaticResource TombolGaris}" Margin="0,0,6,0"
+                                Command="{Binding EksporCommand}" CommandParameter="xlsx" />
+                        <Button Content="CSV" Style="{StaticResource TombolGaris}"
+                                Command="{Binding EksporCommand}" CommandParameter="csv" />
+                    </StackPanel>
+                </WrapPanel>
+            </Border>
+
+            <Border DockPanel.Dock="Top" Style="{StaticResource KartuLembut}" Padding="14,8,14,8" Margin="0,0,0,12"
+                    BorderThickness="0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Total}" Style="{StaticResource TeksKecil}" />
+                    <TextBlock Text="{Binding Rentang, StringFormat= · {0}}" Style="{StaticResource TeksKecil}" />
+                </StackPanel>
+            </Border>
+
+            <Border DockPanel.Dock="Bottom" Style="{StaticResource Kartu}" Padding="12,8,12,8" Margin="0,12,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="&lt; Sebelumnya" Style="{StaticResource TombolHalus}"
+                            Command="{Binding HalamanSebelumnyaCommand}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Halaman, Converter={StaticResource Tambah}, StringFormat=Halaman {0}}"
+                               Style="{StaticResource TeksKecil}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Button Grid.Column="2" Content="Berikutnya &gt;" Style="{StaticResource TombolHalus}"
+                            Command="{Binding HalamanBerikutnyaCommand}" />
+                </Grid>
+            </Border>
+
+            <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
+                            Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
+
+            <Border Style="{StaticResource Kartu}" Padding="0">
+                <Grid>
+                    <DataGrid Style="{StaticResource TabelData}" ItemsSource="{Binding Daftar}"
+                              SelectedItem="{Binding Terpilih}" BorderThickness="0" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Waktu"
+                                                Binding="{Binding AtUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap}"
+                                                Width="170" />
+                            <DataGridTextColumn Header="Entitas" Binding="{Binding EntityType}" Width="110" />
+                            <DataGridTextColumn Header="Aksi" Binding="{Binding Action}" Width="110" />
+                            <DataGridTextColumn Header="Oleh" Binding="{Binding Actor}" Width="150" />
+                            <DataGridTextColumn Header="Alasan" Binding="{Binding Reason}" Width="*" />
+                            <DataGridTextColumn Header="Asal" Binding="{Binding Source}" Width="80" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Text="Tidak ada baris audit pada rentang ini. Kosong berarti memang tidak ada perubahan, bukan gagal memuat."
+                               Style="{StaticResource TeksKecil}" TextWrapping="Wrap" Margin="18,56,18,18"
+                               Visibility="{Binding Daftar.Count, Converter={StaticResource Kosong}, ConverterParameter=balik}" />
+                </Grid>
+            </Border>
+        </DockPanel>
+
+        <StackPanel Grid.Column="2">
+            <Border Style="{StaticResource Kartu}"
+                    Visibility="{Binding AdaDetail, Converter={StaticResource BoolKasus}}">
+                <StackPanel>
+                    <TextBlock Text="ISI BARIS AUDIT" Style="{StaticResource TeksLabel}" />
+                    <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0"
+                               Text="{Binding Terpilih.AtUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap, StringFormat=Waktu: {0}}" />
+                    <TextBlock Style="{StaticResource TeksKecil}" Margin="0,2,0,0"
+                               Text="{Binding Terpilih.Action, StringFormat=Aksi: {0}}" />
+                    <TextBlock Style="{StaticResource TeksKecil}" Margin="0,2,0,0"
+                               Text="{Binding Terpilih.EntityType, StringFormat=Entitas: {0}}" />
+                    <TextBlock Style="{StaticResource TeksKecil}" Margin="0,2,0,0" TextWrapping="Wrap"
+                               Text="{Binding Terpilih.CorrelationId, StringFormat=Korelasi: {0}}" />
+                    <Separator />
+                    <TextBlock Text="SEBELUM" Style="{StaticResource TeksLabel}" />
+                    <TextBox Style="{StaticResource KotakTeksBesar}" Height="90" IsReadOnly="True" TextWrapping="Wrap"
+                             AcceptsReturn="True" FontFamily="Consolas, Cascadia Mono" FontSize="11"
+                             Text="{Binding Terpilih.BeforeJson}" />
+                    <TextBlock Text="SESUDAH" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
+                    <TextBox Style="{StaticResource KotakTeksBesar}" Height="90" IsReadOnly="True" TextWrapping="Wrap"
+                             AcceptsReturn="True" FontFamily="Consolas, Cascadia Mono" FontSize="11"
+                             Text="{Binding Terpilih.AfterJson}" />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Kartu}" Margin="0,12,0,0">
+                <StackPanel>
+                    <TextBlock Text="HANYA-BACA" Style="{StaticResource TeksLabel}" />
+                    <TextBlock Style="{StaticResource TeksKecil}" Margin="0,6,0,0" TextWrapping="Wrap"
+                               Text="Audit ditulis setiap kali uang, status, atau data pelanggan berubah. Aplikasi tidak punya jalur untuk mengubah atau menghapus barisnya, termasuk bagi admin." />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>

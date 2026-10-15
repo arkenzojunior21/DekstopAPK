@@ -1,0 +1,379 @@
+<UserControl x:Class="Laundry.Desktop.Views.PesananView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="430" />
+            <ColumnDefinition Width="14" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- ==================== KIRI: filter + daftar ==================== -->
+        <DockPanel Grid.Column="0" LastChildFill="True">
+            <Border DockPanel.Dock="Top" Style="{StaticResource Kartu}" Padding="14,12,14,12" Margin="0,0,0,12">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Style="{StaticResource KotakTeks}"
+                                 Text="{Binding Cari, UpdateSourceTrigger=PropertyChanged}"
+                                 Tag="cari nomor pesanan" />
+                        <Button Grid.Column="1" Content="Cari" Style="{StaticResource Tombol}" Margin="8,0,0,0"
+                                Command="{Binding TerapkanFilterCommand}" />
+                    </Grid>
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="STATUS" Style="{StaticResource TeksLabel}" />
+                            <ComboBox Style="{StaticResource KotakPilih}" ItemsSource="{Binding SemuaStatus}"
+                                      SelectedItem="{Binding FilterStatus}" Tag="semua status"
+                                      ItemTemplate="{StaticResource TemplateEnum}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="PEMBAYARAN" Style="{StaticResource TeksLabel}" />
+                            <ComboBox Style="{StaticResource KotakPilih}"
+                                      ItemsSource="{Binding SemuaStatusBayar}"
+                                      SelectedItem="{Binding FilterPembayaran}" Tag="semua pembayaran"
+                                      ItemTemplate="{StaticResource TemplateEnum}" />
+                        </StackPanel>
+                    </Grid>
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="DARI" Style="{StaticResource TeksLabel}" />
+                            <DatePicker SelectedDate="{Binding Dari}" FontSize="12" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="SAMPAI" Style="{StaticResource TeksLabel}" />
+                            <DatePicker SelectedDate="{Binding Sampai}" FontSize="12" />
+                        </StackPanel>
+                        <Button Grid.Column="3" Content="Reset" Style="{StaticResource TombolGaris}"
+                                VerticalAlignment="Bottom" Command="{Binding BersihkanFilterCommand}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border DockPanel.Dock="Bottom" Style="{StaticResource Kartu}" Padding="12,8,12,8" Margin="0,12,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="&lt; Sebelumnya" Style="{StaticResource TombolHalus}"
+                            Command="{Binding HalamanSebelumnyaCommand}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Halaman, Converter={StaticResource Tambah}, StringFormat=Halaman {0}}"
+                               Style="{StaticResource TeksKecil}" HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                    <Button Grid.Column="2" Content="Berikutnya &gt;" Style="{StaticResource TombolHalus}"
+                            Command="{Binding HalamanBerikutnyaCommand}" />
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource Kartu}" Padding="0">
+                <DataGrid Style="{StaticResource TabelData}" ItemsSource="{Binding Daftar}"
+                          SelectedItem="{Binding Terpilih}" BorderThickness="0" HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <!-- Daftar sempit: nama pelanggan tetap ada di panel detail, kolomnya di sini dipangkas. -->
+                        <DataGridTextColumn Header="Nomor" Binding="{Binding OrderNumber}" Width="*" MinWidth="150"
+                                            ElementStyle="{StaticResource SelPotong}" />
+                        <DataGridTextColumn Header="Status"
+                                            Binding="{Binding Status, Converter={StaticResource Label}}" Width="150"
+                                            ElementStyle="{StaticResource SelPotong}" />
+                        <DataGridTextColumn Header="Total"
+                                            Binding="{Binding FinalTotal, Converter={StaticResource Rupiah}}"
+                                            Width="95" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </DockPanel>
+
+        <!-- ==================== KANAN: detail & aksi ==================== -->
+        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}">
+            <StackPanel>
+                <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
+                                Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
+                <ContentControl Content="{Binding Hasil}" ContentTemplate="{StaticResource BarisHasil}"
+                                Visibility="{Binding Hasil, Converter={StaticResource Kosong}}" />
+
+                <Border Style="{StaticResource Kartu}" Margin="0,0,0,12"
+                        Visibility="{Binding AdaTerpilih, Converter={StaticResource BoolKasus}}">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding Detail.OrderNumber}" Style="{StaticResource TeksJudul}" />
+                                <TextBlock Style="{StaticResource TeksSub}" Margin="0,2,0,0"
+                                           Text="{Binding Detail.CustomerName}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Border Style="{StaticResource Lencana}"
+                                        Background="{Binding Detail.Status, Converter={StaticResource KuasStatus}}">
+                                    <TextBlock Style="{StaticResource TeksLencana}" Foreground="White"
+                                               Text="{Binding Detail.Status, Converter={StaticResource Label}}" />
+                                </Border>
+                                <Border Style="{StaticResource Lencana}" Margin="8,0,0,0"
+                                        Background="{Binding Detail.Payment, Converter={StaticResource KuasStatus}}">
+                                    <TextBlock Style="{StaticResource TeksLencana}" Foreground="White"
+                                               Text="{Binding Detail.Payment, Converter={StaticResource Label}}" />
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                        <WrapPanel Margin="0,12,0,0">
+                            <Border Style="{StaticResource KartuLembut}" Padding="12,8,12,8" Margin="0,0,8,8"
+                                    BorderThickness="0">
+                                <StackPanel>
+                                    <TextBlock Text="TOTAL AKHIR" Style="{StaticResource TeksLabel}" />
+                                    <TextBlock Style="{StaticResource TeksData}" FontWeight="Bold" FontSize="15"
+                                               Text="{Binding Detail.FinalTotal, Converter={StaticResource Rupiah}}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource KartuLembut}" Padding="12,8,12,8" Margin="0,0,8,8"
+                                    BorderThickness="0">
+                                <StackPanel>
+                                    <TextBlock Text="DIBAYAR" Style="{StaticResource TeksLabel}" />
+                                    <TextBlock Style="{StaticResource TeksData}" FontWeight="Bold" FontSize="15"
+                                               Text="{Binding Detail.Paid, Converter={StaticResource Rupiah}}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource KartuLembut}" Padding="12,8,12,8" Margin="0,0,8,8"
+                                    BorderThickness="0">
+                                <StackPanel>
+                                    <TextBlock Text="SISA" Style="{StaticResource TeksLabel}" />
+                                    <TextBlock Style="{StaticResource TeksData}" FontWeight="Bold" FontSize="15"
+                                               Text="{Binding Detail.Remaining, Converter={StaticResource Rupiah}}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource KartuLembut}" Padding="12,8,12,8" Margin="0,0,8,8"
+                                    BorderThickness="0">
+                                <StackPanel>
+                                    <TextBlock Text="KREDIT PAKAI" Style="{StaticResource TeksLabel}" />
+                                    <TextBlock Style="{StaticResource TeksData}" FontWeight="Bold" FontSize="15"
+                                               Text="{Binding Detail.AppliedCredit, Converter={StaticResource Rupiah}}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource KartuLembut}" Padding="12,8,12,8" Margin="0,0,8,8"
+                                    BorderThickness="0">
+                                <StackPanel>
+                                    <TextBlock Text="REFUND" Style="{StaticResource TeksLabel}" />
+                                    <TextBlock Style="{StaticResource TeksData}" FontWeight="Bold" FontSize="15"
+                                               Text="{Binding Detail.Refunded, Converter={StaticResource Rupiah}}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource KartuLembut}" Padding="12,8,12,8" Margin="0,0,0,8"
+                                    BorderThickness="0">
+                                <StackPanel>
+                                    <TextBlock Text="ONGKOS" Style="{StaticResource TeksLabel}" />
+                                    <TextBlock Style="{StaticResource TeksData}" FontWeight="Bold" FontSize="15"
+                                               Text="{Binding Detail.DeliveryFee, Converter={StaticResource Rupiah}}" />
+                                </StackPanel>
+                            </Border>
+                        </WrapPanel>
+                        <TextBlock Style="{StaticResource TeksKecil}" TextWrapping="Wrap"
+                                   Text="{Binding Detail.Source, StringFormat=Asal data: {0}}" />
+                        <TextBlock Style="{StaticResource TeksKecil}" TextWrapping="Wrap" Margin="0,2,0,0"
+                                   Text="{Binding Detail.EstimatedFinishUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap, StringFormat=Perkiraan selesai: {0}}" />
+                        <Button Content="Lihat &amp; cetak struk" Style="{StaticResource TombolGaris}"
+                                HorizontalAlignment="Left" Margin="0,10,0,0"
+                                Command="{Binding TampilkanStrukCommand}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="LAYANAN &amp; BERAT AKTUAL" Style="{StaticResource TeksLabel}" />
+                        <DataGrid Style="{StaticResource TabelData}" ItemsSource="{Binding Items}" MaxHeight="220"
+                                  BorderThickness="0" IsReadOnly="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Layanan" Binding="{Binding Nama}" Width="*"
+                                                    MinWidth="110" IsReadOnly="True"
+                                                    ElementStyle="{StaticResource SelPotong}" />
+                                <DataGridTextColumn Header="Satuan" Binding="{Binding Satuan}" Width="74"
+                                                    IsReadOnly="True" />
+                                <DataGridTextColumn Header="Tarif" Binding="{Binding HargaSnapshot, Converter={StaticResource Rupiah}}"
+                                                    Width="88" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Estimasi"
+                                                    Binding="{Binding EstimasiBerat, Converter={StaticResource Kuantitas}}"
+                                                    Width="76" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Berat (kg)"
+                                                    Binding="{Binding BeratAktual, UpdateSourceTrigger=PropertyChanged}"
+                                                    Width="92" />
+                                <DataGridTextColumn Header="Jumlah"
+                                                    Binding="{Binding JumlahAktual, UpdateSourceTrigger=PropertyChanged}"
+                                                    Width="80" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Button Content="Simpan berat / jumlah aktual" Style="{StaticResource Tombol}"
+                                HorizontalAlignment="Left" Margin="0,10,0,0" Height="34"
+                                Command="{Binding SimpanActualCommand}" />
+                    </StackPanel>
+                </Border>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="12" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="UBAH STATUS" Style="{StaticResource TeksLabel}" />
+                                <ComboBox Style="{StaticResource KotakPilih}" ItemsSource="{Binding LangkahBerikut}"
+                                          SelectedItem="{Binding StatusBaru}" Tag="pilih status berikutnya"
+                                          ItemTemplate="{StaticResource TemplateEnum}" />
+                                <TextBox Style="{StaticResource KotakTeks}" Margin="0,10,0,0" Tag="catatan (opsional)"
+                                         Text="{Binding CatatanStatus, UpdateSourceTrigger=PropertyChanged}" />
+                                <Button Content="Simpan status" Style="{StaticResource Tombol}" Margin="0,10,0,0"
+                                        Command="{Binding GantiStatusCommand}" />
+                                <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
+                                           Text="Hanya langkah yang diizinkan mesin status yang muncul. Kalau server menolak, alasannya ditampilkan apa adanya." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Kartu}">
+                            <StackPanel>
+                                <TextBlock Text="PERKIRAAN SELESAI" Style="{StaticResource TeksLabel}" />
+                                <DatePicker SelectedDate="{Binding EstimasiSelesai}" FontSize="12" />
+                                <TextBox Style="{StaticResource KotakTeks}" Margin="0,10,0,0"
+                                         Text="{Binding CatatanEstimasi, UpdateSourceTrigger=PropertyChanged}"
+                                         Tag="alasan perkiraan (opsional)" />
+                                <Button Content="Simpan perkiraan" Style="{StaticResource TombolGaris}"
+                                        Margin="0,10,0,0" Command="{Binding SetEstimasiCommand}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="PEMBAYARAN" Style="{StaticResource TeksLabel}" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="130" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Style="{StaticResource KotakTeks}" Tag="jumlah bayar"
+                                             Text="{Binding Jumlah, UpdateSourceTrigger=PropertyChanged}" />
+                                    <ComboBox Grid.Column="2" Style="{StaticResource KotakPilih}"
+                                              ItemsSource="{Binding SumberJenisBayar}"
+                                              SelectedItem="{Binding JenisBayar}"
+                                              ItemTemplate="{StaticResource TemplateEnum}" />
+                                </Grid>
+                                <TextBox Style="{StaticResource KotakTeks}" Margin="0,10,0,0" Tag="catatan (opsional)"
+                                         Text="{Binding CatatanBayar, UpdateSourceTrigger=PropertyChanged}" />
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <Button Content="Tunai" Style="{StaticResource TombolSukses}"
+                                            Command="{Binding BayarTunaiCommand}" Margin="0,0,8,0" />
+                                    <Button Content="QRIS (simulasi)" Style="{StaticResource TombolGaris}"
+                                            Command="{Binding KutipQrisCommand}" />
+                                </StackPanel>
+                                <CheckBox Style="{StaticResource KotakCek}" Margin="0,12,0,0"
+                                          Content="Pelanggan menyetujui pembayaran dengan saldo kredit"
+                                          IsChecked="{Binding SetujuKredit}" />
+                                <Button Content="Bayar dari saldo kredit" Style="{StaticResource TombolGaris}"
+                                        Margin="0,8,0,0" Command="{Binding BayarKreditCommand}" />
+                                <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
+                                           Text="{Binding KutipanQris}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="REFUND" Style="{StaticResource TeksLabel}" />
+                                <TextBox Style="{StaticResource KotakTeks}"
+                                         Text="{Binding JumlahRefund, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Style="{StaticResource KotakTeks}" Margin="0,8,0,0" Tag="alasan refund"
+                                         Text="{Binding AlasanRefund, UpdateSourceTrigger=PropertyChanged}" />
+                                <Button Content="Catat refund" Style="{StaticResource TombolBahaya}" Margin="0,8,0,0"
+                                        Command="{Binding RefundCommand}" />
+                                <TextBlock Style="{StaticResource TeksKecil}" Margin="0,6,0,0" TextWrapping="Wrap"
+                                           Text="Refund selalu alasan wajib dan tercatat sebagai baris baru — pembayaran lama tidak diubah." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Kartu}"
+                                Visibility="{Binding BisaPutuskanBatal, Converter={StaticResource BoolKasus}}">
+                            <StackPanel>
+                                <TextBlock Text="PERMINTAAN PEMBATALAN" Style="{StaticResource TeksLabel}" />
+                                <TextBox Style="{StaticResource KotakTeks}"
+                                         Text="{Binding CatatanBatal, UpdateSourceTrigger=PropertyChanged}" />
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <Button Content="Setujui" Style="{StaticResource TombolBahaya}" Margin="0,0,8,0"
+                                            Command="{Binding PutuskanBatalCommand}" CommandParameter="ya" />
+                                    <Button Content="Tolak" Style="{StaticResource TombolGaris}"
+                                            Command="{Binding PutuskanBatalCommand}" CommandParameter="tidak" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <Border Style="{StaticResource Kartu}" Margin="0,12,0,0">
+                    <StackPanel>
+                        <TextBlock Text="RIWAYAT STATUS" Style="{StaticResource TeksLabel}" />
+                        <ItemsControl ItemsSource="{Binding Detail.History}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,3,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="170" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Style="{StaticResource TeksKecil}"
+                                                   Text="{Binding AtUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap}" />
+                                        <TextBlock Grid.Column="1" Style="{StaticResource TeksData}"
+                                                   Text="{Binding To, Converter={StaticResource Label}}" />
+                                        <TextBlock Grid.Column="2" Style="{StaticResource TeksKecil}"
+                                                   Text="{Binding Note}" TextTrimming="CharacterEllipsis" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Separator />
+                        <TextBlock Text="PEMBAYARAN TERCATAT" Style="{StaticResource TeksLabel}" />
+                        <ItemsControl ItemsSource="{Binding Pembayaran}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,3,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="120" />
+                                            <ColumnDefinition Width="120" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Style="{StaticResource TeksKecil}"
+                                                   Text="{Binding CreatedAtUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap}" />
+                                        <TextBlock Grid.Column="1" Style="{StaticResource TeksData}"
+                                                   Text="{Binding Method, Converter={StaticResource Label}}" />
+                                        <TextBlock Grid.Column="2" Style="{StaticResource TeksData}"
+                                                   Text="{Binding Amount, Converter={StaticResource Rupiah}}" />
+                                        <TextBlock Grid.Column="3" Style="{StaticResource TeksKecil}"
+                                                   Text="{Binding Status, Converter={StaticResource Label}}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -1,0 +1,6 @@
+<Project>
+  <!-- Versi aplikasi dibaca oleh pemeriksaan update (fase 8). Versi rilis akhir dinaikkan pada fase 10. -->
+  <PropertyGroup>
+    <Version>0.8.0</Version>
+  </PropertyGroup>
+</Project>

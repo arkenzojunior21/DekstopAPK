@@ -1,0 +1,95 @@
+<UserControl x:Class="Laundry.Desktop.Views.SlotView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="14" />
+            <ColumnDefinition Width="320" />
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Grid.Column="0" LastChildFill="True">
+            <Border DockPanel.Dock="Top" Style="{StaticResource Kartu}" Padding="14,12,14,12" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="DARI" Style="{StaticResource TeksLabel}" />
+                        <DatePicker SelectedDate="{Binding Dari}" FontSize="12" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="SAMPAI" Style="{StaticResource TeksLabel}" />
+                        <DatePicker SelectedDate="{Binding Sampai}" FontSize="12" />
+                    </StackPanel>
+                    <Button Grid.Column="3" Content="Muat" Style="{StaticResource Tombol}" VerticalAlignment="Bottom"
+                            Command="{Binding SegarkanCommand}" />
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource Kartu}" Padding="0">
+                <Grid>
+                    <DataGrid Style="{StaticResource TabelData}" ItemsSource="{Binding Daftar}" BorderThickness="0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Mulai"
+                                                Binding="{Binding StartsAtUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap}"
+                                                Width="180" />
+                            <DataGridTextColumn Header="Selesai"
+                                                Binding="{Binding EndsAtUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap}"
+                                                Width="170" />
+                            <DataGridTextColumn Header="Kapasitas" Binding="{Binding Capacity}" Width="90" />
+                            <DataGridTextColumn Header="Terisi" Binding="{Binding BookedCount}" Width="80" />
+                            <DataGridTextColumn Header="Aktif"
+                                                Binding="{Binding IsActive, Converter={StaticResource YaTidak}}" Width="80" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Text="Belum ada slot pada rentang ini. Slot wajib dibuat dulu supaya pesanan antar-jemput bisa dipilih."
+                               Style="{StaticResource TeksKecil}" TextWrapping="Wrap" Margin="18,56,18,18"
+                               Visibility="{Binding Daftar.Count, Converter={StaticResource Kosong}, ConverterParameter=balik}" />
+                </Grid>
+            </Border>
+        </DockPanel>
+
+        <StackPanel Grid.Column="2">
+            <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
+                            Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
+            <ContentControl Content="{Binding Hasil}" ContentTemplate="{StaticResource BarisHasil}"
+                            Visibility="{Binding Hasil, Converter={StaticResource Kosong}}" />
+
+            <Border Style="{StaticResource Kartu}">
+                <StackPanel>
+                    <TextBlock Text="SLOT BARU" Style="{StaticResource TeksLabel}" />
+                    <TextBlock Text="TANGGAL" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
+                    <DatePicker SelectedDate="{Binding TanggalBaru}" FontSize="12" />
+                    <TextBlock Text="JAM MULAI (HH:mm)" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
+                    <TextBox Style="{StaticResource KotakTeks}"
+                             Text="{Binding JamMulai, UpdateSourceTrigger=PropertyChanged}" />
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="DURASI (JAM)" Style="{StaticResource TeksLabel}" />
+                            <TextBox Style="{StaticResource KotakTeks}"
+                                     Text="{Binding DurasiJam, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="KAPASITAS" Style="{StaticResource TeksLabel}" />
+                            <TextBox Style="{StaticResource KotakTeks}"
+                                     Text="{Binding Kapasitas, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </Grid>
+                    <Button Content="Tambah slot" Style="{StaticResource Tombol}" Margin="0,14,0,0" Height="34"
+                            Command="{Binding TambahCommand}" />
+                    <TextBlock Style="{StaticResource TeksKecil}" Margin="0,10,0,0" TextWrapping="Wrap"
+                               Text="Jam diketik apa adanya lalu disimpan sebagai UTC. Aturan slot, jam operasional, dan area layanan masih menunggu Q11, jadi tidak ada validasi yang dikarang." />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,233 @@
+<UserControl x:Class="Laundry.Desktop.Views.SistemView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="14" />
+            <ColumnDefinition Width="420" />
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer Grid.Column="0" Style="{StaticResource Gulir}">
+            <StackPanel>
+                <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
+                                Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
+                <ContentControl Content="{Binding Hasil}" ContentTemplate="{StaticResource BarisHasil}"
+                                Visibility="{Binding Hasil, Converter={StaticResource Kosong}}" />
+
+                <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="SINKRONISASI LOKAL ⇄ CLOUD" Style="{StaticResource TeksLabel}" />
+                                <TextBlock Text="{Binding RingkasanSinkron}" Style="{StaticResource TeksData}"
+                                           TextWrapping="Wrap" Margin="0,6,0,0" />
+                            </StackPanel>
+                            <Button Grid.Column="1" Content="Satu siklus" Style="{StaticResource Tombol}"
+                                    VerticalAlignment="Top" Command="{Binding JalankanSyncCommand}" />
+                        </Grid>
+                        <Button Content="Coba ulang event gagal" Style="{StaticResource TombolGaris}"
+                                HorizontalAlignment="Left" Margin="0,10,0,0" Command="{Binding CobaUlangCommand}" />
+
+                        <Border Background="{DynamicResource KuasBahayaLembut}" CornerRadius="8" Padding="12,9,12,9"
+                                Margin="0,10,0,0" Visibility="{Binding AdaGagal, Converter={StaticResource BoolKasus}}">
+                            <StackPanel>
+                                <TextBlock Text="EVENT YANG GAGAL (5x percobaan)" Style="{StaticResource TeksLabel}"
+                                           Foreground="{DynamicResource KuasBahaya}" />
+                                <DataGrid Style="{StaticResource TabelData}" MaxHeight="150" BorderThickness="0"
+                                          ItemsSource="{Binding GagalAdmin}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Admin→Cloud" Binding="{Binding AggregateType}" Width="140" />
+                                        <DataGridTextColumn Header="Aksi" Binding="{Binding Operation}" Width="90" />
+                                        <DataGridTextColumn Header="Coba" Binding="{Binding RetryCount}" Width="60" />
+                                        <DataGridTextColumn Header="Kesalahan" Binding="{Binding LastError}" Width="*" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <DataGrid Style="{StaticResource TabelData}" MaxHeight="150" BorderThickness="0"
+                                          Margin="0,8,0,0" ItemsSource="{Binding GagalCloud}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Cloud→Admin" Binding="{Binding AggregateType}" Width="140" />
+                                        <DataGridTextColumn Header="Aksi" Binding="{Binding Operation}" Width="90" />
+                                        <DataGridTextColumn Header="Coba" Binding="{Binding RetryCount}" Width="60" />
+                                        <DataGridTextColumn Header="Kesalahan" Binding="{Binding LastError}" Width="*" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="PROVIDER &amp; NOTIFIKASI" Style="{StaticResource TeksLabel}" />
+                        <TextBlock Text="{Binding RingkasanProvider}" Style="{StaticResource TeksData}"
+                                   TextWrapping="Wrap" Margin="0,6,0,0" />
+                        <ItemsControl ItemsSource="{Binding Adapter}" Margin="0,10,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,3,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="110" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Style="{StaticResource TeksData}" Text="{Binding Nama}" />
+                                        <Border Grid.Column="1" Style="{StaticResource Lencana}" HorizontalAlignment="Left"
+                                                Background="{DynamicResource KuasNetral}">
+                                            <!-- KuasNetral sama dengan warna teks dua: tanpa putih teksnya hilang. -->
+                                            <TextBlock Style="{StaticResource TeksLencana}" Foreground="White"
+                                                       Text="{Binding Label}" />
+                                        </Border>
+                                        <TextBlock Grid.Column="2" Style="{StaticResource TeksKecil}" TextWrapping="Wrap"
+                                                   Text="{Binding Catatan}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Button Content="Kirim antrean notifikasi sekarang" Style="{StaticResource TombolGaris}"
+                                HorizontalAlignment="Left" Margin="0,10,0,0" Command="{Binding KirimNotifikasiCommand}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Kartu}">
+                    <StackPanel>
+                        <TextBlock Text="ARSIP BACKUP" Style="{StaticResource TeksLabel}" />
+                        <TextBlock Style="{StaticResource TeksKecil}" Margin="0,4,0,8"
+                                   Text="{Binding Backup.FolderBackup, StringFormat=Folder: {0}}" />
+                        <DataGrid Style="{StaticResource TabelData}" MaxHeight="240" BorderThickness="0"
+                                  ItemsSource="{Binding BerkasBackup}" SelectedItem="{Binding ArsipTerpilih}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Target" Binding="{Binding Target}" Width="62" />
+                                <DataGridTextColumn Header="Berkas" Binding="{Binding NamaFile}" Width="*"
+                                                    ElementStyle="{StaticResource SelPotong}" />
+                                <DataGridTextColumn Header="Dibuat"
+                                                    Binding="{Binding DibuatUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap}"
+                                                    Width="150" />
+                                <DataGridTextColumn Header="Sukses" Binding="{Binding Sukses, Converter={StaticResource YaTidak}}" Width="62" />
+                                <DataGridTextColumn Header="Verifikasi" Binding="{Binding Terverifikasi, Converter={StaticResource YaTidak}}" Width="88" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Button Content="Baca ulang arsip terpilih (pg_restore --list)" Style="{StaticResource TombolGaris}"
+                                HorizontalAlignment="Left" Margin="0,10,0,0" Command="{Binding VerifikasiCommand}" />
+                        <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
+                                   Text="Restore sengaja tidak ada di aplikasi: menjalankan scripts/restore.ps1 dengan konfirmasi diketik, karena menimpa database tidak bisa dibatalkan." />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}">
+            <StackPanel>
+                <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="BACKUP HARIAN &amp; RETENSI" Style="{StaticResource TeksLabel}" />
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="RETENSI (HARI)" Style="{StaticResource TeksLabel}" />
+                                <TextBox Style="{StaticResource KotakTeks}"
+                                         Text="{Binding RetensiHari, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
+                                <CheckBox Style="{StaticResource KotakCek}" Content="Backup harian otomatis"
+                                          IsChecked="{Binding BackupHarian}" />
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                            <Button Content="Simpan" Style="{StaticResource Tombol}" Margin="0,0,8,0"
+                                    Command="{Binding SimpanBackupConfigCommand}" />
+                            <Button Content="Admin" Style="{StaticResource TombolGaris}" Margin="0,0,6,0"
+                                    Command="{Binding BackupCommand}" CommandParameter="admin" />
+                            <Button Content="Cloud" Style="{StaticResource TombolGaris}" Margin="0,0,6,0"
+                                    Command="{Binding BackupCommand}" CommandParameter="cloud" />
+                            <Button Content="Retensi" Style="{StaticResource TombolGaris}"
+                                    Command="{Binding RetensiCommand}" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
+                                   Text="Retensi hanya menghapus arsip yang pernah sukses DAN lolos pg_restore --list, dan tidak pernah menghapus arsip terbaru per target." />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="VERSI APLIKASI" Style="{StaticResource TeksLabel}" />
+                        <TextBlock Style="{StaticResource TeksData}" Margin="0,6,0,0"
+                                   Text="{Binding VersiAplikasi, StringFormat=Versi terpasang: {0}}" />
+                        <Border Background="{DynamicResource KuasPermukaanDua}" CornerRadius="8" Padding="12,9,12,9"
+                                Margin="0,8,0,0">
+                            <StackPanel>
+                                <TextBlock TextWrapping="Wrap" FontSize="12.5" Foreground="{DynamicResource KuasTeks}"
+                                           Text="{Binding StatusUpdate}" />
+                            </StackPanel>
+                        </Border>
+                        <Button Content="Periksa manifest versi" Style="{StaticResource TombolGaris}"
+                                HorizontalAlignment="Left" Margin="0,10,0,0" Command="{Binding CekUpdateCommand}" />
+                        <Separator />
+                        <TextBlock Text="VERIFIKASI INSTALLER (SHA256)" Style="{StaticResource TeksLabel}" />
+                        <TextBox Style="{StaticResource KotakTeks}" Margin="0,8,0,0" Tag="nama-berkas-installer.exe"
+                                 Text="{Binding NamaBerkasInstaller, UpdateSourceTrigger=PropertyChanged}" />
+                        <Button Content="Cocokkan hash" Style="{StaticResource Tombol}" Margin="0,8,0,0" Height="32"
+                                HorizontalAlignment="Left" Command="{Binding VerifikasiInstallerCommand}" />
+                        <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
+                                   Text="{Binding HasilVerifikasi}" />
+                        <TextBlock Style="{StaticResource TeksKecil}" Margin="0,6,0,0" TextWrapping="Wrap"
+                                   Text="Nama berkas saja, tanpa path dan harus .exe. Tidak ada unduh atau pasang otomatis." />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="NAMA USAHA (KEPALA STRUK)" Style="{StaticResource TeksLabel}" />
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Style="{StaticResource KotakTeks}"
+                                     Text="{Binding NamaUsaha, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Grid.Column="1" Content="Simpan" Style="{StaticResource Tombol}" Margin="8,0,0,0"
+                                    Command="{Binding SimpanNamaUsahaCommand}" />
+                        </Grid>
+                        <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
+                                   Text="Sistem tidak menebak identitas usaha (Q1); struk tetap kosong di kepala sampai admin mengisinya." />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Kartu}">
+                    <StackPanel>
+                        <TextBlock Text="KUNCI KONFIGURASI (TANPA NILAI)" Style="{StaticResource TeksLabel}" />
+                        <ItemsControl ItemsSource="{Binding Kunci}" Margin="0,8,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2,0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="70" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Style="{StaticResource TeksData}" FontSize="11.5"
+                                                   Text="{Binding Kunci}" />
+                                        <TextBlock Grid.Column="1" Style="{StaticResource TeksKecil}"
+                                                   Text="{Binding Terisi, StringFormat={}{0}}" />
+                                        <TextBlock Grid.Column="2" Style="{StaticResource TeksKecil}" TextWrapping="Wrap"
+                                                   Text="{Binding Catatan}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
+                                   Text="Yang dilaporkan hanya terisi atau tidak. Nilai rahasia (connection string, JWT_KEY, WEBHOOK_SECRET) tidak pernah dikirim ke klien." />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

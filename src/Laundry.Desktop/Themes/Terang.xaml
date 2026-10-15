@@ -1,0 +1,41 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Palet terang. Semua kontrol membaca kuas ini lewat DynamicResource supaya ganti tema
+         tidak perlu menyentuh satu pun style. -->
+    <Color x:Key="WarnaLatar">#EEF2F8</Color>
+    <Color x:Key="WarnaPermukaan">#FFFFFFFF</Color>
+    <Color x:Key="WarnaPermukaanDua">#FFF6F8FC</Color>
+    <Color x:Key="WarnaSisi">#FF0F1B2D</Color>
+    <Color x:Key="WarnaSisiTeks">#FFD8E2F0</Color>
+    <Color x:Key="WarnaGaris">#FFDDE5F0</Color>
+    <Color x:Key="WarnaTeks">#FF101828</Color>
+    <Color x:Key="WarnaTeksDua">#FF667085</Color>
+    <Color x:Key="WarnaAksen">#FF2563EB</Color>
+    <Color x:Key="WarnaAksenGelap">#FF1D4ED8</Color>
+    <Color x:Key="WarnaSukses">#FF047857</Color>
+    <Color x:Key="WarnaProses">#FFB45309</Color>
+    <Color x:Key="WarnaBahaya">#FFB91C1C</Color>
+    <Color x:Key="WarnaNetral">#FF667085</Color>
+
+    <SolidColorBrush x:Key="KuasLatar" Color="{StaticResource WarnaLatar}" />
+    <SolidColorBrush x:Key="KuasPermukaan" Color="{StaticResource WarnaPermukaan}" />
+    <SolidColorBrush x:Key="KuasPermukaanDua" Color="{StaticResource WarnaPermukaanDua}" />
+    <SolidColorBrush x:Key="KuasSisi" Color="{StaticResource WarnaSisi}" />
+    <SolidColorBrush x:Key="KuasSisiTeks" Color="{StaticResource WarnaSisiTeks}" />
+    <SolidColorBrush x:Key="KuasGaris" Color="{StaticResource WarnaGaris}" />
+    <SolidColorBrush x:Key="KuasTeks" Color="{StaticResource WarnaTeks}" />
+    <SolidColorBrush x:Key="KuasTeksDua" Color="{StaticResource WarnaTeksDua}" />
+    <SolidColorBrush x:Key="KuasAksen" Color="{StaticResource WarnaAksen}" />
+    <SolidColorBrush x:Key="KuasAksenGelap" Color="{StaticResource WarnaAksenGelap}" />
+    <SolidColorBrush x:Key="KuasSukses" Color="{StaticResource WarnaSukses}" />
+    <SolidColorBrush x:Key="KuasProses" Color="{StaticResource WarnaProses}" />
+    <SolidColorBrush x:Key="KuasBahaya" Color="{StaticResource WarnaBahaya}" />
+    <SolidColorBrush x:Key="KuasNetral" Color="{StaticResource WarnaNetral}" />
+
+    <SolidColorBrush x:Key="KuasSuksesLembut" Color="#FFE6F4EF" />
+    <SolidColorBrush x:Key="KuasProsesLembut" Color="#FFFDF1E0" />
+    <SolidColorBrush x:Key="KuasBahayaLembut" Color="#FFFDEAE8" />
+    <SolidColorBrush x:Key="KuasAksenLembut" Color="#FFE8EFFD" />
+
+</ResourceDictionary>

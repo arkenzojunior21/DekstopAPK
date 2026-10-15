@@ -1,0 +1,154 @@
+<Window x:Class="Laundry.Desktop.Views.JendelaUtama"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Laundry.Desktop.ViewModels"
+        xmlns:v="clr-namespace:Laundry.Desktop.Views"
+        Title="Laundry Desk" Height="820" Width="1320" MinHeight="640" MinWidth="1000"
+        Language="id-ID"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource KuasLatar}"
+        FontFamily="{StaticResource FontUtama}">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:BerandaAdminViewModel}">
+            <v:BerandaAdminView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:BerandaPelangganViewModel}">
+            <v:BerandaPelangganView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:PesananViewModel}">
+            <v:PesananView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:PesanBaruViewModel}">
+            <v:PesanBaruView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:KatalogViewModel}">
+            <v:KatalogView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:PelangganViewModel}">
+            <v:PelangganView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SlotViewModel}">
+            <v:SlotView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:KomplainViewModel}">
+            <v:KomplainView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:LaporanViewModel}">
+            <v:LaporanView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AuditViewModel}">
+            <v:AuditView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SistemViewModel}">
+            <v:SistemView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:PesananSayaViewModel}">
+            <v:PesananSayaView />
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="236" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sisi kiri: menu sesuai peran. -->
+        <Border Grid.Column="0" Background="{DynamicResource KuasSisi}">
+            <DockPanel LastChildFill="True">
+                <StackPanel DockPanel.Dock="Top" Margin="20,20,20,14" Orientation="Horizontal">
+                    <Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource KuasAksen}">
+                        <TextBlock Text="L" Foreground="White" FontWeight="Bold" FontSize="16"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Laundry Desk" Foreground="White" FontSize="14" FontWeight="Bold" />
+                        <TextBlock Text="{Binding Sesi.Peran}" Foreground="{DynamicResource KuasSisiTeks}"
+                                   FontSize="11" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Bottom" Margin="16,10,16,16">
+                    <Separator Background="#33FFFFFF" />
+                    <Button Command="{Binding GantiTemaCommand}" Style="{StaticResource TombolHalus}"
+                            Foreground="{DynamicResource KuasSisiTeks}" HorizontalContentAlignment="Left">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE706;" FontFamily="{StaticResource FontIkon}" Margin="2,0,10,0" />
+                            <TextBlock Text="{Binding NamaTema, StringFormat=Tema: {0}}" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding KeluarCommand}" Style="{StaticResource TombolHalus}"
+                            Foreground="{DynamicResource KuasSisiTeks}" HorizontalContentAlignment="Left">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE7E8;" FontFamily="{StaticResource FontIkon}" Margin="2,0,10,0" />
+                            <TextBlock Text="Keluar" />
+                        </StackPanel>
+                    </Button>
+                    <TextBlock Text="{Binding Versi}" Foreground="#66B9C8E2" FontSize="10.5" Margin="12,8,0,0" />
+                </StackPanel>
+
+                <ListBox Background="Transparent" BorderThickness="0" Margin="0,4,0,0"
+                         ItemsSource="{Binding Menu}" SelectedItem="{Binding MenuAktif}"
+                         ItemContainerStyle="{StaticResource MenuSisi}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Ikon}" FontFamily="{StaticResource FontIkon}"
+                                           FontSize="15" Width="22" Foreground="{DynamicResource KuasSisiTeks}" />
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Judul}" Foreground="White" FontSize="13"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding Keterangan}" Foreground="#99B9C8E2" FontSize="10.5" />
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- Kanan: bilah atas + halaman aktif. -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="{DynamicResource KuasPermukaan}"
+                    BorderBrush="{DynamicResource KuasGaris}" BorderThickness="0,0,0,1" Padding="24,14,24,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{Binding MenuAktif.Judul}" Style="{StaticResource TeksJudul}" />
+                        <TextBlock Text="{Binding MenuAktif.Keterangan}" Style="{StaticResource TeksSub}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding StatusSinkron}" Style="{StaticResource TeksKecil}"
+                                   VerticalAlignment="Center" Margin="0,0,14,0"
+                                   Visibility="{Binding StatusSinkron, Converter={StaticResource Kosong}}" />
+                        <Border Style="{StaticResource Lencana}">
+                            <TextBlock Style="{StaticResource TeksLencana}"
+                                       Text="{Binding Sesi.Sapaan, StringFormat={}{0}}" />
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <ContentControl Grid.Row="1" Content="{Binding Halaman}" Margin="24,20,24,12"
+                            VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" />
+
+            <!-- Toast: hasil/galat terakhir dari aksi apa pun. -->
+            <Border Grid.Row="2" x:Name="KartuToast" HorizontalAlignment="Right" Margin="0,0,24,16"
+                    Background="{DynamicResource KuasPermukaan}" BorderBrush="{DynamicResource KuasGaris}"
+                    BorderThickness="1" CornerRadius="{StaticResource RadiusKecil}" Padding="14,9,14,9"
+                    Visibility="Collapsed">
+                <TextBlock x:Name="IsiToast" Style="{StaticResource TeksKecil}" MaxWidth="460"
+                           TextWrapping="Wrap" Foreground="{DynamicResource KuasTeks}" />
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
