@@ -6,19 +6,61 @@ body {
   color: #0f172a;
 }
 
-.topbar {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  padding: 18px 28px;
+.kerangka { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 210px;
+  flex-shrink: 0;
   background: #0f172a;
   color: #fff;
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
-.topbar h1 { font-size: 20px; font-weight: 700; }
-.topbar .sub { font-size: 13px; color: #94a3b8; }
+.merek {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 0 8px;
+}
 
-main { padding: 28px; max-width: 1100px; }
+.logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.merek strong { display: block; font-size: 14px; }
+.merek small { color: #94a3b8; font-size: 11px; }
+
+.sidebar nav { display: flex; flex-direction: column; gap: 4px; }
+
+.sidebar nav button {
+  text-align: left;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #cbd5e1;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sidebar nav button:hover { background: #1e293b; color: #fff; }
+.sidebar nav button.nav-aktif { background: #2563eb; color: #fff; }
+
+.konten { flex: 1; padding: 28px; max-width: 1040px; }
 
 .kartu {
   background: #fff;
@@ -80,7 +122,7 @@ input[type="search"] { width: 240px; }
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 10px 12px;
   margin-bottom: 12px;
 }
@@ -98,7 +140,7 @@ input[type="search"] { width: 240px; }
 
 .form input { width: 100%; }
 
-.form-aksi { display: flex; align-items: center; gap: 8px; }
+.form-aksi { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
 .error { color: #b91c1c; font-size: 12px; }
 
@@ -119,9 +161,10 @@ th {
   color: #64748b;
 }
 
+td.angka { font-variant-numeric: tabular-nums; }
 tbody tr:hover { background: #f8fafc; }
 
 td.aksi { white-space: nowrap; }
 td.aksi .btn + .btn { margin-left: 4px; }
 
-#kosong { padding: 16px 0; font-size: 13px; color: #64748b; }
+.kartu p.kosong { padding: 16px 0; font-size: 13px; color: #64748b; }

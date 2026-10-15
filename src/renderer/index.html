@@ -7,53 +7,115 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <header class="topbar">
-    <h1>LaundryFlow Desk</h1>
-    <span class="sub">Kasir &amp; Manajemen Laundry</span>
-  </header>
-  <main>
-    <section class="kartu">
-      <div class="kartu-kepala">
-        <h2>Data Pelanggan</h2>
-        <div class="cari-wrap">
-          <input type="search" id="cari" placeholder="Cari nama / no HP..." />
-          <button class="btn utama" id="btn-baru">+ Pelanggan Baru</button>
+  <div class="kerangka">
+    <aside class="sidebar">
+      <div class="merek">
+        <span class="logo">LF</span>
+        <div>
+          <strong>LaundryFlow</strong>
+          <small>Desk — Kasir Laundry</small>
         </div>
       </div>
+      <nav>
+        <button class="nav-aktif" data-halaman="pelanggan">Pelanggan</button>
+        <button data-halaman="layanan">Layanan</button>
+      </nav>
+    </aside>
 
-      <form class="form" id="form" hidden>
-        <h3 id="form-judul">Pelanggan Baru</h3>
-        <div class="form-grid">
-          <label>Nama
-            <input id="nama" type="text" autocomplete="off" required />
-          </label>
-          <label>No. HP
-            <input id="no_hp" type="tel" autocomplete="off" required />
-          </label>
-          <label class="lebar">Alamat
-            <input id="alamat" type="text" autocomplete="off" required />
-          </label>
-        </div>
-        <div class="form-aksi">
-          <button type="submit" class="btn utama">Simpan</button>
-          <button type="button" class="btn polos" id="btn-batal">Batal</button>
-          <span class="error" id="form-error"></span>
-        </div>
-      </form>
+    <main class="konten">
+      <section class="halaman" id="halaman-pelanggan">
+        <div class="kartu">
+          <div class="kartu-kepala">
+            <h2>Data Pelanggan</h2>
+            <div class="cari-wrap">
+              <input type="search" id="cari" placeholder="Cari nama / no HP..." />
+              <button class="btn utama" id="btn-baru">+ Pelanggan Baru</button>
+            </div>
+          </div>
 
-      <div class="tabel-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th><th>Nama</th><th>No. HP</th><th>Alamat</th><th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-        <p id="kosong" hidden>Tidak ada data pelanggan.</p>
-      </div>
-    </section>
-  </main>
+          <form class="form" id="form" hidden>
+            <h3 id="form-judul">Pelanggan Baru</h3>
+            <div class="form-grid">
+              <label>Nama
+                <input id="nama" type="text" autocomplete="off" required />
+              </label>
+              <label>No. HP
+                <input id="no_hp" type="tel" autocomplete="off" required />
+              </label>
+              <label class="lebar">Alamat
+                <input id="alamat" type="text" autocomplete="off" required />
+              </label>
+            </div>
+            <div class="form-aksi">
+              <button type="submit" class="btn utama">Simpan</button>
+              <button type="button" class="btn polos" id="btn-batal">Batal</button>
+              <span class="error" id="form-error"></span>
+            </div>
+          </form>
+
+          <div class="tabel-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>Nama</th><th>No. HP</th><th>Alamat</th><th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+            <p id="kosong" hidden>Tidak ada data pelanggan.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="halaman" id="halaman-layanan" hidden>
+        <div class="kartu">
+          <div class="kartu-kepala">
+            <h2>Layanan &amp; Harga</h2>
+            <div class="cari-wrap">
+              <input type="search" id="cari-layanan" placeholder="Cari layanan..." />
+              <button class="btn utama" id="btn-baru-layanan">+ Layanan Baru</button>
+            </div>
+          </div>
+
+          <form class="form" id="form-layanan" hidden>
+            <h3 id="form-judul-layanan">Layanan Baru</h3>
+            <div class="form-grid">
+              <label>Nama Layanan
+                <input id="nama_layanan" type="text" autocomplete="off" required />
+              </label>
+              <label>Satuan
+                <input id="satuan" type="text" placeholder="kg / pasang / potong" autocomplete="off" required />
+              </label>
+              <label>Harga per Satuan (Rp)
+                <input id="harga" type="number" min="0" step="500" autocomplete="off" required />
+              </label>
+            </div>
+            <div class="form-aksi">
+              <button type="submit" class="btn utama">Simpan</button>
+              <button type="button" class="btn polos" id="btn-batal-layanan">Batal</button>
+              <span class="error" id="form-error-layanan"></span>
+            </div>
+          </form>
+
+          <div class="tabel-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>Nama Layanan</th><th>Satuan</th><th>Harga</th><th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-layanan"></tbody>
+            </table>
+            <p id="kosong-layanan" hidden>Tidak ada data layanan.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/util.js"></script>
+  <script src="js/pelanggan.js"></script>
+  <script src="js/layanan.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

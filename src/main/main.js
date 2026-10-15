@@ -20,20 +20,38 @@ app.whenReady().then(() => {
 
   if (process.argv.includes('--smoke')) {
     const pelanggan = require('./db/pelanggan');
-    const hasil = pelanggan.tambah({
+    const layanan = require('./db/layanan');
+
+    const p = pelanggan.tambah({
       nama: 'Uji Coba',
       no_hp: '081234567890',
       alamat: 'Jl. Tes No. 1',
     });
-    pelanggan.ubah(hasil.id_pelanggan, {
+    pelanggan.ubah(p.id_pelanggan, {
       nama: 'Uji Coba Edit',
       no_hp: '081234567890',
       alamat: 'Jl. Tes No. 2',
     });
-    const ketemu = pelanggan.getAll().some((p) => p.nama === 'Uji Coba Edit');
-    pelanggan.hapus(hasil.id_pelanggan);
+    const pelangganOk = pelanggan.getAll().some((x) => x.nama === 'Uji Coba Edit');
+    pelanggan.hapus(p.id_pelanggan);
+
+    const l = layanan.tambah({
+      nama_layanan: 'Uji Layanan',
+      satuan: 'kg',
+      harga_persatuan: 1000,
+    });
+    layanan.ubah(l.id_layanan, {
+      nama_layanan: 'Uji Layanan Edit',
+      satuan: 'item',
+      harga_persatuan: 2000,
+    });
+    const layananOk = layanan.getAll().some((x) => x.nama_layanan === 'Uji Layanan Edit');
+    layanan.hapus(l.id_layanan);
+
     const n = db.prepare('SELECT COUNT(*) AS n FROM layanan').get().n;
-    console.log(`SMOKE_OK db="${db.name}" layanan=${n} pelangganCRUD=${ketemu}`);
+    console.log(
+      `SMOKE_OK db="${db.name}" layanan=${n} pelangganCRUD=${pelangganOk} layananCRUD=${layananOk}`
+    );
     app.quit();
     return;
   }

@@ -7,4 +7,10 @@ contextBridge.exposeInMainWorld('api', {
     ubah: (id, data) => ipcRenderer.invoke('pelanggan:ubah', id, data),
     hapus: (id) => ipcRenderer.invoke('pelanggan:hapus', id),
   },
+  layanan: {
+    getAll: () => ipcRenderer.invoke('layanan:getAll'),
+    tambah: (data) => ipcRenderer.invoke('layanan:tambah', data),
+    ubah: (id, data) => ipcRenderer.invoke('layanan:ubah', id, data),
+    hapus: (id) => ipcRenderer.invoke('layanan:hapus', id),
+  },
 });
