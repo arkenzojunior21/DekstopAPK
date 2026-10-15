@@ -17,5 +17,6 @@ contextBridge.exposeInMainWorld('api', {
     buat: (data) => ipcRenderer.invoke('transaksi:buat', data),
     getAll: () => ipcRenderer.invoke('transaksi:getAll'),
     getById: (id) => ipcRenderer.invoke('transaksi:getById', id),
+    ubahStatus: (id, statusBaru) => ipcRenderer.invoke('transaksi:ubahStatus', id, statusBaru),
   },
 });

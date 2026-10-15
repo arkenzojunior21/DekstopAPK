@@ -17,10 +17,11 @@
         </div>
       </div>
       <nav>
-        <button class="nav-aktif" data-halaman="pelanggan">Pelanggan</button>
-        <button data-halaman="layanan">Layanan</button>
-        <button data-halaman="transaksi">Transaksi</button>
+        <button class="nav-aktif" data-halaman="pelanggan"><span class="ikon">👥</span>Pelanggan</button>
+        <button data-halaman="layanan"><span class="ikon">🧺</span>Layanan</button>
+        <button data-halaman="transaksi"><span class="ikon">🧾</span>Transaksi</button>
       </nav>
+      <div class="kaki">LaundryFlow Desk v1.0</div>
     </aside>
 
     <main class="konten">
@@ -112,6 +113,24 @@
         </div>
       </section>
       <section class="halaman" id="halaman-transaksi" hidden>
+        <div class="stat-grid">
+          <div class="stat proses">
+            <span class="label"><span class="titik titik-proses"></span> Masih Diproses</span>
+            <span class="nilai" id="stat-proses">0</span>
+          </div>
+          <div class="stat selesai">
+            <span class="label"><span class="titik titik-selesai"></span> Siap Diambil</span>
+            <span class="nilai" id="stat-selesai">0</span>
+          </div>
+          <div class="stat diambil">
+            <span class="label"><span class="titik titik-diambil"></span> Sudah Diambil</span>
+            <span class="nilai" id="stat-diambil">0</span>
+          </div>
+          <div class="stat piutang">
+            <span class="label"><span class="titik titik-piutang"></span> Sisa Bayar Aktif</span>
+            <span class="nilai" id="stat-piutang">Rp0</span>
+          </div>
+        </div>
         <div class="kartu">
           <div class="kartu-kepala">
             <h2>Terima Cucian</h2>
@@ -119,7 +138,7 @@
           <form class="form" id="form-transaksi">
             <div class="form-grid">
               <label>Pelanggan
-                <select id="tr-pelanggan"></select>
+                <select id="tr-pelanggan" required></select>
               </label>
               <label>Tanggal Masuk
                 <input type="date" id="tr-masuk" required />
@@ -157,13 +176,19 @@
         <div class="kartu">
           <div class="kartu-kepala">
             <h2>Riwayat Transaksi</h2>
+            <div class="chip-bar" id="chip-status">
+              <button class="chip aktif" data-filter="Semua">Semua</button>
+              <button class="chip" data-filter="Proses">Proses</button>
+              <button class="chip" data-filter="Selesai">Selesai</button>
+              <button class="chip" data-filter="Diambil">Diambil</button>
+            </div>
           </div>
           <div class="tabel-wrap">
             <table>
               <thead>
                 <tr>
                   <th>ID</th><th>Pelanggan</th><th>Masuk</th><th>Estimasi</th>
-                  <th>Total</th><th>DP</th><th>Sisa</th><th>Status</th>
+                  <th>Total</th><th>DP</th><th>Sisa</th><th>Status</th><th>Aksi</th>
                 </tr>
               </thead>
               <tbody id="tbody-transaksi"></tbody>
@@ -173,6 +198,16 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <div class="modal-lapisan" id="modal-detail" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-kepala">
+        <h3 id="modal-judul">Detail Transaksi</h3>
+        <button class="btn polos" id="modal-tutup">✕ Tutup</button>
+      </div>
+      <div class="modal-isi" id="modal-isi"></div>
+    </div>
   </div>
 
   <script src="js/util.js"></script>

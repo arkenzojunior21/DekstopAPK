@@ -6,6 +6,7 @@
   let pelanggan = [];
   let layanan = [];
   let riwayat = [];
+  let filterStatus = 'Semua';
 
   const fmtTgl = (d) =>
     new Date(d + 'T00:00:00').toLocaleDateString('id-ID', {
@@ -35,13 +36,33 @@
 
   async function muatRiwayat() {
     riwayat = await api.getAll();
+    renderStatistik();
     renderRiwayat();
   }
 
+  function renderStatistik() {
+    const hitung = (s) => riwayat.filter((t) => t.status === s).length;
+    el('stat-proses').textContent = hitung('Proses');
+    el('stat-selesai').textContent = hitung('Selesai');
+    el('stat-diambil').textContent = hitung('Diambil');
+    const piutang = riwayat
+      .filter((t) => t.status !== 'Diambil')
+      .reduce((s, t) => s + t.sisa_bayar, 0);
+    el('stat-piutang').textContent = rupiah(piutang);
+  }
+
+  const AKSI = {
+    Proses: { label: 'Tandai Selesai', ke: 'Selesai' },
+    Selesai: { label: 'Tandai Diambil', ke: 'Diambil' },
+  };
+
   function renderRiwayat() {
-    el('tbody-transaksi').innerHTML = riwayat
-      .map(
-        (t) => `<tr>
+    const tampil =
+      filterStatus === 'Semua' ? riwayat : riwayat.filter((t) => t.status === filterStatus);
+    el('tbody-transaksi').innerHTML = tampil
+      .map((t) => {
+        const aksi = AKSI[t.status];
+        return `<tr>
           <td>#${t.id_transaksi}</td>
           <td>${esc(t.nama_pelanggan)}</td>
           <td>${fmtTgl(t.tanggal_masuk)}</td>
@@ -50,11 +71,96 @@
           <td class="angka">${rupiah(t.dp)}</td>
           <td class="angka">${rupiah(t.sisa_bayar)}</td>
           <td><span class="badge badge-${t.status.toLowerCase()}">${t.status}</span></td>
-        </tr>`
-      )
+          <td class="aksi">
+            <button class="btn kecil" data-detail="${t.id_transaksi}">Detail</button>${
+              aksi
+                ? ` <button class="btn kecil ${aksi.ke === 'Selesai' ? 'hijau' : ''}" data-status="${aksi.ke}" data-id="${t.id_transaksi}">${aksi.label}</button>`
+                : ''
+            }
+          </td>
+        </tr>`;
+      })
       .join('');
-    el('kosong-transaksi').hidden = riwayat.length > 0;
+    el('kosong-transaksi').hidden = tampil.length > 0;
   }
+
+  el('chip-status').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    filterStatus = chip.dataset.filter;
+    document.querySelectorAll('#chip-status .chip').forEach((c) => {
+      c.classList.toggle('aktif', c === chip);
+    });
+    renderRiwayat();
+  });
+
+  async function bukaDetail(id) {
+    const t = await api.getById(id);
+    if (!t) return;
+    el('modal-judul').textContent = `Transaksi #${t.id_transaksi} — ${t.nama_pelanggan}`;
+    el('modal-isi').innerHTML = `
+      <div class="info-grid">
+        <div class="info"><div class="k">No. HP</div><div class="v">${esc(t.no_hp)}</div></div>
+        <div class="info"><div class="k">Masuk</div><div class="v">${fmtTgl(t.tanggal_masuk)}</div></div>
+        <div class="info"><div class="k">Estimasi Selesai</div><div class="v">${fmtTgl(t.tanggal_estimasi)}</div></div>
+        <div class="info"><div class="k">Status</div><div class="v"><span class="badge badge-${t.status.toLowerCase()}">${t.status}</span></div></div>
+      </div>
+      <div class="tabel-wrap">
+        <table>
+          <thead><tr><th>Layanan</th><th>Jumlah</th><th>Harga</th><th>Subtotal</th></tr></thead>
+          <tbody>${t.items
+            .map(
+              (i) => `<tr>
+                <td>${esc(i.nama_layanan_snapshot)}</td>
+                <td class="angka">${i.jumlah} ${esc(i.satuan || '')}</td>
+                <td class="angka">${rupiah(i.harga_snapshot)}</td>
+                <td class="angka">${rupiah(i.subtotal)}</td>
+              </tr>`
+            )
+            .join('')}</tbody>
+          <tfoot>
+            <tr><td colspan="3">Total Bayar</td><td>${rupiah(t.total_bayar)}</td></tr>
+            <tr><td colspan="3">DP</td><td>${rupiah(t.dp)}</td></tr>
+            <tr><td colspan="3">Sisa Bayar</td><td>${rupiah(t.sisa_bayar)}</td></tr>
+          </tfoot>
+        </table>
+      </div>`;
+    el('modal-detail').hidden = false;
+  }
+
+  el('modal-tutup').addEventListener('click', () => {
+    el('modal-detail').hidden = true;
+  });
+
+  el('modal-detail').addEventListener('click', (e) => {
+    if (e.target === el('modal-detail')) el('modal-detail').hidden = true;
+  });
+
+  el('tbody-transaksi').addEventListener('click', async (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    if (btn.dataset.detail) {
+      try {
+        await bukaDetail(Number(btn.dataset.detail));
+      } catch (err) {
+        alert(pesanError(err));
+      }
+      return;
+    }
+    const id = Number(btn.dataset?.id);
+    const ke = btn.dataset?.status;
+    if (!id || !ke) return;
+    if (!confirm(`Ubah status transaksi #${id} menjadi "${ke}"?`)) return;
+    try {
+      const hasil = await api.ubahStatus(id, ke);
+      if (hasil.wa && !hasil.wa.dibuka) {
+        alert(`Status diubah ke "${ke}".\nNotifikasi WA tidak terkirim: ${hasil.wa.alasan}`);
+      }
+      await muatRiwayat();
+    } catch (err) {
+      alert(pesanError(err));
+    }
+  });
 
   function tambahBaris() {
     const row = document.createElement('div');
@@ -136,6 +242,11 @@
       dp: Number(el('tr-dp').value) || 0,
       items,
     };
+    const total = hitungTotal();
+    if (data.dp > total) {
+      el('tr-error').textContent = 'DP tidak boleh melebihi total bayar.';
+      return;
+    }
     try {
       const r = await api.buat(data);
       alert(`Transaksi #${r.id_transaksi} tersimpan.\nTotal: ${rupiah(r.total)}`);

@@ -3,8 +3,12 @@ const path = require('path');
 
 function buatWindow() {
   const win = new BrowserWindow({
-    width: 1100,
-    height: 720,
+    width: 1200,
+    height: 760,
+    minWidth: 980,
+    minHeight: 640,
+    backgroundColor: '#eef2f8',
+    icon: path.join(__dirname, '..', '..', 'build', 'icon.png'),
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),
@@ -18,6 +22,45 @@ function buatWindow() {
 
 app.whenReady().then(() => {
   const db = require('./db/koneksi');
+
+  if (process.argv.includes('--seed-demo')) {
+    const pelanggan = require('./db/pelanggan');
+    const transaksi = require('./db/transaksi');
+    const sudah = db.prepare('SELECT COUNT(*) AS n FROM transaksi').get().n;
+    if (sudah > 0) {
+      console.log(`SEED_LEWATI sudah ada ${sudah} transaksi.`);
+      app.quit();
+      return;
+    }
+    const hariIni = new Date();
+    const tgl = (offset) => {
+      const d = new Date(hariIni.getTime() + offset * 86400000);
+      return d.toISOString().slice(0, 10);
+    };
+    const budi = pelanggan.tambah({ nama: 'Budi Santoso', no_hp: '081234567890', alamat: 'Jl. Merdeka No. 10' });
+    const sari = pelanggan.tambah({ nama: 'Sari Dewi', no_hp: '082198765432', alamat: 'Jl. Kenanga No. 5' });
+    const layanan = require('./db/layanan').getAll();
+    const cuciSetrika = layanan.find((l) => l.nama_layanan === 'Cuci Kering Setrika');
+    const sepatu = layanan.find((l) => l.nama_layanan === 'Cuci Sepatu');
+    const t1 = transaksi.buat({
+      id_pelanggan: budi.id_pelanggan,
+      tanggal_masuk: tgl(-4),
+      tanggal_estimasi: tgl(-1),
+      dp: 20000,
+      items: [{ id_layanan: cuciSetrika.id_layanan, jumlah: 3 }],
+    });
+    transaksi.ubahStatus(t1.id_transaksi, 'Selesai');
+    transaksi.buat({
+      id_pelanggan: sari.id_pelanggan,
+      tanggal_masuk: tgl(0),
+      tanggal_estimasi: tgl(3),
+      dp: 0,
+      items: [{ id_layanan: sepatu.id_layanan, jumlah: 2 }],
+    });
+    console.log('SEED_OK 2 pelanggan demo + 2 transaksi demo ditambahkan.');
+    app.quit();
+    return;
+  }
 
   if (process.argv.includes('--smoke')) {
     const pelanggan = require('./db/pelanggan');
@@ -82,6 +125,25 @@ app.whenReady().then(() => {
     const snapshotOk =
       transaksi.getById(t.id_transaksi).items[0].harga_snapshot === 7000;
 
+    let tolakSalah = false;
+    try {
+      transaksi.ubahStatus(t.id_transaksi, 'Diambil');
+    } catch {
+      tolakSalah = true;
+    }
+    transaksi.ubahStatus(t.id_transaksi, 'Selesai');
+    transaksi.ubahStatus(t.id_transaksi, 'Diambil');
+    let tolakUlang = false;
+    try {
+      transaksi.ubahStatus(t.id_transaksi, 'Selesai');
+    } catch {
+      tolakUlang = true;
+    }
+    const statusOk =
+      tolakSalah &&
+      tolakUlang &&
+      transaksi.getById(t.id_transaksi).status === 'Diambil';
+
     db.prepare('DELETE FROM detail_transaksi WHERE id_transaksi = ?').run(t.id_transaksi);
     db.prepare('DELETE FROM transaksi WHERE id_transaksi = ?').run(t.id_transaksi);
     layanan.ubah(cuci.id_layanan, {
@@ -93,7 +155,7 @@ app.whenReady().then(() => {
 
     const n = db.prepare('SELECT COUNT(*) AS n FROM layanan').get().n;
     console.log(
-      `SMOKE_OK db="${db.name}" layanan=${n} pelangganCRUD=${pelangganOk} layananCRUD=${layananOk} transaksiOK=${transaksiOk} snapshotOK=${snapshotOk}`
+      `SMOKE_OK db="${db.name}" layanan=${n} pelangganCRUD=${pelangganOk} layananCRUD=${layananOk} transaksiOK=${transaksiOk} snapshotOK=${snapshotOk} statusOK=${statusOk}`
     );
     app.quit();
     return;

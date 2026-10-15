@@ -81,6 +81,12 @@ const simpan = db.transaction((data) => {
   return { id_transaksi, total };
 });
 
+const TRANSISI = {
+  Proses: ['Selesai'],
+  Selesai: ['Diambil'],
+  Diambil: [],
+};
+
 module.exports = {
   buat: (data) => simpan(validasi(data)),
 
@@ -111,5 +117,25 @@ module.exports = {
       )
       .all(id);
     return header;
+  },
+
+  ubahStatus: (id, statusBaru) => {
+    if (!TRANSISI[statusBaru]) {
+      throw new Error(`Status "${statusBaru}" tidak dikenal.`);
+    }
+    const t = db
+      .prepare(
+        `SELECT t.*, p.nama AS nama_pelanggan, p.no_hp
+         FROM transaksi t JOIN pelanggan p ON p.id_pelanggan = t.id_pelanggan
+         WHERE t.id_transaksi = ?`
+      )
+      .get(id);
+    if (!t) throw new Error(`Transaksi #${id} tidak ditemukan.`);
+    if (!TRANSISI[t.status].includes(statusBaru)) {
+      throw new Error(`Transisi ${t.status} → ${statusBaru} tidak diizinkan.`);
+    }
+    db.prepare('UPDATE transaksi SET status = ? WHERE id_transaksi = ?').run(statusBaru, id);
+    t.status = statusBaru;
+    return t;
   },
 };

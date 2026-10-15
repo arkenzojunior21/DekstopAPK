@@ -2,6 +2,7 @@ const { ipcMain } = require('electron');
 const pelanggan = require('./db/pelanggan');
 const layanan = require('./db/layanan');
 const transaksi = require('./db/transaksi');
+const wa = require('./wa');
 
 ipcMain.handle('pelanggan:getAll', () => pelanggan.getAll());
 ipcMain.handle('pelanggan:tambah', (_e, data) => pelanggan.tambah(data));
@@ -16,3 +17,11 @@ ipcMain.handle('layanan:hapus', (_e, id) => layanan.hapus(id));
 ipcMain.handle('transaksi:buat', (_e, data) => transaksi.buat(data));
 ipcMain.handle('transaksi:getAll', () => transaksi.getAll());
 ipcMain.handle('transaksi:getById', (_e, id) => transaksi.getById(id));
+ipcMain.handle('transaksi:ubahStatus', async (_e, id, statusBaru) => {
+  const t = transaksi.ubahStatus(id, statusBaru);
+  const hasil = { transaksi: t, wa: null };
+  if (statusBaru === 'Selesai') {
+    hasil.wa = await wa.kirimWaSelesai(t);
+  }
+  return hasil;
+});
