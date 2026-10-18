@@ -109,7 +109,8 @@ public sealed class CustomerService(LaundryDbContext db, EventWriter events) : I
     private static CustomerDto Map(User u) => new(
         u.Profile!.Id, u.Profile.Nama, u.NormalizedPhone, u.Profile.Alamat, u.IsActive, u.CreatedAtUtc);
 
-    public async Task<CustomerDto> GetOrCreateAsync(Guid? customerId, string? nama, string? phone, CancellationToken ct)
+    public async Task<CustomerDto> GetOrCreateAsync(Guid? customerId, string? nama, string? phone, string? alamat,
+        CancellationToken ct)
     {
         if (customerId is not null)
         {
@@ -133,7 +134,7 @@ public sealed class CustomerService(LaundryDbContext db, EventWriter events) : I
             NormalizedPhone = normalized,
             PasswordHash = string.Empty,
             CreatedAtUtc = DateTime.UtcNow,
-            Profile = new CustomerProfile { Nama = nama.Trim() },
+            Profile = new CustomerProfile { Nama = nama.Trim(), Alamat = alamat?.Trim() },
         };
         db.Users.Add(user);
         await db.SaveChangesAsync(ct);

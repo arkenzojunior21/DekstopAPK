@@ -377,4 +377,18 @@ public class CoreFlowApiTests
         // 404, bukan 403 — keberadaan data pelanggan lain tidak dibocorkan (IDOR).
         Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
     }
+
+    [Fact]
+    public async Task AlamatPelangganIkutTersimpanSaatDibuatLewatApi()
+    {
+        var (http, admin) = await SetupAsync();
+        var dibuat = await PostJsonAsync(http, admin, "/api/customers", new
+        {
+            nama = "Pelanggan Beralamat", phone = ApiFactory.RandomPhone(), alamat = "Jalan Mawar 12",
+        });
+        Assert.Equal("Jalan Mawar 12", dibuat.GetProperty("alamat").GetString());
+
+        var dibaca = await GetAsync(http, admin, $"/api/customers/{dibuat.GetProperty("id").GetGuid()}");
+        Assert.Equal("Jalan Mawar 12", dibaca.GetProperty("alamat").GetString());
+    }
 }

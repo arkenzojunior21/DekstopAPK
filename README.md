@@ -67,6 +67,8 @@ Worker yang sama juga mengosongkan antrean notifikasi WhatsApp tiap siklus. Prov
 
 Butuh data contoh di database dev? Set `SEED_DEV_CONTOH=1` sebelum menjalankan API pada environment Development. Katalog yang dibuat diberi label `(CONTOH)` dan tarifnya hanya placeholder — tarif asli usaha tetap harus diisi lewat menu katalog.
 
+`GET /health` tidak hanya menjawab "proses API hidup": pemeriksaan `database-admin` ikut dibuka (batas 3 detik), jadi `Healthy` berarti API dan PostgreSQL sisi admin sama-sama terjangkau. Kalau API jalan tapi database mati, `/health` mengembalikan 503 dan layar login menampilkan "Server di ... hidup, tapi database-nya belum bisa dihubungi" — permintaan lain yang menabrak koneksi database juga dibalas 503 dengan pesan Indonesia, bukan pesan mentah dari EF Core.
+
 ## Aplikasi desktop (dua role)
 
 Setelah login, menu yang muncul ditentukan peran yang dikembalikan server — bukan pilihan pengguna:
@@ -92,6 +94,36 @@ dotnet publish src/Laundry.Sync -c Release -o dist/sync
 `dist/` tidak ikut ke git. Jalankan dengan berkas `.env` yang benar berada di folder proyek atau salah satu induk dari folder eksekusi (connection string, `JWT_KEY`, `WEBHOOK_SECRET` dibaca dari sana). Installer NSIS/Inno sengaja belum dipakai — distribusi untuk sekarang adalah folder hasil publish di atas.
 
 Satu hal yang perlu diketahui saat menguji hasil publish: `Laundry.Api.exe` / `Laundry.Desktop.exe` adalah apphost yang mencari runtime .NET di lokasi terpasang sistem. Di mesin yang .NET-nya terpasang level pengguna (hasil `dotnet-install.ps1 -InstallDir`), runtime itu tidak terdaftar secara global, jadi `.exe` akan menjawab "You must install or update .NET". Solusinya salah satu: pasang .NET Desktop Runtime 8 secara normal di mesin target, set `DOTNET_ROOT` ke folder runtime tersebut, atau jalankan lewat `dotnet Laundry.Api.dll`. Kedua jalur terakhir sudah dites dan jalan.
+
+## Naik ke database & hosting online
+
+Skema database dibuat lewat migrasi EF, bukan berkas SQL tangan:
+
+```powershell
+powershell -File scripts/migrate.ps1          # kedua sisi (admin lalu cloud)
+powershell -File scripts/migrate.ps1 cloud    # hanya sisi cloud
+```
+
+Connection string diambil dari environment, atau dari `.env` kalau environment kosong. Database cloud biasanya diserahkan sebagai URI — bentuk itu bisa ditempel apa adanya ke `CONN_CLOUD`, karena `EnvironmentConfig` mengubahnya sendiri jadi bentuk kunci=nilai yang dimau Npgsql (`Host=...;Port=...;Database=...;Username=...;Password=...;SSL Mode=...`, termasuk melepas kode persen pada password):
+
+```powershell
+CONN_CLOUD=postgresql://pengguna:sandi@ep-contoh.neon.tech:5432/laundry_cloud?sslmode=require
+```
+
+Sisi cloud sengaja dibangun memakai konteks migrasi `LaundryDbContext`; lewat `CloudDbContext`, EF Core tidak melihat satu pun migrasi (terbukti pada database kosong: riwayat migrasinya terbentuk tapi nol tabel). Skemanya memang identik, jadi yang membedakan hanya connection string-nya.
+
+Setelah `CONN_CLOUD` menunjuk ke database online, `Laundry.Sync` worker membangun replikanya sendiri — tidak ada impor berkas. Dibuktikan pada replika pertama (database cloud kosong, sisi admin berisi 115 pesanan hasil pengujian): 674 event keluar semua dalam 7 siklus (100 event per siklus, jeda `SYNC_INTERVAL_DETIK=15`), nol konflik, dan jumlah baris di kedua sisi sama persis — 151 pelanggan, 115 pesanan, 115 baris pesanan, 266 riwayat status, 91 pembayaran, 20 refund, 20 ledger, total pembayaran lunas Rp1.270.000. Yang memang sengaja tidak direplikasi: `AuditLogs` (jejak audit hidup di sisi tempat kejadian) dan akun Admin (hash kata sandi tidak pernah berpindah database). Replikasi penuh ini butuh sekitar 12 menit karena worker bicara ke jaringan per event; pemakaian harian hanya mengirim beberapa event per siklus sehingga tidak terasa.
+
+Kalau ada event yang tidak bisa diterapkan, worker tidak membuangnya: barisnya di `SyncConflicts` sisi tujuan ditandai `PerluRekonsiliasi` dan event-nya tetap ada di `SyncInbox` dengan status `Gagal`. `Laundry.Sync` punya jalur antrean gagal + coba ulang (`AntreanGagalAsync` / `CobaUlangGagalAsync`, muncul di layar Sistem aplikasi desktop) untuk mengembalikan antrean itu ke `Menunggu`.
+
+Di hosting, API cukup dijalankan dari hasil publish (`dotnet dist/api/Laundry.Api.dll`). Kalau host memberi port lewat variabel `PORT` dan tidak menyetel `ASPNETCORE_URLS` — kebiasaan Render/Fly.io/Koyeb — aplikasi bind ke `0.0.0.0:$PORT` dengan sendirinya. `ASPNETCORE_URLS` tetap menang kalau diset, jadi development (5104 lewat `launchSettings.json`) tidak berubah.
+
+Batas yang jujur untuk versi online:
+
+- `JWT_KEY` (minimal 32 byte) dan `WEBHOOK_SECRET` wajib diisi sendiri; repo tidak membawa nilai asli, dan `WEBHOOK_SECRET` yang kosong/`CHANGE_ME` berarti semua webhook ditolak.
+- Pekerja backup butuh `pg_dump`/`pg_restore` di mesin tempat API jalan. Di container hosting umum perkakas itu tidak ada, jadi matikan dengan `BACKUP_AUTO=0` dan jalankan backup dari mesin yang punya perkakasnya (`powershell -File scripts/db.ps1 backup`) — bukan mengandaikan backup otomatis ikut online.
+- Database gratis biasanya tidur saat tidak dipakai (scale-to-zero), jadi permintaan pertama setelah nganggur bisa lambat beberapa detik.
+- Kuota, region, dan batas gratis provider berubah sewaktu-waktu — angka pastinya tidak ditulis di sini; cek halaman harga provider sebelum menentukannya.
 
 ## Peta endpoint (v1)
 
@@ -164,7 +196,7 @@ dan mencocokkannya dengan yang diumumkan manifest; nama berkas dengan path atau 
 
 Lihat `docs/IMPLEMENTATION_PLAN.md` (fase 1–10), `docs/DECISIONS.md` (keputusan teknis), `docs/OPEN_QUESTIONS.md` (keputusan bisnis yang menunggu jawaban — tidak ditebak).
 
-Gerbang terakhir (15 Oktober 2026): `dotnet build Laundry.sln` **0 warning / 0 error**, `dotnet test Laundry.sln` **169 test hijau** (92 unit + 60 integrasi + 17 test desktop) tanpa satu pun yang dilewati. Fase 1–9 selesai; fase 10 selesai kecuali installer (sengaja belum, lihat "Membangun berkas rilis"). Provider pembayaran dan WhatsApp masih mock, dan tarif, nama usaha, serta kebijakan bisnis lain masih menunggu jawaban di `docs/OPEN_QUESTIONS.md` — tidak ada nilai yang dikarang.
+Gerbang terakhir (18 Oktober 2026): `dotnet build Laundry.sln` **0 warning / 0 error**, `dotnet test Laundry.sln` **182 test hijau** (99 unit + 66 integrasi + 17 test desktop) tanpa satu pun yang dilewati. Fase 1–9 selesai; fase 10 selesai kecuali installer (sengaja belum, lihat "Membangun berkas rilis"). Provider pembayaran dan WhatsApp masih mock, dan tarif, nama usaha, serta kebijakan bisnis lain masih menunggu jawaban di `docs/OPEN_QUESTIONS.md` — tidak ada nilai yang dikarang.
 
 ## Catatan riwayat
 

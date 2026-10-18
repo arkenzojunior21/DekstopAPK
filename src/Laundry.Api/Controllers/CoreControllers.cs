@@ -90,11 +90,11 @@ public class CustomersController(ICustomerService customers) : ControllerBase
         [FromQuery] int pageSize = 20) => customers.SearchAsync(q, page, pageSize, HttpContext.RequestAborted);
 
     [HttpGet("{id:guid}")]
-    public Task<CustomerDto> Get(Guid id) => customers.GetOrCreateAsync(id, null, null, HttpContext.RequestAborted);
+    public Task<CustomerDto> Get(Guid id) => customers.GetOrCreateAsync(id, null, null, null, HttpContext.RequestAborted);
 
     [HttpPost]
     public Task<CustomerDto> Create([FromBody] CreateCustomerRequest req) =>
-        customers.GetOrCreateAsync(null, req.Nama, req.Phone, HttpContext.RequestAborted);
+        customers.GetOrCreateAsync(null, req.Nama, req.Phone, req.Alamat, HttpContext.RequestAborted);
 
     [HttpPut("{id:guid}")]
     public Task<CustomerDto> Update(Guid id, [FromBody] UpdateCustomerRequest req) =>

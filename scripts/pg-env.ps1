@@ -5,7 +5,11 @@
 function Get-DotEnvValue {
     param([string]$Key)
 
-    if (${env:$Key}) { return ${env:$Key} }
+    # Variabel lingkungan menang atas .env — sama seperti EnvironmentConfig di aplikasi C#.
+    # Catatan: "${env:$Key}" tidak mengembang jadi nama variabelnya (selalu kosong), jadi
+    # nilainya diambil lewat API .NET.
+    $dariEnvironment = [Environment]::GetEnvironmentVariable($Key)
+    if ($dariEnvironment) { return $dariEnvironment }
     $dir = Split-Path -Parent $PSScriptRoot
     while ($dir) {
         $file = Join-Path $dir ".env"

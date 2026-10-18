@@ -233,7 +233,7 @@ public sealed class BackupService(
         NpgsqlConnectionStringBuilder csb;
         try
         {
-            csb = new NpgsqlConnectionStringBuilder(EnvironmentConfig.Get(connKey));
+            csb = new NpgsqlConnectionStringBuilder(EnvironmentConfig.GetKoneksi(connKey));
         }
         catch (ArgumentException ex)
         {

@@ -65,9 +65,13 @@ public sealed class KlienApi
         try
         {
             using var respons = await KirimSekaliAsync("health", HttpMethod.Get, null, ct, false);
-            return respons.IsSuccessStatusCode
-                ? $"Terhubung ke {BasisUrl}"
-                : $"Server menjawab {(int)respons.StatusCode} dari {BasisUrl}";
+            return respons.StatusCode switch
+            {
+                HttpStatusCode.OK => $"Terhubung ke {BasisUrl}",
+                HttpStatusCode.ServiceUnavailable =>
+                    $"Server di {BasisUrl} hidup, tapi database-nya belum bisa dihubungi.",
+                _ => $"Server menjawab {(int)respons.StatusCode} dari {BasisUrl}",
+            };
         }
         catch (ApiException ex)
         {

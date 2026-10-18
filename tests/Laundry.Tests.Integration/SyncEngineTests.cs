@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Laundry.Application.Abstractions;
 using Laundry.Application.Core;
 using Laundry.Application.Sync;
 using Laundry.Domain;
@@ -348,6 +349,94 @@ public class SyncEngineTests
         var konflik = await cloud.SyncConflicts.SingleAsync(c => c.AggregateId == asli.Id);
         Assert.Equal("PerluRekonsiliasi", konflik.Resolution);
         Assert.Equal(SyncAggregate.Payment, konflik.AggregateType);
+    }
+
+    [Fact]
+    public async Task SnapshotBerikutnyaDariPesananSamaBukanKonflik()
+    {
+        await _db.KosongkanAsync();
+        await using var admin = _db.Admin();
+        await using var cloud = _db.Cloud();
+        var (adminId, serviceId, customerId) = await SisiSiapAsync(admin);
+        var order = await BuatPesananAsync(admin, adminId, serviceId, customerId, 2m);
+        var baris = (await admin.Orders.Include(o => o.Items).FirstAsync(o => o.Id == order.Id)).Items.Single();
+
+        // Revisi timbangan mengubah subtotal baris pesanan: dua snapshot berurutan dari pesanan
+        // yang sama adalah progres, bukan divergensi dua sisi.
+        var pesanan = PesananService(admin);
+        await pesanan.TransitionAsync(order.Id, OrderStatus.DiterimaDiLaundry, adminId, null, CancellationToken.None);
+        await pesanan.RecordActualsAsync(order.Id,
+            [new ActualItemInput(baris.Id, 5m, null)], adminId, CancellationToken.None);
+        await _db.Mesin(admin, cloud).JalankanSatuSiklusAsync(CancellationToken.None);
+
+        Assert.Equal(0, await cloud.SyncConflicts.CountAsync());
+        Assert.Equal(3, await cloud.SyncInbox.CountAsync(i => i.AggregateId == order.Id));
+        var sampai = await cloud.Orders.Include(o => o.Items).FirstAsync(o => o.Id == order.Id);
+        Assert.Equal(50_000m, sampai.Items.Single().Subtotal);
+        Assert.Equal(10_000m, sampai.Items.Single().PriceSnapshot); // tarif beku tetap utuh
+        Assert.Equal(5m, sampai.ActualWeightKg);
+        Assert.Equal(OrderStatus.DitimbangDanDiverifikasi, sampai.Status);
+        Assert.Equal(await admin.OrderStatusHistories.CountAsync(h => h.OrderId == order.Id),
+            await cloud.OrderStatusHistories.CountAsync(h => h.OrderId == order.Id));
+        Assert.Equal(sampai.FinalTotal, (await admin.Orders.FirstAsync(o => o.Id == order.Id)).FinalTotal);
+    }
+
+    [Fact]
+    public async Task StatusPembayaranMajuMenyebrangTanpaKonflik()
+    {
+        await _db.KosongkanAsync();
+        await using var admin = _db.Admin();
+        await using var cloud = _db.Cloud();
+        var (adminId, serviceId, customerId) = await SisiSiapAsync(admin);
+        var order = await BuatPesananAsync(admin, adminId, serviceId, customerId, 2m);
+
+        var bayar = PembayaranService(admin);
+        var tagihan = await bayar.CreateQuoteAsync(
+            new CreateGatewayPaymentRequest(order.Id, PaymentKind.Pelunasan), adminId, CancellationToken.None);
+        await bayar.HandleWebhookAsync(
+            new GatewayPaymentUpdate(tagihan.PaymentId, tagihan.Reference, tagihan.Amount, true,
+                DateTime.UtcNow, null), CancellationToken.None);
+
+        await _db.Mesin(admin, cloud).JalankanSatuSiklusAsync(CancellationToken.None);
+
+        // Pembayaran yang sama diantrekan dua kali (menunggu → lunas); sisi tujuan ikut maju.
+        Assert.Equal(0, await cloud.SyncConflicts.CountAsync());
+        var sampai = await cloud.Payments.SingleAsync(p => p.Id == tagihan.PaymentId);
+        Assert.Equal(PaymentStatus.Lunas, sampai.Status);
+        Assert.Equal(tagihan.Amount, sampai.Amount);
+        Assert.NotNull(sampai.ConfirmedAtUtc);
+        Assert.Equal(PaymentStatus.Lunas,
+            (await cloud.Orders.FirstAsync(o => o.Id == order.Id)).PaymentStatus);
+    }
+
+    [Fact]
+    public async Task PembayaranLebihLamaTidakMemundurkanStatus()
+    {
+        await _db.KosongkanAsync();
+        await using var admin = _db.Admin();
+        await using var cloud = _db.Cloud();
+        var (adminId, serviceId, customerId) = await SisiSiapAsync(admin);
+        var order = await BuatPesananAsync(admin, adminId, serviceId, customerId, 2m);
+        var bayar = PembayaranService(admin);
+        var tagihan = await bayar.CreateQuoteAsync(
+            new CreateGatewayPaymentRequest(order.Id, PaymentKind.Pelunasan), adminId, CancellationToken.None);
+        await bayar.HandleWebhookAsync(
+            new GatewayPaymentUpdate(tagihan.PaymentId, tagihan.Reference, tagihan.Amount, true,
+                DateTime.UtcNow, null), CancellationToken.None);
+        await _db.Mesin(admin, cloud).JalankanSatuSiklusAsync(CancellationToken.None);
+
+        // Event tertunda yang baru tiba belakangan membawa status lama → dilewati, bukan konflik.
+        var tertunda = Event(await admin.Payments.FirstAsync(p => p.Id == tagihan.PaymentId)) with
+        {
+            Status = PaymentStatus.MenungguKonfirmasi,
+            ConfirmedAtUtc = null,
+            CreatedAtUtc = DateTime.UtcNow.AddMinutes(-30),
+        };
+        await SusunInboxAsync(cloud, SyncAggregate.Payment, tagihan.PaymentId, "bayar-lambat", tertunda, 77);
+        await _db.Mesin(admin, cloud).JalankanSatuSiklusAsync(CancellationToken.None);
+
+        Assert.Equal(0, await cloud.SyncConflicts.CountAsync());
+        Assert.Equal(PaymentStatus.Lunas, (await cloud.Payments.FirstAsync(p => p.Id == tagihan.PaymentId)).Status);
     }
 
     [Fact]

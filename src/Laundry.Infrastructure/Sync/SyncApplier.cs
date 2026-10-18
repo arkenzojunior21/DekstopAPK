@@ -9,8 +9,11 @@ namespace Laundry.Infrastructure.Sync;
 
 /// <summary>
 /// Menerapkan satu event inbox ke database tujuan.
-/// Aturan utama (PROMPT fase 6): baris finansial bersifat immutable — duplikat dilewati,
-/// isi yang berbeda untuk id/kunci yang sama jadi konflik untuk rekonsiliasi, bukan ditimpa.
+/// Aturan utama (PROMPT fase 6, diperhalus saat replika pertama diuji ke cloud nyata):
+/// jejak beku (nominal, kunci idempotensi, layanan + tarif pesanan yang dibekukan) bersifat
+/// immutable — isi berbeda untuk id yang sama jadi konflik untuk rekonsiliasi, bukan ditimpa.
+/// Nilai yang memang bergerak bersama status (subtotal dari timbangan nyata, status pembayaran)
+/// mengikuti event terbaru; event lama hanya dilewati, tidak memundurkan sisi penerima.
 /// </summary>
 public sealed class SyncApplier(LaundryDbContext target)
 {
@@ -153,6 +156,11 @@ public sealed class SyncApplier(LaundryDbContext target)
             return;
         }
 
+        // Replay event lama: isi pesanan yang sudah lebih baru di sisi ini tidak boleh mundur,
+        // termasuk baris dan riwayatnya yang sudah ikut maju.
+        if (Numbering(order) > waktuTerkini)
+            return;
+
         foreach (var baru in p.History)
         {
             if (order.StatusHistory.Any(h => h.Id == baru.Id)) continue;
@@ -179,14 +187,20 @@ public sealed class SyncApplier(LaundryDbContext target)
                 });
                 continue;
             }
-            // Snapshot tarif & subtotal adalah jejak finansial — tidak pernah ditimpa.
-            if (ada.PriceSnapshot != item.PriceSnapshot || ada.Subtotal != item.Subtotal)
+            // Layanan dan tarif yang dibekukan saat pesanan dibuat adalah jejak finansial — tidak pernah ditimpa.
+            if (ada.ServiceId != item.ServiceId || ada.ServiceNameSnapshot != item.ServiceName
+                || ada.UnitTypeSnapshot != item.UnitType || ada.PriceSnapshot != item.PriceSnapshot
+                || ada.MinimumWeightKgSnapshot != item.MinimumWeightKgSnapshot)
                 throw new SyncConflictException(
                     $"Baris pesanan {item.Id} berbeda antara dua sisi; perlu rekonsiliasi manual.");
+            // Timbangan/jumlah nyata dan subtotal berubah saat status bergerak (estimasi → actuals → lunas),
+            // jadi snapshot terbaru dari event yang sah boleh menimpa. Yang tidak boleh hanya jejak beku di atas.
+            ada.EstimatedWeightKg = item.EstimatedWeightKg;
+            ada.EstimatedItemCount = item.EstimatedItemCount;
+            ada.ActualWeightKg = item.ActualWeightKg;
+            ada.ActualItemCount = item.ActualItemCount;
+            ada.Subtotal = item.Subtotal;
         }
-
-        if (Numbering(order) > waktuTerkini)
-            return; // event lama datang belakangan: replay, jangan memundurkan status
 
         order.Status = p.Status;
         order.PaymentStatus = p.PaymentStatus;
@@ -209,13 +223,23 @@ public sealed class SyncApplier(LaundryDbContext target)
     private async Task TerapkanPayment(PaymentEvent p, SyncInbox row, DateTime nowUtc, CancellationToken ct)
     {
         CekJam(p.CreatedAtUtc, nowUtc, "Pembayaran");
-        if (await target.Payments.IgnoreQueryFilters().AnyAsync(x => x.Id == p.Id, ct))
+        var lama = await target.Payments.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == p.Id, ct);
+        if (lama is not null)
         {
-            var lama = await target.Payments.FirstAsync(x => x.Id == p.Id, ct);
-            if (lama.IdempotencyKey == p.IdempotencyKey && lama.Amount == p.Amount && lama.Status == p.Status)
-                return; // pengiriman ulang event yang sama → lewati
-            throw new SyncConflictException(
-                $"Pembayaran {p.Id} sudah tercatat dengan isi berbeda di sisi ini.");
+            // Nominal, kunci idempotensi, dan pemiliknya adalah jejak finansial: beda = konflik, bukan timpa.
+            if (lama.IdempotencyKey != p.IdempotencyKey || lama.Amount != p.Amount
+                || lama.OrderId != p.OrderId || lama.CustomerId != p.CustomerId
+                || lama.Kind != p.Kind || lama.Method != p.Method)
+                throw new SyncConflictException(
+                    $"Pembayaran {p.Id} sudah tercatat dengan isi berbeda di sisi ini.");
+            // Satu pembayaran diantrekan ulang saat webhook mengubah statusnya (menunggu → lunas/gagal),
+            // jadi status maju mengikuti event terbaru; event lama tidak memundurkan yang sudah lunas.
+            if (Terbaru(lama.CreatedAtUtc, [lama.ConfirmedAtUtc ?? lama.CreatedAtUtc])
+                > Terbaru(p.CreatedAtUtc, [p.ConfirmedAtUtc ?? p.CreatedAtUtc])) return;
+            lama.Status = p.Status;
+            lama.ProviderReference = p.ProviderReference;
+            lama.ConfirmedAtUtc = p.ConfirmedAtUtc;
+            return;
         }
         if (await target.Payments.IgnoreQueryFilters().AnyAsync(x => x.IdempotencyKey == p.IdempotencyKey, ct))
             return; // kunci idempotensi sama = pembayaran yang sama

@@ -19,20 +19,30 @@ using Laundry.Infrastructure.Update;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Hosting gratis (Render, Fly.io, Koyeb) memberitahu port lewat variabel PORT dan expects
+// aplikasi bind ke 0.0.0.0. ASPNETCORE_URLS tetap menang kalau diset — termasuk oleh
+// launchSettings.json saat `dotnet run` di development.
+var portHosting = Environment.GetEnvironmentVariable("PORT");
+if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ASPNETCORE_URLS"))
+    && int.TryParse(portHosting, out var nomorPort) && nomorPort is > 0 and < 65536)
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{nomorPort}");
+}
+
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(
         new System.Text.Json.Serialization.JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks().AddCheck<DatabaseHealthCheck>("database-admin");
 
 builder.Services.AddDbContext<LaundryDbContext>(o =>
 {
-    o.UseNpgsql(EnvironmentConfig.Get("CONN_ADMIN"));
+    o.UseNpgsql(EnvironmentConfig.GetKoneksi("CONN_ADMIN"));
     if (builder.Environment.IsDevelopment()) o.EnableSensitiveDataLogging();
 });
 // Database cloud untuk sisi sync; model dan migrasi sama, hanya connection string berbeda.
-builder.Services.AddDbContext<CloudDbContext>(o => o.UseNpgsql(EnvironmentConfig.Get("CONN_CLOUD")));
+builder.Services.AddDbContext<CloudDbContext>(o => o.UseNpgsql(EnvironmentConfig.GetKoneksi("CONN_CLOUD")));
 builder.Services.AddSingleton(SyncConfig.DariLingkungan());
 builder.Services.AddScoped<SyncEngine>();
 
@@ -130,6 +140,10 @@ app.UseExceptionHandler(errApp => errApp.Run(async context =>
     context.Response.ContentType = "application/json";
     var (code, message) = ex switch
     {
+        // Koneksi database mati bukan salah pengguna: tanpa kasus ini, pesan bahasa Inggris
+        // dari EF Core ("transient failure") muncul di layar login dengan status 400.
+        _ when DatabaseTidakTerhubung(ex) => (StatusCodes.Status503ServiceUnavailable,
+            "Database belum dapat dihubungi. Pastikan server PostgreSQL menyala, lalu coba lagi."),
         KeyNotFoundException ke => (StatusCodes.Status404NotFound, ke.Message),
         UnauthorizedAccessException ua => (StatusCodes.Status403Forbidden, ua.Message),
         InvalidOperationException io => (StatusCodes.Status400BadRequest, io.Message),
@@ -157,4 +171,20 @@ if (builder.Environment.IsDevelopment() && EnvironmentConfig.Get("SEED_DEV_CONTO
 
 app.Run();
 
-public partial class Program { }
+public partial class Program
+{
+    /// <summary>
+    /// Membedakan "database tidak terjangkau" dari <see cref="InvalidOperationException"/> bisnis
+    /// (yang pesannya sudah berbahasa Indonesia) lewat rantai inner exception.
+    /// </summary>
+    public static bool DatabaseTidakTerhubung(Exception? ex)
+    {
+        for (var jalan = ex; jalan is not null; jalan = jalan.InnerException)
+        {
+            if (jalan is Npgsql.NpgsqlException or Microsoft.EntityFrameworkCore.DbUpdateException)
+                return true;
+        }
+
+        return false;
+    }
+}

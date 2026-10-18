@@ -12,7 +12,8 @@ public interface ICatalogService
 
 public interface ICustomerService
 {
-    Task<CustomerDto> GetOrCreateAsync(Guid? customerId, string? nama, string? phone, CancellationToken ct);
+    Task<CustomerDto> GetOrCreateAsync(Guid? customerId, string? nama, string? phone, string? alamat,
+        CancellationToken ct);
     Task<List<CustomerDto>> SearchAsync(string? query, int page, int pageSize, CancellationToken ct);
     Task<CustomerDto> UpdateAsync(Guid customerId, UpdateCustomerRequest req, CancellationToken ct);
     Task<CustomerDto> SetActiveAsync(Guid customerId, bool aktif, CancellationToken ct);

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore;
 var builder = Host.CreateApplicationBuilder(args);
 
 // Dua sisi database: admin lokal (sisi kerja kasir) dan cloud (sisi pelanggan/analitik).
-builder.Services.AddDbContext<LaundryDbContext>(o => o.UseNpgsql(EnvironmentConfig.Get("CONN_ADMIN")));
-builder.Services.AddDbContext<CloudDbContext>(o => o.UseNpgsql(EnvironmentConfig.Get("CONN_CLOUD")));
+builder.Services.AddDbContext<LaundryDbContext>(o => o.UseNpgsql(EnvironmentConfig.GetKoneksi("CONN_ADMIN")));
+builder.Services.AddDbContext<CloudDbContext>(o => o.UseNpgsql(EnvironmentConfig.GetKoneksi("CONN_CLOUD")));
 builder.Services.AddSingleton(SyncConfig.DariLingkungan());
 builder.Services.AddScoped<SyncEngine>();
 
