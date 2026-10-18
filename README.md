@@ -125,6 +125,21 @@ Batas yang jujur untuk versi online:
 - Database gratis biasanya tidur saat tidak dipakai (scale-to-zero), jadi permintaan pertama setelah nganggur bisa lambat beberapa detik.
 - Kuota, region, dan batas gratis provider berubah sewaktu-waktu — angka pastinya tidak ditulis di sini; cek halaman harga provider sebelum menentukannya.
 
+### Host API lewat Docker (jalur yang disiapkan: Render paket gratis)
+
+Tiga berkas di akar repo mengurus ini: `Dockerfile` (hanya membangun sisi API — `Laundry.Desktop` WPF dan `Laundry.Sync` tidak ikut, jadi tidak ada proyek `net8.0-windows` di jalur Linux), `render.yaml` (blueprint satu web service, region Singapore supaya dekat Neon), dan `.dockerignore` yang menahan `.env` supaya connection string serta kunci tidak pernah membeku di dalam image.
+
+```powershell
+dotnet publish src/Laundry.Api -c Release -o dist/api   # bukti jalur build-nya jalan (4 proyek, tanpa tests/desktop)
+```
+
+Isi variabel ini di dashboard Render (nilainya tidak pernah masuk git): `CONN_ADMIN`, `CONN_CLOUD`, `JWT_KEY` (minimal 32 byte), `WEBHOOK_SECRET`. `ENVIRONMENT=Production` dan `BACKUP_AUTO=0` sudah dibawa `render.yaml`. Setelah deploy dapat alamat `https://...`, isi alamat itu di kolom **SERVER** jendela login atau di layar **Sistem** aplikasi desktop.
+
+Dua batas yang perlu diketahui sebelum disebut "online penuh":
+
+- `Laundry.Sync` tidak ikut di-host. Worker itu harus jalan di mesin yang bisa menjangkau kedua database; selama ini laptop, karena kedua database sudah di Neon maka laptop tetap cocok — jalankan `dotnet run --project src/Laundry.Sync` saat ingin data di sisi admin naik ke sisi cloud (atau tombol **Sinkron sekarang** di layar Sistem).
+- `Dockerfile` belum pernah dibangun di mesin ini (tidak ada Docker Desktop terpasang). Yang terbukti di sini hanya `dotnet publish src/Laundry.Api -c Release` berdiri sendiri tanpa solution/tests. Build image-nya baru dibuktikan pada deployment pertama di Render.
+
 ## Peta endpoint (v1)
 
 | Group | Endpoint penting |

@@ -1,0 +1,20 @@
+# Berkas yang tidak boleh ikut ke dalam konteks build Docker.
+# .env ada di baris pertama karena di dalamnya ada connection string, JWT_KEY dan WEBHOOK_SECRET;
+# kalau lolos, rahasianya membeku di dalam image dan terbaca siapa pun yang menarik image itu.
+.env
+.env.*
+!.env.example
+
+.git
+.gitignore
+.gitattributes
+
+bin/
+obj/
+**/bin/
+**/obj/
+dist/
+tmp-verifikasi/
+tests/
+docs/
+scripts/

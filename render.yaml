@@ -1,0 +1,30 @@
+# Blueprint Render: satu-satunya layanan yang di-hosting adalah API-nya.
+# Database TIDAK dibuat dari berkas ini — Render menyimpan Postgres-nya di paket berbayar,
+# sedangkan proyek ini memakai Neon paket gratis (dua project: laundry-admin dan laundry-cloud).
+# Nilai rahasia sengaja tidak ditulis di sini; `sync: false` berarti isinya diisi manual di
+# dashboard Render, jadi connection string dan kunci tidak pernah masuk ke git.
+services:
+  - type: web
+    name: laundry-api
+    plan: free
+    region: singapore
+    runtime: docker
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: Production
+      # pg_dump/pg_restore tidak ada di dalam image, jadi pekerja backup harian dimatikan di sini.
+      # Backup dijalankan dari mesin yang punya perkakasnya: scripts/db.ps1 backup.
+      - key: BACKUP_AUTO
+        value: "0"
+      - key: CONN_ADMIN
+        sync: false
+      - key: CONN_CLOUD
+        sync: false
+      - key: JWT_KEY
+        sync: false
+      - key: WEBHOOK_SECRET
+        sync: false
