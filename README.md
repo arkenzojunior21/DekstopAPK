@@ -107,10 +107,25 @@ powershell -File scripts/migrate.ps1 cloud    # hanya sisi cloud
 Connection string diambil dari environment, atau dari `.env` kalau environment kosong. Database cloud biasanya diserahkan sebagai URI — bentuk itu bisa ditempel apa adanya ke `CONN_CLOUD`, karena `EnvironmentConfig` mengubahnya sendiri jadi bentuk kunci=nilai yang dimau Npgsql (`Host=...;Port=...;Database=...;Username=...;Password=...;SSL Mode=...`, termasuk melepas kode persen pada password):
 
 ```powershell
-CONN_CLOUD=postgresql://pengguna:sandi@ep-contoh.neon.tech:5432/laundry_cloud?sslmode=require
+CONN_CLOUD=postgresql://pengguna:sandi@ep-contoh.neon.tech:5432/laundry_cloud?sslmode=require&SearchPath=public
 ```
 
+`SearchPath=public` bukan hiasan. Endpoint pooled Neon tertentu mengembalikan `search_path` kosong, dan EF Core mengirim nama tabel tanpa skema — akibatnya setiap query mati dengan `relation "Orders" does not exist` padahal tabelnya ada. Param itu dikenali Npgsql (bukan `psql`/libpq, jadi pemeriksaan manual dengan `psql` harus melepasnya dan menulis `public."Orders"`). Gejalanya menipu: `SELECT 1` pada `/health` tetap hijau karena tidak menyentuh tabel.
+
 Sisi cloud sengaja dibangun memakai konteks migrasi `LaundryDbContext`; lewat `CloudDbContext`, EF Core tidak melihat satu pun migrasi (terbukti pada database kosong: riwayat migrasinya terbentuk tapi nol tabel). Skemanya memang identik, jadi yang membedakan hanya connection string-nya.
+
+### Memindahkan sisi admin ke Neon (satu kali, pakai dump)
+
+Sisi admin tidak dibangun ulang dari nol — datanya dipindah, karena `SyncOutbox` sisi admin adalah sumber jejak sinkronisasi. Yang dipakai `pg_dump`/`pg_restore` (di mesin ini ada di `C:\Program Files\PostgreSQL\18\bin`, tidak di PATH):
+
+```powershell
+& "C:\Program Files\PostgreSQL\18\bin\pg_dump.exe" -h localhost -p 5433 -U laundry -d laundry_admin --no-owner --no-privileges -F c -f admin-lokal.dump
+& "C:\Program Files\PostgreSQL\18\bin\pg_restore.exe" -d "<URI admin, tanpa &SearchPath>" --no-owner --no-privileges --exit-on-error admin-lokal.dump
+```
+
+Hasil pemindahan pertama (18 Oktober 2026): `--exit-on-error` tanpa satu pun galat, lalu hitungan per tabel **sama persis** di kedua sisi — 26 tabel, 3.938 baris, termasuk `Orders` 159, `Users` 217, `CustomerProfiles` 216, `Payments` 127, `Refunds` 28, `SyncOutbox` 942, `__EFMigrationsHistory` 5. Riwayat migrasi ikut berpindah, jadi `dotnet ef database update` di kemudian hari melihat skema sudah naik dan tidak mencoba membuat ulang. Bukti tulisan berjalan: `SyncCheckpoints` di Neon bertambah `LastSuccessAtUtc` beberapa detik setelah worker lokal berputar.
+
+Dua hal yang harus dihentikan sebelum dump: matikan `Laundry.Api` dan `Laundry.Sync` (kalau tidak, antrean bergerak di tengah dump dan hitungannya tidak cocok). PostgreSQL lokal port 5433 jangan dihapus — dia satu-satunya salinan sebelum dump ini, dan `tmp-verifikasi/admin-lokal.dump` adalah jalur rollback-nya.
 
 Setelah `CONN_CLOUD` menunjuk ke database online, `Laundry.Sync` worker membangun replikanya sendiri — tidak ada impor berkas. Dibuktikan pada replika pertama (database cloud kosong, sisi admin berisi 115 pesanan hasil pengujian): 674 event keluar semua dalam 7 siklus (100 event per siklus, jeda `SYNC_INTERVAL_DETIK=15`), nol konflik, dan jumlah baris di kedua sisi sama persis — 151 pelanggan, 115 pesanan, 115 baris pesanan, 266 riwayat status, 91 pembayaran, 20 refund, 20 ledger, total pembayaran lunas Rp1.270.000. Yang memang sengaja tidak direplikasi: `AuditLogs` (jejak audit hidup di sisi tempat kejadian) dan akun Admin (hash kata sandi tidak pernah berpindah database). Replikasi penuh ini butuh sekitar 12 menit karena worker bicara ke jaringan per event; pemakaian harian hanya mengirim beberapa event per siklus sehingga tidak terasa.
 
@@ -133,7 +148,9 @@ Tiga berkas di akar repo mengurus ini: `Dockerfile` (hanya membangun sisi API �
 dotnet publish src/Laundry.Api -c Release -o dist/api   # bukti jalur build-nya jalan (4 proyek, tanpa tests/desktop)
 ```
 
-Isi variabel ini di dashboard Render (nilainya tidak pernah masuk git): `CONN_ADMIN`, `CONN_CLOUD`, `JWT_KEY` (minimal 32 byte), `WEBHOOK_SECRET`. `ENVIRONMENT=Production` dan `BACKUP_AUTO=0` sudah dibawa `render.yaml`. Setelah deploy dapat alamat `https://...`, isi alamat itu di kolom **SERVER** jendela login atau di layar **Sistem** aplikasi desktop.
+Isi variabel ini di dashboard Render (nilainya tidak pernah masuk git): `CONN_ADMIN`, `CONN_CLOUD`, `JWT_KEY` (minimal 32 byte), `WEBHOOK_SECRET`. Keduanya sekarang URI Neon dan **wajib membawa `&SearchPath=public`** (alasan di atas). `ENVIRONMENT=Production` dan `BACKUP_AUTO=0` sudah dibawa `render.yaml`. Setelah deploy dapat alamat `https://...`, isi alamat itu di kolom **SERVER** jendela login atau di layar **Sistem** aplikasi desktop.
+
+Kalau `.env` disunting lewat skrip, tulis tanpa BOM. `Set-Content -Encoding UTF8` di Windows PowerShell 5.1 menempel `EF BB BF` di awal berkas, dan karena `CONN_ADMIN` adalah baris pertama maka kunci itu tidak lagi dikenali oleh perkakas yang mencocokkan teks mentah (.NET sendiri menghapus BOM saat membaca, jadi gejalanya hanya muncul di `grep`/`sed`/skrip periksa).
 
 Dua batas yang perlu diketahui sebelum disebut "online penuh":
 
