@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="800" viewBox="0 0 1400 800" font-family="Segoe UI, Arial, sans-serif">
+<rect width="1400" height="800" fill="#ffffff"/>
+<text x="40" y="770" font-size="17" font-weight="700" fill="#1b2a41">Class Diagram — Sistem Informasi Perpustakaan</text>
+<text x="40" y="790" font-size="11.5" fill="#6b7a8c">6 class · 9 relasi · notasi UML</text>
+<path d="M240,170.048 L310,170.016" fill="none" stroke="#5b6b7c" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M610,170.016 L680,169.892" fill="none" stroke="#5b6b7c" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M940,169.892 L1010,169.981" fill="none" stroke="#5b6b7c" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M370,258 L370,580 L680,580.004" fill="none" stroke="#5b6b7c" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M810,296 L809.92,500" fill="none" stroke="#5b6b7c" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1119.89,277 L1120,410 L920,410 L919.96,500" fill="none" stroke="#5b6b7c" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1289.84,277 L1290,500" fill="none" stroke="#5b6b7c" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M960,620.006 L1060,619.944" fill="none" stroke="#5b6b7c" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1175,70 L1175,30 L480,30 L480.1,70" fill="none" stroke="#5b6b7c" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="40" y="70" width="200" height="169" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.3"/>
+<rect x="40" y="70" width="200" height="34" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.3"/>
+<text x="140" y="92.5" text-anchor="middle" font-size="15.5" font-weight="700" fill="#1b2a41">Siswa</text>
+<line x1="40" y1="181" x2="240" y2="181" stroke="#9fb6d4" stroke-width="1"/>
+<text x="50" y="126.5" font-size="12.5" fill="#1b2a41">- nis : String</text>
+<text x="50" y="145.5" font-size="12.5" fill="#1b2a41">- nama : String</text>
+<text x="50" y="164.5" font-size="12.5" fill="#1b2a41">- kelas : String</text>
+<text x="50" y="207.5" font-size="12.5" fill="#1b2a41">+ getNis() : String</text>
+<text x="50" y="226.5" font-size="12.5" fill="#1b2a41">+ getNama() : String</text>
+<rect x="310" y="70" width="300" height="188" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.3"/>
+<rect x="310" y="70" width="300" height="34" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.3"/>
+<text x="460" y="92.5" text-anchor="middle" font-size="15.5" font-weight="700" fill="#1b2a41">Anggota</text>
+<line x1="310" y1="181" x2="610" y2="181" stroke="#9fb6d4" stroke-width="1"/>
+<text x="320" y="126.5" font-size="12.5" fill="#1b2a41">- idAnggota : String</text>
+<text x="320" y="145.5" font-size="12.5" fill="#1b2a41">- tanggalDaftar : Date</text>
+<text x="320" y="164.5" font-size="12.5" fill="#1b2a41">- statusAktif : boolean</text>
+<text x="320" y="207.5" font-size="12.5" fill="#1b2a41">+ cariBuku(kunci : String) : Buku[]</text>
+<text x="320" y="226.5" font-size="12.5" fill="#1b2a41">+ ajukanPeminjaman(buku : Buku)</text>
+<text x="320" y="245.5" font-size="12.5" fill="#1b2a41">+ kembalikanBuku()</text>
+<rect x="680" y="70" width="260" height="226" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.3"/>
+<rect x="680" y="70" width="260" height="34" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.3"/>
+<text x="810" y="92.5" text-anchor="middle" font-size="15.5" font-weight="700" fill="#1b2a41">Buku</text>
+<line x1="680" y1="219" x2="940" y2="219" stroke="#9fb6d4" stroke-width="1"/>
+<text x="690" y="126.5" font-size="12.5" fill="#1b2a41">- kodeBuku : String</text>
+<text x="690" y="145.5" font-size="12.5" fill="#1b2a41">- judul : String</text>
+<text x="690" y="164.5" font-size="12.5" fill="#1b2a41">- pengarang : String</text>
+<text x="690" y="183.5" font-size="12.5" fill="#1b2a41">- penerbit : String</text>
+<text x="690" y="202.5" font-size="12.5" fill="#1b2a41">- stok : int</text>
+<text x="690" y="245.5" font-size="12.5" fill="#1b2a41">+ tampilDetail()</text>
+<text x="690" y="264.5" font-size="12.5" fill="#1b2a41">+ kurangiStok()</text>
+<text x="690" y="283.5" font-size="12.5" fill="#1b2a41">+ tambahStok()</text>
+<rect x="1010" y="70" width="330" height="207" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.3"/>
+<rect x="1010" y="70" width="330" height="34" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.3"/>
+<text x="1175" y="92.5" text-anchor="middle" font-size="15.5" font-weight="700" fill="#1b2a41">Petugas</text>
+<line x1="1010" y1="181" x2="1340" y2="181" stroke="#9fb6d4" stroke-width="1"/>
+<text x="1020" y="126.5" font-size="12.5" fill="#1b2a41">- idPetugas : String</text>
+<text x="1020" y="145.5" font-size="12.5" fill="#1b2a41">- namaPetugas : String</text>
+<text x="1020" y="164.5" font-size="12.5" fill="#1b2a41">- jabatan : String</text>
+<text x="1020" y="207.5" font-size="12.5" fill="#1b2a41">+ catatAnggota(a : Anggota)</text>
+<text x="1020" y="226.5" font-size="12.5" fill="#1b2a41">+ perbaruiBuku(b : Buku)</text>
+<text x="1020" y="245.5" font-size="12.5" fill="#1b2a41">+ verifikasiPeminjaman(p : Peminjaman)</text>
+<text x="1020" y="264.5" font-size="12.5" fill="#1b2a41">+ catatDenda(d : Denda)</text>
+<rect x="680" y="500" width="280" height="226" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.3"/>
+<rect x="680" y="500" width="280" height="34" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.3"/>
+<text x="820" y="522.5" text-anchor="middle" font-size="15.5" font-weight="700" fill="#1b2a41">Peminjaman</text>
+<line x1="680" y1="649" x2="960" y2="649" stroke="#9fb6d4" stroke-width="1"/>
+<text x="690" y="556.5" font-size="12.5" fill="#1b2a41">- noTransaksi : String</text>
+<text x="690" y="575.5" font-size="12.5" fill="#1b2a41">- tanggalPinjam : Date</text>
+<text x="690" y="594.5" font-size="12.5" fill="#1b2a41">- jatuhTempo : Date</text>
+<text x="690" y="613.5" font-size="12.5" fill="#1b2a41">- tanggalKembali : Date</text>
+<text x="690" y="632.5" font-size="12.5" fill="#1b2a41">- status : String</text>
+<text x="690" y="675.5" font-size="12.5" fill="#1b2a41">+ buatTransaksi()</text>
+<text x="690" y="694.5" font-size="12.5" fill="#1b2a41">+ prosesPengembalian()</text>
+<text x="690" y="713.5" font-size="12.5" fill="#1b2a41">+ hitungKeterlambatan() : int</text>
+<rect x="1060" y="500" width="250" height="188" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.3"/>
+<rect x="1060" y="500" width="250" height="34" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.3"/>
+<text x="1185" y="522.5" text-anchor="middle" font-size="15.5" font-weight="700" fill="#1b2a41">Denda</text>
+<line x1="1060" y1="630" x2="1310" y2="630" stroke="#9fb6d4" stroke-width="1"/>
+<text x="1070" y="556.5" font-size="12.5" fill="#1b2a41">- idDenda : String</text>
+<text x="1070" y="575.5" font-size="12.5" fill="#1b2a41">- jumlahHari : int</text>
+<text x="1070" y="594.5" font-size="12.5" fill="#1b2a41">- tarifPerHari : double</text>
+<text x="1070" y="613.5" font-size="12.5" fill="#1b2a41">- totalDenda : double</text>
+<text x="1070" y="656.5" font-size="12.5" fill="#1b2a41">+ hitungDenda() : double</text>
+<text x="1070" y="675.5" font-size="12.5" fill="#1b2a41">+ cetakBukti()</text>
+<text x="256" y="157" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">1</text>
+<text x="294" y="157" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">1</text>
+<text x="626" y="157" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">0..*</text>
+<text x="664" y="157" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">0..*</text>
+<text x="956" y="157" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">0..*</text>
+<text x="994" y="157" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">1</text>
+<text x="383" y="274" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">1</text>
+<text x="664" y="562" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">0..*</text>
+<text x="823" y="322" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">1</text>
+<text x="823" y="487" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">0..*</text>
+<text x="1133" y="301" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">1</text>
+<text x="934" y="472" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">0..*</text>
+<text x="1303" y="300" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">1</text>
+<text x="1303" y="480" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">0..*</text>
+<text x="975" y="607" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">1</text>
+<text x="1045" y="607" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">0..1</text>
+<text x="1189" y="57" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">1</text>
+<text x="494" y="57" text-anchor="middle" font-size="12" fill="#2b3a4d" stroke="#ffffff" stroke-width="3.5" paint-order="stroke">0..*</text>
+</svg>

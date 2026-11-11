@@ -54,13 +54,20 @@
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="SERVER" Foreground="#FF7E94B8" FontSize="10" FontWeight="SemiBold" />
-                                <TextBlock Text="{Binding Server}" Foreground="White" FontSize="12"
-                                           TextTrimming="CharacterEllipsis" />
+                                <TextBox Text="{Binding Server, UpdateSourceTrigger=PropertyChanged}"
+                                         Background="#33000000" Foreground="White" CaretBrush="White"
+                                         BorderBrush="#44FFFFFF" BorderThickness="1" FontSize="12"
+                                         Padding="6,3,6,3" Margin="0,3,0,0" VerticalContentAlignment="Center" />
                                 <TextBlock Text="{Binding StatusServer}" Foreground="#FF9FB2D0" FontSize="11"
-                                           TextTrimming="CharacterEllipsis" />
+                                           TextTrimming="CharacterEllipsis" Margin="0,4,0,0" />
                             </StackPanel>
-                            <Button Grid.Column="1" Content="Periksa" Command="{Binding CekServerCommand}"
-                                    Style="{StaticResource TombolGaris}" VerticalAlignment="Center" Padding="12,6,12,6" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Content="Simpan" Command="{Binding SimpanServerCommand}"
+                                        Style="{StaticResource TombolGaris}" Padding="12,6,12,6" Margin="0,0,8,0" />
+                                <Button Content="Periksa" Command="{Binding CekServerCommand}"
+                                        Style="{StaticResource TombolGaris}" Padding="12,6,12,6" />
+                            </StackPanel>
+
                         </Grid>
                     </Border>
                     <TextBlock Text="Semua data dibaca dari Laundry.Api — aplikasi ini tidak membuka database."

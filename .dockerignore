@@ -15,6 +15,10 @@ obj/
 **/obj/
 dist/
 tmp-verifikasi/
-tests/
 docs/
 scripts/
+
+# Yang di-host hanya API: proyek uji dan sisi desktop tidak pernah ikut build image.
+backend/Laundry.Tests.Unit/
+backend/Laundry.Tests.Integration/
+frontend/

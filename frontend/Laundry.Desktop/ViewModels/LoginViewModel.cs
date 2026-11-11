@@ -29,7 +29,9 @@ public partial class LoginViewModel : ObservableObject
 
     public string SandiBaru { get; set; } = "";
 
-    public string Server => App.Instance.Api.BasisUrl;
+    /// <summary>Alamat API. Bisa disunting di layar login karena inilah satu-satunya tempat
+    /// pengguna bisa masuk saat server masih salah — tanpa sesi, layar Sistem tidak terjangkau.</summary>
+    [ObservableProperty] private string _server = App.Instance.Api.BasisUrl;
 
     public bool LagiMasuk => Mode == ModeMasuk;
 
@@ -60,6 +62,28 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     private async Task CekServerAsync()
     {
+        StatusServer = "memeriksa…";
+        StatusServer = await App.Instance.Api.CekServerAsync();
+    }
+
+    /// <summary>Pindah alamat API dan simpan ke preferensi mesin ini, lalu langsung periksa hasilnya.</summary>
+    [RelayCommand]
+    private async Task SimpanServerAsync()
+    {
+        var tujuan = Server.Trim().TrimEnd('/');
+        if (!Uri.TryCreate(tujuan, UriKind.Absolute, out var uri)
+            || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
+            || string.IsNullOrEmpty(uri.Host))
+        {
+            Galat = "Alamat server harus lengkap dan diawali http:// atau https://.";
+            return;
+        }
+
+        Galat = null;
+        Server = tujuan;
+        App.Instance.Api.GantiServer(tujuan);
+        App.Instance.Preferensi.Server = tujuan;
+        App.Instance.Preferensi.Simpan();
         StatusServer = "memeriksa…";
         StatusServer = await App.Instance.Api.CekServerAsync();
     }

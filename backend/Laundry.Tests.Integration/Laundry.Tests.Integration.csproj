@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Laundry.Api\Laundry.Api.csproj" />
-    <ProjectReference Include="..\..\src\Laundry.Infrastructure\Laundry.Infrastructure.csproj" />
+    <ProjectReference Include="..\Laundry.Api\Laundry.Api.csproj" />
+    <ProjectReference Include="..\Laundry.Infrastructure\Laundry.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

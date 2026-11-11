@@ -36,7 +36,7 @@ public sealed class KunciResourceTerkunciTest
             return kunci;
         });
 
-        var folder = Path.Combine(akar, "src", "Laundry.Desktop");
+        var folder = Path.Combine(akar, "frontend", "Laundry.Desktop");
         var hilang = new SortedSet<string>(StringComparer.Ordinal);
         foreach (var berkas in Directory.EnumerateFiles(folder, "*.xaml", SearchOption.AllDirectories)
                      .Where(b => !b.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}")

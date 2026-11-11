@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Laundry.Application\Laundry.Application.csproj" />
-    <ProjectReference Include="..\Laundry.Domain\Laundry.Domain.csproj" />
+    <ProjectReference Include="..\..\backend\Laundry.Application\Laundry.Application.csproj" />
+    <ProjectReference Include="..\..\backend\Laundry.Domain\Laundry.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,18 +6,28 @@ Stack sesuai spesifikasi (`PRD.md`): **C# WPF (MVVM) + ASP.NET Core Web API + Po
 
 ## Peta berkas
 
-### Frontend (tampilan) — `src/Laundry.Desktop`
+Kode bagi dua folder, masing-masing membawa ujinya sendiri: `frontend/` untuk tampilan, `backend/` untuk logika dan data.
+
+### Frontend (tampilan) — `frontend/Laundry.Desktop`
 Seluruh UI berada di sini dan hanya di sini: window, View XAML, ViewModel (MVVM via CommunityToolkit.Mvvm), tema light/dark, style, dan aset gambar. Frontend **tidak pernah** membuka koneksi database — semua baca/tulis lewat `Laundry.Api`.
+
+| Project | Isi |
+|---|---|
+| `frontend/Laundry.Desktop` | Aplikasi WPF-nya |
+| `frontend/Laundry.Tests.Desktop` | 17 uji tampilan: kecocokan kunci tema, konverter rupiah/tanggal/relatif, pesan kosong, keterbacaan kontras |
 
 ### Backend (logika & data)
 | Project | Isi |
 |---|---|
-| `src/Laundry.Domain` | Entitas, enum status, aturan bisnis murni (tanpa dependensi UI/DB) |
-| `src/Laundry.Application` | Use case, DTO request/response, validator, interface layanan (termasuk `IWhatsAppClient`, `IPaymentGateway`) |
-| `src/Laundry.Api` | ASP.NET Core Web API: endpoint, autentikasi & otorisasi role, validasi server-side |
-| `src/Laundry.Infrastructure` | EF Core + Npgsql, migration, repository, adapter mock provider |
-| `src/Laundry.Sync` | Worker sinkronisasi: outbox/inbox, retry exponential backoff, checkpoint, idempotency |
-| `tests/` | Unit & integration test |
+| `backend/Laundry.Domain` | Entitas, enum status, aturan bisnis murni (tanpa dependensi UI/DB) |
+| `backend/Laundry.Application` | Use case, DTO request/response, validator, interface layanan (termasuk `IWhatsAppClient`, `IPaymentGateway`) |
+| `backend/Laundry.Api` | ASP.NET Core Web API: endpoint, autentikasi & otorisasi role, validasi server-side |
+| `backend/Laundry.Infrastructure` | EF Core + Npgsql, migration, repository, adapter mock provider |
+| `backend/Laundry.Sync` | Worker sinkronisasi: outbox/inbox, retry exponential backoff, checkpoint, idempotency |
+| `backend/Laundry.Tests.Unit` | 99 uji aturan bisnis tanpa database |
+| `backend/Laundry.Tests.Integration` | 66 uji endpoint + database sungguhan |
+
+Satu arah dependensi yang perlu diketahui: `Laundry.Desktop` memakai DTO dan aturan dari `Laundry.Application`/`Laundry.Domain`, jadi `frontend/` tidak bisa dibangun sendiri — `dotnet build frontend/Laundry.Desktop` akan menarik proyek backend lewat jalur `..\..\backend\`. Yang berlaku tetap batasannya: frontend hanya bicara HTTP ke API, tidak pernah menyentuh database.
 
 ## Prasyarat (Windows)
 
@@ -41,11 +51,11 @@ dotnet build Laundry.sln
 dotnet test Laundry.sln
 
 # jalankan API (http://localhost:5104, swagger di /swagger) lalu desktop client
-dotnet run --project src/Laundry.Api
-dotnet run --project src/Laundry.Desktop
+dotnet run --project backend/Laundry.Api
+dotnet run --project frontend/Laundry.Desktop
 
 # jalankan worker sinkronisasi admin ⇄ cloud (proses terpisah dari API)
-dotnet run --project src/Laundry.Sync
+dotnet run --project backend/Laundry.Sync
 ```
 
 Worker membaca `SYNC_BATCH` (default 100, maks 500) dan `SYNC_INTERVAL_DETIK` (default 15) dari `.env`. Tanpa worker, semua operasi lokal tetap jalan dan perubahan hanya menumpuk di antrean keluar — tidak ada data yang hilang.
@@ -54,9 +64,9 @@ Worker membaca `SYNC_BATCH` (default 100, maks 500) dan `SYNC_INTERVAL_DETIK` (d
 
 ```powershell
 powershell -File scripts\db.ps1 start                          # 1 database dev
-dotnet run --project src/Laundry.Api                           # 2 http://localhost:5104
-dotnet run --project src/Laundry.Sync                          # 3 opsional: pekerja sinkronisasi
-dotnet run --project src/Laundry.Desktop                       # 4 aplikasinya
+dotnet run --project backend/Laundry.Api                           # 2 http://localhost:5104
+dotnet run --project backend/Laundry.Sync                          # 3 opsional: pekerja sinkronisasi
+dotnet run --project frontend/Laundry.Desktop                       # 4 aplikasinya
 ```
 
 Akun pertama kali dibuat, bukan dibawa kode: `POST /api/auth/bootstrap` membuat admin (endpoint ini menutup diri begitu satu admin ada), dan akun Pelanggan dibuat dari tab **Daftar** di jendela login (`POST /api/auth/register/start` + `/register/complete`). Pada environment Development kode OTP tampil langsung di layar login dan di log API (`[MOCK WA] OTP ...`) — tidak ada pesan WhatsApp yang benar-benar terkirim. Tidak ada kata sandi bawaan di repo — kredensial dev hanya ada di `.env` dan database lokal.
@@ -83,17 +93,21 @@ Tema terang/gelap tersedia di semua layar dan perpindahan lewat tombol di bilah 
 ## Membangun berkas rilis
 
 ```powershell
-# desktop (one-file, tetap butuh .NET Desktop Runtime 8 di mesin target)
-dotnet publish src/Laundry.Desktop -c Release -p:PublishSingleFile=true -r win-x64 --self-contained false -o dist/desk
+# desktop (satu berkas .exe, runtime .NET ikut dibungkus -> tidak perlu install apa pun di mesin target)
+dotnet publish frontend/Laundry.Desktop -c Release -r win-x64 --self-contained true `
+  -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true `
+  -o dist/desk
 
 # API dan worker sinkronisasi
-dotnet publish src/Laundry.Api  -c Release -o dist/api
-dotnet publish src/Laundry.Sync -c Release -o dist/sync
+dotnet publish backend/Laundry.Api  -c Release -o dist/api
+dotnet publish backend/Laundry.Sync -c Release -o dist/sync
 ```
 
 `dist/` tidak ikut ke git. Jalankan dengan berkas `.env` yang benar berada di folder proyek atau salah satu induk dari folder eksekusi (connection string, `JWT_KEY`, `WEBHOOK_SECRET` dibaca dari sana). Installer NSIS/Inno sengaja belum dipakai — distribusi untuk sekarang adalah folder hasil publish di atas.
 
-Satu hal yang perlu diketahui saat menguji hasil publish: `Laundry.Api.exe` / `Laundry.Desktop.exe` adalah apphost yang mencari runtime .NET di lokasi terpasang sistem. Di mesin yang .NET-nya terpasang level pengguna (hasil `dotnet-install.ps1 -InstallDir`), runtime itu tidak terdaftar secara global, jadi `.exe` akan menjawab "You must install or update .NET". Solusinya salah satu: pasang .NET Desktop Runtime 8 secara normal di mesin target, set `DOTNET_ROOT` ke folder runtime tersebut, atau jalankan lewat `dotnet Laundry.Api.dll`. Kedua jalur terakhir sudah dites dan jalan.
+Hasil desktop berupa satu berkas `dist/desk/Laundry.Desktop.exe` ±69 MB yang sudah dites di mesin ini: jendela muncul, login berhasil, dan tidak ada dependensi tambahan di mesin target karena runtime-nya ikut dibungkus. Desktop tidak membaca `.env` sama sekali (ia hanya bicara ke API lewat HTTP), jadi berkas `.exe`-nya boleh disalin sendiri tanpa folder lain. Alamat API diambil dari `preferensi.json` (bawaan `http://localhost:5104`) dan bisa diganti langsung dari kartu **SERVER** di jendela login: ketik alamat lengkap, tekan **Simpan**, aplikasi langsung memeriksa koneksinya dan menyimpannya. Kartu itu tetap ada sebelum login, jadi server baru bisa dipindah bahkan ketika belum ada sesi yang aktif.
+
+Batasnya tinggal di sisi server: `Laundry.Api.exe` / `Laundry.Sync.exe` masih apphost yang mencari runtime .NET di lokasi terpasang sistem. Di mesin yang .NET-nya terpasang level pengguna (hasil `dotnet-install.ps1 -InstallDir`), runtime itu tidak terdaftar secara global, jadi `.exe` akan menjawab "You must install or update .NET". Solusinya salah satu: pasang .NET Runtime 8 secara normal di mesin target, set `DOTNET_ROOT` ke folder runtime tersebut, atau jalankan lewat `dotnet Laundry.Api.dll`. Kedua jalur terakhir sudah dites dan jalan.
 
 ## Naik ke database & hosting online
 
@@ -145,17 +159,17 @@ Batas yang jujur untuk versi online:
 Tiga berkas di akar repo mengurus ini: `Dockerfile` (hanya membangun sisi API — `Laundry.Desktop` WPF dan `Laundry.Sync` tidak ikut, jadi tidak ada proyek `net8.0-windows` di jalur Linux), `render.yaml` (blueprint satu web service, region Singapore supaya dekat Neon), dan `.dockerignore` yang menahan `.env` supaya connection string serta kunci tidak pernah membeku di dalam image.
 
 ```powershell
-dotnet publish src/Laundry.Api -c Release -o dist/api   # bukti jalur build-nya jalan (4 proyek, tanpa tests/desktop)
+dotnet publish backend/Laundry.Api -c Release -o dist/api   # bukti jalur build-nya jalan (4 proyek backend, tanpa uji & tanpa desktop)
 ```
 
-Isi variabel ini di dashboard Render (nilainya tidak pernah masuk git): `CONN_ADMIN`, `CONN_CLOUD`, `JWT_KEY` (minimal 32 byte), `WEBHOOK_SECRET`. Keduanya sekarang URI Neon dan **wajib membawa `&SearchPath=public`** (alasan di atas). `ENVIRONMENT=Production` dan `BACKUP_AUTO=0` sudah dibawa `render.yaml`. Setelah deploy dapat alamat `https://...`, isi alamat itu di kolom **SERVER** jendela login atau di layar **Sistem** aplikasi desktop.
+Isi variabel ini di dashboard Render (nilainya tidak pernah masuk git): `CONN_ADMIN`, `CONN_CLOUD`, `JWT_KEY` (minimal 32 byte), `WEBHOOK_SECRET`. Keduanya sekarang URI Neon dan **wajib membawa `&SearchPath=public`** (alasan di atas). `ENVIRONMENT=Production` dan `BACKUP_AUTO=0` sudah dibawa `render.yaml`. Setelah deploy dapat alamat `https://...`, isi alamat itu di kartu **SERVER** pada jendela login aplikasi desktop, lalu tekan **Simpan**.
 
 Kalau `.env` disunting lewat skrip, tulis tanpa BOM. `Set-Content -Encoding UTF8` di Windows PowerShell 5.1 menempel `EF BB BF` di awal berkas, dan karena `CONN_ADMIN` adalah baris pertama maka kunci itu tidak lagi dikenali oleh perkakas yang mencocokkan teks mentah (.NET sendiri menghapus BOM saat membaca, jadi gejalanya hanya muncul di `grep`/`sed`/skrip periksa).
 
 Dua batas yang perlu diketahui sebelum disebut "online penuh":
 
-- `Laundry.Sync` tidak ikut di-host. Worker itu harus jalan di mesin yang bisa menjangkau kedua database; selama ini laptop, karena kedua database sudah di Neon maka laptop tetap cocok — jalankan `dotnet run --project src/Laundry.Sync` saat ingin data di sisi admin naik ke sisi cloud (atau tombol **Sinkron sekarang** di layar Sistem).
-- `Dockerfile` belum pernah dibangun di mesin ini (tidak ada Docker Desktop terpasang). Yang terbukti di sini hanya `dotnet publish src/Laundry.Api -c Release` berdiri sendiri tanpa solution/tests. Build image-nya baru dibuktikan pada deployment pertama di Render.
+- `Laundry.Sync` tidak ikut di-host. Worker itu harus jalan di mesin yang bisa menjangkau kedua database; selama ini laptop, karena kedua database sudah di Neon maka laptop tetap cocok — jalankan `dotnet run --project backend/Laundry.Sync` saat ingin data di sisi admin naik ke sisi cloud (atau tombol **Sinkron sekarang** di layar Sistem).
+- `Dockerfile` belum pernah dibangun di mesin ini (tidak ada Docker Desktop terpasang). Yang terbukti di sini hanya `dotnet publish backend/Laundry.Api -c Release` berdiri sendiri tanpa solution/tests. Build image-nya baru dibuktikan pada deployment pertama di Render.
 
 ## Peta endpoint (v1)
 

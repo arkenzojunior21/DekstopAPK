@@ -7,14 +7,14 @@ WORKDIR /src
 # Berkas proyek disalin lebih dulu supaya lapisan restore ikut terpakai ulang selama kode
 # sumbernya belum berubah (build ulang jadi cepat, dan itu penting di paket gratis).
 COPY Directory.Build.props ./
-COPY src/Laundry.Domain/Laundry.Domain.csproj src/Laundry.Domain/
-COPY src/Laundry.Application/Laundry.Application.csproj src/Laundry.Application/
-COPY src/Laundry.Infrastructure/Laundry.Infrastructure.csproj src/Laundry.Infrastructure/
-COPY src/Laundry.Api/Laundry.Api.csproj src/Laundry.Api/
-RUN dotnet restore src/Laundry.Api/Laundry.Api.csproj
+COPY backend/Laundry.Domain/Laundry.Domain.csproj backend/Laundry.Domain/
+COPY backend/Laundry.Application/Laundry.Application.csproj backend/Laundry.Application/
+COPY backend/Laundry.Infrastructure/Laundry.Infrastructure.csproj backend/Laundry.Infrastructure/
+COPY backend/Laundry.Api/Laundry.Api.csproj backend/Laundry.Api/
+RUN dotnet restore backend/Laundry.Api/Laundry.Api.csproj
 
-COPY src/ src/
-RUN dotnet publish src/Laundry.Api/Laundry.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
+COPY backend/ backend/
+RUN dotnet publish backend/Laundry.Api/Laundry.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app

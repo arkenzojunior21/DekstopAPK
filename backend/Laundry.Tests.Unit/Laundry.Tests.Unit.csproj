@@ -21,9 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Laundry.Domain\Laundry.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Laundry.Application\Laundry.Application.csproj" />
-    <ProjectReference Include="..\..\src\Laundry.Infrastructure\Laundry.Infrastructure.csproj" />
+    <ProjectReference Include="..\Laundry.Domain\Laundry.Domain.csproj" />
+    <ProjectReference Include="..\Laundry.Application\Laundry.Application.csproj" />
+    <ProjectReference Include="..\Laundry.Infrastructure\Laundry.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

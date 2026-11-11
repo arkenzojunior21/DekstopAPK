@@ -18,7 +18,7 @@ $root = Split-Path -Parent $PSScriptRoot
 
 function Jalankan-Migrasi([string]$label) {
     Write-Host "== migrasi skema: sisi $label =="
-    dotnet ef database update --project src/Laundry.Infrastructure --startup-project src/Laundry.Api `
+    dotnet ef database update --project backend/Laundry.Infrastructure --startup-project backend/Laundry.Api `
         --context LaundryDbContext
     if ($LASTEXITCODE -ne 0) { throw "Migrasi sisi $label gagal (kode keluar $LASTEXITCODE)." }
 }
