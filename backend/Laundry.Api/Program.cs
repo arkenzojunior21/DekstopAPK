@@ -80,18 +80,22 @@ builder.Services.AddScoped<ISlotService, SlotService>();
 // Fase 9: laporan dan ekspor. Perhitungan angka hidup di Domain (LaporanAngka); service hanya memproyeksikan baris.
 builder.Services.AddScoped<IReportService, ReportService>();
 
-// Fase 9: laporan + ekspor. Query hanya memproyeksikan baris; semua rumus angka ada di Domain.
-builder.Services.AddScoped<IReportService, ReportService>();
-
-// Fase 9: laporan + ekspor. Perhitungan angka ada di Domain (LaporanAngka), service hanya memproyeksikan baris.
-builder.Services.AddScoped<IReportService, ReportService>();
-
 // Fase 8: backup pg_dump + pemeriksaan versi. BackupService scoped karena menulis riwayat ke database.
 builder.Services.AddSingleton(BackupConfig.DariLingkungan());
 builder.Services.AddScoped<BackupService>();
 builder.Services.AddScoped<IBackupService>(sp => sp.GetRequiredService<BackupService>());
 builder.Services.AddHttpClient<IUpdateChecker, UpdateChecker>(c => c.Timeout = TimeSpan.FromSeconds(10));
 builder.Services.AddHostedService<BackupWorker>();
+
+// Antrean sync dan notifikasi punya dua cara dijalankan. Di laptop, Laundry.Sync adalah host
+// sendiri dan flag ini dibiarkan mati. Di hosting gratis hanya ada satu service (API), jadi
+// pekerja yang sama dipindah ke sini; tanpa itu antrean tidak pernah jalan saat laptop mati
+// dan Beranda.admin selalu melaporkan "pekerja sinkronisasi tidak berjalan".
+if (EnvironmentConfig.Get("SYNC_AUTO") == "1")
+{
+    builder.Services.AddHostedService<SyncWorker>();
+    builder.Services.AddHostedService<NotificationWorker>();
+}
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

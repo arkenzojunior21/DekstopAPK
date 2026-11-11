@@ -23,7 +23,7 @@ Seluruh UI berada di sini dan hanya di sini: window, View XAML, ViewModel (MVVM 
 | `backend/Laundry.Application` | Use case, DTO request/response, validator, interface layanan (termasuk `IWhatsAppClient`, `IPaymentGateway`) |
 | `backend/Laundry.Api` | ASP.NET Core Web API: endpoint, autentikasi & otorisasi role, validasi server-side |
 | `backend/Laundry.Infrastructure` | EF Core + Npgsql, migration, repository, adapter mock provider |
-| `backend/Laundry.Sync` | Worker sinkronisasi: outbox/inbox, retry exponential backoff, checkpoint, idempotency |
+| `backend/Laundry.Sync` | Host standalone untuk pekerja antrean: outbox/inbox, retry exponential backoff, checkpoint, idempotency. Kelas `SyncWorker`/`NotificationWorker` tinggal di `Laundry.Infrastructure/Sync` supaya host yang sama juga bisa dinyalakan dari dalam API lewat `SYNC_AUTO=1` (D-24) |
 | `backend/Laundry.Tests.Unit` | 99 uji aturan bisnis tanpa database |
 | `backend/Laundry.Tests.Integration` | 66 uji endpoint + database sungguhan |
 
@@ -58,7 +58,7 @@ dotnet run --project frontend/Laundry.Desktop
 dotnet run --project backend/Laundry.Sync
 ```
 
-Worker membaca `SYNC_BATCH` (default 100, maks 500) dan `SYNC_INTERVAL_DETIK` (default 15) dari `.env`. Tanpa worker, semua operasi lokal tetap jalan dan perubahan hanya menumpuk di antrean keluar — tidak ada data yang hilang.
+Worker membaca `SYNC_BATCH` (default 100, maks 500) dan `SYNC_INTERVAL_DETIK` (default 15) dari `.env`. Tanpa worker, semua operasi lokal tetap jalan dan perubahan hanya menumpuk di antrean keluar — tidak ada data yang hilang. Siklus yang sama (plus penguras antrean notifikasi) bisa dijalankan **di dalam proses API** dengan `SYNC_AUTO=1`; itu jalur yang dipakai di hosting yang hanya mengirim satu service. Jangan nyalakan keduanya terhadap database yang sama — lihat batas di bagian "Host API lewat Docker".
 
 ### Jalur uji cepat (empat terminal)
 
@@ -162,13 +162,13 @@ Tiga berkas di akar repo mengurus ini: `Dockerfile` (hanya membangun sisi API �
 dotnet publish backend/Laundry.Api -c Release -o dist/api   # bukti jalur build-nya jalan (4 proyek backend, tanpa uji & tanpa desktop)
 ```
 
-Isi variabel ini di dashboard Render (nilainya tidak pernah masuk git): `CONN_ADMIN`, `CONN_CLOUD`, `JWT_KEY` (minimal 32 byte), `WEBHOOK_SECRET`. Keduanya sekarang URI Neon dan **wajib membawa `&SearchPath=public`** (alasan di atas). `ENVIRONMENT=Production` dan `BACKUP_AUTO=0` sudah dibawa `render.yaml`. Setelah deploy dapat alamat `https://...`, isi alamat itu di kartu **SERVER** pada jendela login aplikasi desktop, lalu tekan **Simpan**.
+Isi variabel ini di dashboard Render (nilainya tidak pernah masuk git): `CONN_ADMIN`, `CONN_CLOUD`, `JWT_KEY` (minimal 32 byte), `WEBHOOK_SECRET`. Keduanya sekarang URI Neon dan **wajib membawa `&SearchPath=public`** (alasan di atas). `ENVIRONMENT=Production`, `BACKUP_AUTO=0`, dan `SYNC_AUTO=1` sudah dibawa `render.yaml`. Setelah deploy dapat alamat `https://...`, isi alamat itu di kartu **SERVER** pada jendela login aplikasi desktop, lalu tekan **Simpan**.
 
 Kalau `.env` disunting lewat skrip, tulis tanpa BOM. `Set-Content -Encoding UTF8` di Windows PowerShell 5.1 menempel `EF BB BF` di awal berkas, dan karena `CONN_ADMIN` adalah baris pertama maka kunci itu tidak lagi dikenali oleh perkakas yang mencocokkan teks mentah (.NET sendiri menghapus BOM saat membaca, jadi gejalanya hanya muncul di `grep`/`sed`/skrip periksa).
 
 Dua batas yang perlu diketahui sebelum disebut "online penuh":
 
-- `Laundry.Sync` tidak ikut di-host. Worker itu harus jalan di mesin yang bisa menjangkau kedua database; selama ini laptop, karena kedua database sudah di Neon maka laptop tetap cocok — jalankan `dotnet run --project backend/Laundry.Sync` saat ingin data di sisi admin naik ke sisi cloud (atau tombol **Sinkron sekarang** di layar Sistem).
+- Pekerja antrean (`Laundry.Sync`) tidak di-host sebagai service kedua — di paket gratis, layanan non-HTTP tidak punya health check untuk dijaga tetap hidup. Sebagai gantinya siklus yang sama berjalan **di dalam proses API** lewat `SYNC_AUTO=1`, jadi data sisi admin tetap naik ke sisi cloud dan antrean notifikasi tetap terisi tanpa laptop menyala. Batasnya: Render paket gratis tertidur setelah tidak ada permintaan, jadi siklus baru jalan lagi begitu ada yang membuka aplikasi. Di laptop, `SYNC_AUTO` dibiarkan kosong dan worker tetap berdiri sendiri — menyalakan keduanya terhadap database yang sama berisiko satu pesan terkirim dua kali, karena `NotificationDispatcher.DrainAsync` mengambil baris `Menunggu` tanpa mekanisme klaim (`FOR UPDATE SKIP LOCKED` tidak dipakai).
 - `Dockerfile` belum pernah dibangun di mesin ini (tidak ada Docker Desktop terpasang). Yang terbukti di sini hanya `dotnet publish backend/Laundry.Api -c Release` berdiri sendiri tanpa solution/tests. Build image-nya baru dibuktikan pada deployment pertama di Render.
 
 ## Peta endpoint (v1)

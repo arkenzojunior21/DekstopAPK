@@ -45,6 +45,7 @@ Cara mengganti alamat tanpa membangun ulang: kartu **SERVER** di jendela login b
 
 - **Admin.** Di database development hanya ada satu akun Admin. Jangan meminta kata sandinya: tekan **Lupa sandi** di jendela login, masukkan nomor akun itu, kode OTP-nya langsung tampil di layar (di environment Development server memang mengembalikan kodenya, tidak ada pesan yang benar-benar terkirim), lalu tentukan sandi baru sendiri. Ini sekaligus memperbaiki batas aman dari sandi development yang sempat terlihat.
 - **Pelanggan.** Buat sendiri lewat tab **Daftar** di jendela login — alurnya sama, OTP tampil di layar, dan akun baru langsung masuk sebagai Pelanggan. Di development ada 366 akun pelanggan sisa pengujian, tapi sandinya tidak diketahui siapa pun, jadi jangan dipakai untuk demo.
+- **Batas yang harus diketahui sebelum demo ke alamat publik.** Kode OTP di layar hanya ada selama API berjalan dengan `ENVIRONMENT=Development`. Di URL publik (Render menyetel `ENVIRONMENT=Production`) `devCode` sengaja `null` dan satu-satunya tempat kode itu adalah log host — tidak bisa dibaca dari aplikasi. Jadi jalur **Lupa sandi**/**Daftar** di atas berlaku untuk API lokal; kalau demonya lewat alamat publik, yang menyiapkan akunnya pemilik proyek lebih dulu.
 - Setelah login, menu yang muncul ditentukan peran dari server, bukan pilihan pengguna.
 
 ## 4. Jalur demo per layar (klik berurutan, ini yang harus terlihat benar)

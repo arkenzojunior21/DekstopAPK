@@ -4,7 +4,6 @@ using Laundry.Infrastructure.Persistence;
 using Laundry.Infrastructure.Services;
 using Laundry.Infrastructure.Sync;
 using Laundry.Infrastructure.Whatsapp;
-using Laundry.Sync;
 using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateApplicationBuilder(args);

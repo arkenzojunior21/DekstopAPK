@@ -1,7 +1,9 @@
 using Laundry.Application.Core;
-using Laundry.Infrastructure.Sync;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace Laundry.Sync;
+namespace Laundry.Infrastructure.Sync;
 
 /// <summary>
 /// Pengulang tak berujung antrean notifikasi. Adapter yang terpasang masih mock, jadi baris

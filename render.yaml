@@ -20,6 +20,13 @@ services:
       # Backup dijalankan dari mesin yang punya perkakasnya: scripts/db.ps1 backup.
       - key: BACKUP_AUTO
         value: "0"
+      # Satu-satunya service yang di-host adalah API, jadi pekerja antrean (sync admin<->cloud dan
+      # notifikasi) dijalankan di dalam proses API. Tanpa baris ini antrean berhenti jalan saat
+      # laptop mati dan Beranda.admin melaporkan "pekerja sinkronisasi tidak berjalan".
+      # Batasnya: paket gratis Render tertidur setelah tidak ada permintaan, jadi siklus berjalan
+      # lagi begitu ada yang membuka aplikasi.
+      - key: SYNC_AUTO
+        value: "1"
       - key: CONN_ADMIN
         sync: false
       - key: CONN_CLOUD

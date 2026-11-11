@@ -62,6 +62,8 @@ Kalau pesan untuk sisi lain belum dikerjakan, jangan dihapus — biarkan entri-n
 - Database produksi ada di Neon (project `laundry-admin` dan `laundry-cloud`). URI pooled dari sisi admin butuh `&SearchPath=public` di akhir connection string, dan hanya Npgsql yang menerima parameter itu — `psql` menolaknya, dan itu bukan bukti koneksi aplikasi rusak. Jangan pernah menyentuh project Neon lain yang ada di akun.
 - Berkas `.env` dicari dari folder ini ke atas; letaknya tetap di root repo dan tidak ikut ke git.
 - Hasil `dotnet publish` berupa `.exe` apphost bisa gagal menemukan runtime di mesin ini; jalankan dengan `DOTNET_ROOT` diset ke runtime level pengguna, atau `dotnet <nama>.dll`.
+- **Satu database hanya boleh punya satu penguras antrean.** `NotificationDispatcher.DrainAsync` memilih baris `Menunggu` tanpa klaim baris (`FOR UPDATE SKIP LOCKED` tidak dipakai), jadi `SYNC_AUTO=1` (pekerja sync + notifikasi jalan di dalam `Laundry.Api`) dan `dotnet run --project backend/Laundry.Sync` tidak boleh hidup bersamaan pada database yang sama. Di laptop: `SYNC_AUTO` kosong. Di hosting: `SYNC_AUTO=1` dan tidak ada worker lokal yang menyentuh database itu.
+- Mengubah skema tidak otomatis berlaku di Neon. Yang terpasang di cloud hanya dibangun lewat `powershell -File scripts/migrate.ps1` dari laptop ini (URI pooled + `&SearchPath=public`); tidak ada `MigrateAsync` saat API menyala, jadi deploy berikutnya dengan migrasi baru akan membaca skema lama sampai skrip itu dijalankan.
 
 ## 5. Gerbang mutu
 
@@ -92,10 +94,12 @@ Perubahan apa pun pada skema database juga wajib: `powershell -File scripts/migr
 - Popup kalender `DatePicker` masih bertema terang saat aplikasi memakai tema gelap (kontrol `Calendar` bawaan WPF perlu restyle menyeluruh). Batas ini sudah tercatat di README.
 - Data pengujian masih banyak di database sisi admin (147 dari 150 layanan, 134 dari 217 pelanggan adalah sisa uji). Keputusan membersihkannya belum diambil pemilik; jangan dihapus sepihak.
 - Deployment ke hosting gratis masih menunggu nilai rahasia diisi di dashboard Render; `render.yaml` sengaja tidak memuat nilai rahasia apa pun.
+- Antrean sync dan notifikasi sudah punya penggerak di sisi host: `render.yaml` menyetel `SYNC_AUTO=1` sehingga pekerja berjalan di dalam proses API (D-24). Jangan "memperbaiki" ini dengan menambahkan service worker kedua di Render, dan jangan menyalakan `SYNC_AUTO` di laptop.
 
 ## 8. Rujukan
 
 - `README.md` — cara menjalankan, struktur berkas, dan perintah publish.
-- `docs/DECISIONS.md` — keputusan teknis D-1 sampai D-23 beserta alasan dan batasnya. Baca sebelum mengubah perilaku yang sudah ada.
+- `docs/DECISIONS.md` — keputusan teknis D-1 sampai D-24 beserta alasan dan batasnya. Baca sebelum mengubah perilaku yang sudah ada.
 - `docs/OPEN_QUESTIONS.md` — hal yang menunggu keputusan pemilik proyek.
+- `docs/PANDUAN-UJI-FRONTEND.md` — pemandu sisi tampilan: yang perlu dipasang, cara masuk, jalur klik per layar, peta layar ke berkas.
 - `docs/HANDOFF.md` — kanal komunikasi dua sisi (format di bagian 2).

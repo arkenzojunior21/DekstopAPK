@@ -1,6 +1,8 @@
-using Laundry.Infrastructure.Sync;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace Laundry.Sync;
+namespace Laundry.Infrastructure.Sync;
 
 /// <summary>
 /// Pengulang tak berujung antrian sinkronisasi dua arah. Gagal satu siklus tidak menghentikan
