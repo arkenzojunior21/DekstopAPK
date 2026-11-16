@@ -17,4 +17,11 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <!-- Aset yang bisa diganti admin tanpa build ulang: logo.png di root Aset,
+       foto layanan di Aset/Layanan/<nama-layanan-slug>.png. -->
+  <ItemGroup>
+    <None Remove="Aset\**" />
+    <Content Include="Aset\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

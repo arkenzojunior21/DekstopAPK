@@ -42,7 +42,8 @@
         </Border>
 
         <Border DockPanel.Dock="Top" Style="{StaticResource KartuLembut}" Padding="14,8,14,8" Margin="0,0,0,12"
-                BorderThickness="0">
+                BorderThickness="0"
+                Visibility="{Binding Rentang, Converter={StaticResource Kosong}}">
             <StackPanel>
                 <TextBlock Text="{Binding Rentang}" Style="{StaticResource TeksLabel}" />
                 <TextBlock Text="{Binding Catatan}" Style="{StaticResource TeksKecil}" TextWrapping="Wrap"

@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:Laundry.Desktop.ViewModels"
         xmlns:v="clr-namespace:Laundry.Desktop.Views"
-        Title="Laundry Desk" Height="820" Width="1320" MinHeight="640" MinWidth="1000"
+        Title="Laundry Desk" Height="760" Width="1200" MinHeight="540" MinWidth="880"
         Language="id-ID"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized"
         Background="{DynamicResource KuasLatar}"
         FontFamily="{StaticResource FontUtama}">
     <Window.Resources>
@@ -48,19 +48,38 @@
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="236" />
+            <ColumnDefinition x:Name="KolomSisi" Width="236" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- Sisi kiri: menu sesuai peran. -->
+        <!-- Sisi kiri: menu sesuai peran. Menyempit jadi rel ikon saat jendela sempit. -->
         <Border Grid.Column="0" Background="{DynamicResource KuasSisi}">
             <DockPanel LastChildFill="True">
-                <StackPanel DockPanel.Dock="Top" Margin="20,20,20,14" Orientation="Horizontal">
-                    <Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource KuasAksen}">
-                        <TextBlock Text="L" Foreground="White" FontWeight="Bold" FontSize="16"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                <StackPanel DockPanel.Dock="Top" Margin="20,18,20,10" Orientation="Horizontal"
+                            x:Name="BarisLogo">
+                    <Grid Width="30" Height="30">
+                        <!-- Huruf "L" jadi cadangan bila Aset/logo.png belum ada. -->
+                        <Border CornerRadius="8" Background="{DynamicResource KuasAksen}">
+                            <TextBlock Text="L" Foreground="White" FontWeight="Bold" FontSize="16"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <Image Source="{Binding Converter={StaticResource AsetGambar}, ConverterParameter=logo.png}"
+                               Width="30" Height="30" Stretch="UniformToFill">
+                            <Image.Style>
+                                <Style TargetType="Image">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Source, RelativeSource={RelativeSource Self}}"
+                                                     Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+                    </Grid>
+                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center"
+                                Visibility="{Binding DataContext.Sempit, RelativeSource={RelativeSource AncestorType=Window},
+                                             Converter={StaticResource BoolKasus}, ConverterParameter=balik}">
                         <TextBlock Text="Laundry Desk" Foreground="White" FontSize="14" FontWeight="Bold" />
                         <TextBlock Text="{Binding Sesi.Peran}" Foreground="{DynamicResource KuasSisiTeks}"
                                    FontSize="11" />
@@ -70,35 +89,48 @@
                 <StackPanel DockPanel.Dock="Bottom" Margin="16,10,16,16">
                     <Separator Background="#33FFFFFF" />
                     <Button Command="{Binding GantiTemaCommand}" Style="{StaticResource TombolHalus}"
-                            Foreground="{DynamicResource KuasSisiTeks}" HorizontalContentAlignment="Left">
+                            Foreground="{DynamicResource KuasSisiTeks}" HorizontalContentAlignment="Left"
+                            ToolTip="Ganti tema tampilan">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE706;" FontFamily="{StaticResource FontIkon}" Margin="2,0,10,0" />
-                            <TextBlock Text="{Binding NamaTema, StringFormat=Tema: {0}}" />
+                            <TextBlock Text="{Binding NamaTema, StringFormat=Tema: {0}}"
+                                       Visibility="{Binding DataContext.Sempit, RelativeSource={RelativeSource AncestorType=Window},
+                                                    Converter={StaticResource BoolKasus}, ConverterParameter=balik}" />
                         </StackPanel>
                     </Button>
                     <Button Command="{Binding KeluarCommand}" Style="{StaticResource TombolHalus}"
-                            Foreground="{DynamicResource KuasSisiTeks}" HorizontalContentAlignment="Left">
+                            Foreground="{DynamicResource KuasSisiTeks}" HorizontalContentAlignment="Left"
+                            ToolTip="Keluar dari aplikasi">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE7E8;" FontFamily="{StaticResource FontIkon}" Margin="2,0,10,0" />
-                            <TextBlock Text="Keluar" />
+                            <TextBlock Text="Keluar"
+                                       Visibility="{Binding DataContext.Sempit, RelativeSource={RelativeSource AncestorType=Window},
+                                                    Converter={StaticResource BoolKasus}, ConverterParameter=balik}" />
                         </StackPanel>
                     </Button>
-                    <TextBlock Text="{Binding Versi}" Foreground="#66B9C8E2" FontSize="10.5" Margin="12,8,0,0" />
+                    <TextBlock Text="{Binding Versi}" Foreground="#66B9C8E2" FontSize="10.5" Margin="12,8,0,0"
+                               Visibility="{Binding DataContext.Sempit, RelativeSource={RelativeSource AncestorType=Window},
+                                            Converter={StaticResource BoolKasus}, ConverterParameter=balik}" />
                 </StackPanel>
 
                 <ListBox Background="Transparent" BorderThickness="0" Margin="0,4,0,0"
                          ItemsSource="{Binding Menu}" SelectedItem="{Binding MenuAktif}"
                          ItemContainerStyle="{StaticResource MenuSisi}"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Ikon}" FontFamily="{StaticResource FontIkon}"
                                            FontSize="15" Width="22" Foreground="{DynamicResource KuasSisiTeks}" />
-                                <StackPanel>
+                                <StackPanel
+                                    Visibility="{Binding DataContext.Sempit, RelativeSource={RelativeSource AncestorType=Window},
+                                                 Converter={StaticResource BoolKasus}, ConverterParameter=balik}">
                                     <TextBlock Text="{Binding Judul}" Foreground="White" FontSize="13"
-                                               FontWeight="SemiBold" />
-                                    <TextBlock Text="{Binding Keterangan}" Foreground="#99B9C8E2" FontSize="10.5" />
+                                               FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Keterangan}" Foreground="{DynamicResource KuasSisiTeks}"
+                                               FontSize="10.5" TextTrimming="CharacterEllipsis"
+                                               ToolTip="{Binding Keterangan}" />
                                 </StackPanel>
                             </StackPanel>
                         </DataTemplate>

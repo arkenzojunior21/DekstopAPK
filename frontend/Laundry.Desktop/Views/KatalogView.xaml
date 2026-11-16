@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="420" />
+            <ColumnDefinition Width="370" />
             <ColumnDefinition Width="14" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
@@ -27,6 +27,25 @@
                     <DataGrid Style="{StaticResource TabelData}" ItemsSource="{Binding Daftar}"
                               SelectedItem="{Binding Terpilih}" BorderThickness="0">
                         <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="Foto" Width="52">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Source="{Binding Nama, Converter={StaticResource FotoLayanan}}"
+                                               Width="32" Height="32" Stretch="UniformToFill">
+                                            <Image.Style>
+                                                <Style TargetType="Image">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Source, RelativeSource={RelativeSource Self}}"
+                                                                     Value="{x:Null}">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Image.Style>
+                                        </Image>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Layanan" Binding="{Binding Nama}" Width="*" />
                             <DataGridTextColumn Header="Satuan"
                                                 Binding="{Binding UnitType, Converter={StaticResource Label}}" Width="84" />
@@ -37,7 +56,7 @@
                                                 Width="76" />
                         </DataGrid.Columns>
                     </DataGrid>
-                    <TextBlock Text="Belum ada layanan. Isi tarif usaha lewat panel kanan (Q2 masih menunggu jawaban, jadi sistem tidak menebak angka)."
+                    <TextBlock Text="Belum ada layanan. Tambahkan lewat tombol Baru di atas, lalu isi nama, tarif, dan estimasinya di panel kanan."
                                Style="{StaticResource TeksKecil}" TextWrapping="Wrap" Margin="18,56,18,18"
                                Visibility="{Binding Daftar.Count, Converter={StaticResource Kosong}, ConverterParameter=balik}" />
                 </Grid>
@@ -140,7 +159,7 @@
                                     Command="{Binding SimpanOngkosCommand}" />
                         </Grid>
                         <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
-                                   Text="Biaya per kondisi antar-jemput (Q11) belum ada aturannya, jadi satu angka flat ini yang dipakai kasir sampai dijawab." />
+                                   Text="Satu tarif flat dipakai untuk semua kondisi antar-jemput sampai aturan per kondisi ditambahkan." />
                     </StackPanel>
                 </Border>
             </StackPanel>

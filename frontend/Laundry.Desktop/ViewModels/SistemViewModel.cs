@@ -72,8 +72,7 @@ public partial class SistemViewModel(Konteks konteks) : ViewModelDasar(konteks)
               $"detak terakhir {Format.Relatif(Sinkron.DetakTerakhirUtc)}"
             : "Pekerja sinkronisasi tidak berjalan. Perubahan lokal tetap aman di antrean keluar.";
         RingkasanProvider = Provider.Notifikasi.Ditunda > 0
-            ? $"{Provider.Notifikasi.Ditunda} notifikasi menunggu koneksi/provider asli " +
-              $"(masih menunggu Q7/Q10)."
+            ? $"{Provider.Notifikasi.Ditunda} notifikasi menunggu koneksi atau kredensial provider pesan."
             : $"Antrean notifikasi: menunggu {Provider.Notifikasi.Menunggu}, terkirim {Provider.Notifikasi.Terkirim}, " +
               $"gagal {Provider.Notifikasi.Gagal}.";
     });

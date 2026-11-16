@@ -37,4 +37,10 @@
     <SolidColorBrush x:Key="KuasBahayaLembut" Color="#FF3A1C1C" />
     <SolidColorBrush x:Key="KuasAksenLembut" Color="#FF182A4A" />
 
+    <!-- Tinta gelap untuk teks di atas isian terang (tombol primer/sukses/bahaya di tema gelap),
+         supaya kontrasnya lolos AA; tema terang memakai putih karena isiannya gelap. -->
+    <SolidColorBrush x:Key="KuasAksenTinta" Color="#FF0A1120" />
+    <SolidColorBrush x:Key="KuasSuksesTinta" Color="#FF0A1120" />
+    <SolidColorBrush x:Key="KuasBahayaTinta" Color="#FF0A1120" />
+
 </ResourceDictionary>

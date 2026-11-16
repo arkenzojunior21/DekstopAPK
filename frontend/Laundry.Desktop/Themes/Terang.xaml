@@ -38,4 +38,9 @@
     <SolidColorBrush x:Key="KuasBahayaLembut" Color="#FFFDEAE8" />
     <SolidColorBrush x:Key="KuasAksenLembut" Color="#FFE8EFFD" />
 
+    <!-- Isian tombol di tema terang cukup gelap untuk teks putih (lihat catatan di Gelap.xaml). -->
+    <SolidColorBrush x:Key="KuasAksenTinta" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="KuasSuksesTinta" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="KuasBahayaTinta" Color="#FFFFFFFF" />
+
 </ResourceDictionary>

@@ -14,6 +14,8 @@
     <svc:YaTidakConverter x:Key="YaTidak" />
     <svc:TambahConverter x:Key="Tambah" />
     <svc:DanConverter x:Key="Dan" />
+    <svc:AsetGambarConverter x:Key="AsetGambar" />
+    <svc:FotoLayananConverter x:Key="FotoLayanan" />
 
     <FontFamily x:Key="FontUtama">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="FontIkon">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
@@ -101,7 +103,9 @@
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Foreground" Value="White" />
+        <!-- Tinta, bukan putih: putih di atas aksen terang tema gelap hanya ~2,6:1. -->
+        <Setter Property="Foreground" Value="{DynamicResource KuasAksenTinta}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Background" Value="{DynamicResource KuasAksen}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="16,9,16,9" />
@@ -143,9 +147,11 @@
     </Style>
     <Style x:Key="TombolBahaya" TargetType="Button" BasedOn="{StaticResource TombolDasar}">
         <Setter Property="Background" Value="{DynamicResource KuasBahaya}" />
+        <Setter Property="Foreground" Value="{DynamicResource KuasBahayaTinta}" />
     </Style>
     <Style x:Key="TombolSukses" TargetType="Button" BasedOn="{StaticResource TombolDasar}">
         <Setter Property="Background" Value="{DynamicResource KuasSukses}" />
+        <Setter Property="Foreground" Value="{DynamicResource KuasSuksesTinta}" />
     </Style>
     <Style x:Key="TombolHalus" TargetType="Button" BasedOn="{StaticResource TombolDasar}">
         <Setter Property="Background" Value="Transparent" />
@@ -472,26 +478,107 @@
     <Style x:Key="MenuSisi" TargetType="ListBoxItem">
         <Setter Property="Margin" Value="10,2,10,2" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <!-- Tanpa ini nama otomasi item jadi ToString record (ButirMenu { Judul = ... }). -->
         <Setter Property="AutomationProperties.Name" Value="{Binding Judul}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                    <Border x:Name="Kulit" Background="Transparent" CornerRadius="{StaticResource RadiusKecil}"
-                            Padding="12,10,12,10">
-                        <ContentPresenter />
-                    </Border>
+                    <Grid>
+                        <!-- Penanda aktif: garis aksen kiri, bukan kotak aksen penuh —
+                             latar aksen terang membuat teks putih sulit dibaca. -->
+                        <Border x:Name="GarisAksen" Width="3" CornerRadius="2" Margin="2,6,0,6"
+                                Background="{DynamicResource KuasAksen}" HorizontalAlignment="Left"
+                                Visibility="Collapsed" />
+                        <Border x:Name="Kulit" Background="Transparent" CornerRadius="{StaticResource RadiusKecil}"
+                                Padding="12,10,12,10">
+                            <ContentPresenter />
+                        </Border>
+                    </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Kulit" Property="Background" Value="#22FFFFFF" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Kulit" Property="Background" Value="{DynamicResource KuasAksen}" />
+                            <Setter TargetName="Kulit" Property="Background" Value="{DynamicResource KuasAksenLembut}" />
+                            <Setter TargetName="GarisAksen" Property="Visibility" Value="Visible" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <!-- Tooltip nama muncul hanya saat sidebar menyempit jadi rel ikon. -->
+            <DataTrigger Binding="{Binding DataContext.Sempit, RelativeSource={RelativeSource AncestorType=Window}}"
+                         Value="True">
+                <Setter Property="ToolTip" Value="{Binding Judul}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Scroll bar gelap ramping: tanpa tombol panah, thumb mengambang di atas track.
+         Vertikal: lebar tetap 10, tinggi mengikuti viewport; horizontal dibalik lewat trigger. -->
+    <Style TargetType="ScrollBar">
+        <Setter Property="Width" Value="10" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid Background="Transparent">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.Thumb>
+                                <Thumb>
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border x:Name="Kulit" Background="{DynamicResource KuasGaris}"
+                                                    CornerRadius="5" Margin="2,0,2,0" />
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Kulit" Property="Background"
+                                                            Value="{DynamicResource KuasTeksDua}" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="Width" Value="Auto" />
+                <Setter Property="Height" Value="10" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ScrollBar">
+                            <Grid Background="Transparent">
+                                <Track x:Name="PART_Track">
+                                    <Track.Thumb>
+                                        <Thumb>
+                                            <Thumb.Template>
+                                                <ControlTemplate TargetType="Thumb">
+                                                    <Border x:Name="Kulit" Background="{DynamicResource KuasGaris}"
+                                                            CornerRadius="5" Margin="0,2,0,2" />
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="Kulit" Property="Background"
+                                                                    Value="{DynamicResource KuasTeksDua}" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Thumb.Template>
+                                        </Thumb>
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- ============================ Lain-lain ============================ -->

@@ -197,7 +197,7 @@
                                     Command="{Binding SimpanNamaUsahaCommand}" />
                         </Grid>
                         <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
-                                   Text="Sistem tidak menebak identitas usaha (Q1); struk tetap kosong di kepala sampai admin mengisinya." />
+                                   Text="Isi nama usaha agar struk mencetak identitas yang benar; kolom ini boleh dikosongkan sampai Anda siap." />
                     </StackPanel>
                 </Border>
 

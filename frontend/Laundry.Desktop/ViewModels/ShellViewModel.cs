@@ -20,6 +20,8 @@ public partial class ShellViewModel : ObservableObject
     [ObservableProperty] private string? _toast;
     [ObservableProperty] private bool _sedangMuatStatus;
     [ObservableProperty] private string _namaTema = Tema.SaatIni;
+    /// <summary>Mode sempit: lebar jendela di bawah ambang, sidebar jadi rel ikon agar konten tetap muat.</summary>
+    [ObservableProperty] private bool _sempit;
 
     public ShellViewModel()
     {

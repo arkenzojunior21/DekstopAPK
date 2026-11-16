@@ -140,7 +140,7 @@
                             <TextBox Style="{StaticResource KotakTeksBesar}" Height="60" TextWrapping="Wrap"
                                      AcceptsReturn="True" Text="{Binding Alamat, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock Style="{StaticResource TeksKecil}" Margin="0,6,0,0" TextWrapping="Wrap"
-                                       Text="Slot yang sudah lewat atau penuh tidak ditampilkan. Ongkos antar-jemput memakai satu angka flat dari katalog (Q11 belum dijawab)." />
+                                       Text="Slot yang sudah lewat atau penuh tidak ditampilkan. Ongkos antar-jemput memakai satu tarif flat dari katalog." />
                         </StackPanel>
 
                         <CheckBox Style="{StaticResource KotakCek}" Content="Express" Margin="0,12,0,0"
