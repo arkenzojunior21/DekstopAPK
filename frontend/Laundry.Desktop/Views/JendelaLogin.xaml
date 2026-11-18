@@ -12,7 +12,9 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- Panel kiri: identitas aplikasi, bukan sekadar hiasan. Di sini juga status server. -->
+        <!-- Panel kiri: identitas aplikasi saja. Pengaturan server tidak ditampilkan
+             di sini — alamat API diatur lewat variabel lingkungan API_URL atau
+             berkas preferensi sebelum aplikasi dibuka. -->
         <Border Grid.Column="0" Padding="34,32,34,26">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
@@ -20,7 +22,7 @@
                     <GradientStop Color="#FF1B3A6B" Offset="1" />
                 </LinearGradientBrush>
             </Border.Background>
-            <StackPanel VerticalAlignment="Stretch">
+            <StackPanel VerticalAlignment="Center">
                 <Grid Width="46" Height="46">
                     <!-- Huruf "L" jadi cadangan bila Aset/logo.png belum ada. -->
                     <Border CornerRadius="12" Background="#FF2563EB">
@@ -43,52 +45,7 @@
                 </Grid>
                 <TextBlock Text="Laundry Desk" Foreground="White" FontSize="26" FontWeight="Bold" Margin="0,18,0,4" />
                 <TextBlock Text="Kasir, pesanan, dan laporan dalam satu jendela. Bekerja offline, data tetap tersimpan."
-                           Foreground="#FFB9C8E2" FontSize="13" TextWrapping="Wrap" Margin="0,0,0,26" />
-                <TextBlock Text="MASUK" Foreground="#FF7E94B8" FontSize="10.5" FontWeight="SemiBold" Margin="0,0,0,6" />
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                    <TextBlock Text="Admin toko" Foreground="White" FontSize="13" FontWeight="SemiBold" />
-                    <Border Background="#33FFFFFF" CornerRadius="9" Padding="8,2,8,2" Margin="8,0,0,0">
-                        <TextBlock Text="operasional &amp; laporan" Foreground="#FFCBD8EE" FontSize="11" />
-                    </Border>
-                </StackPanel>
-                <TextBlock Text="Pesanan walk-in, timbang, status, pembayaran tunai/kredit, komplain, backup."
-                           Foreground="#FF9FB2D0" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,18" />
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                    <TextBlock Text="Pelanggan" Foreground="White" FontSize="13" FontWeight="SemiBold" />
-                    <Border Background="#33FFFFFF" CornerRadius="9" Padding="8,2,8,2" Margin="8,0,0,0">
-                        <TextBlock Text="pesan &amp; lacak" Foreground="#FFCBD8EE" FontSize="11" />
-                    </Border>
-                </StackPanel>
-                <TextBlock Text="Pesan online, pilih slot antar-jemput, lihat tagihan dan status cucian."
-                           Foreground="#FF9FB2D0" FontSize="12" TextWrapping="Wrap" />
-                <StackPanel VerticalAlignment="Bottom" Margin="0,26,0,0">
-                    <Border Background="#22FFFFFF" CornerRadius="8" Padding="12,9,12,9">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="SERVER" Foreground="#FF7E94B8" FontSize="10" FontWeight="SemiBold" />
-                                <TextBox Text="{Binding Server, UpdateSourceTrigger=PropertyChanged}"
-                                         Background="#33000000" Foreground="White" CaretBrush="White"
-                                         BorderBrush="#44FFFFFF" BorderThickness="1" FontSize="12"
-                                         Padding="6,3,6,3" Margin="0,3,0,0" VerticalContentAlignment="Center" />
-                                <TextBlock Text="{Binding StatusServer}" Foreground="#FF9FB2D0" FontSize="11"
-                                           TextTrimming="CharacterEllipsis" Margin="0,4,0,0" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                <Button Content="Simpan" Command="{Binding SimpanServerCommand}"
-                                        Style="{StaticResource TombolGaris}" Padding="12,6,12,6" Margin="0,0,8,0" />
-                                <Button Content="Periksa" Command="{Binding CekServerCommand}"
-                                        Style="{StaticResource TombolGaris}" Padding="12,6,12,6" />
-                            </StackPanel>
-
-                        </Grid>
-                    </Border>
-                    <TextBlock Text="Semua data dibaca dari Laundry.Api — aplikasi ini tidak membuka database."
-                               Foreground="#FF7E94B8" FontSize="10.5" TextWrapping="Wrap" Margin="0,10,0,0" />
-                </StackPanel>
+                           Foreground="#FFB9C8E2" FontSize="13" TextWrapping="Wrap" />
             </StackPanel>
         </Border>
 
@@ -130,11 +87,6 @@
                                  PasswordChanged="KotakSandi_Changed" />
                     <Button Content="Masuk" Style="{StaticResource Tombol}" Command="{Binding MasukCommand}"
                             Margin="0,12,0,0" Height="40" IsDefault="True" />
-                    <TextBlock Margin="0,14,0,0" FontSize="12" Foreground="{DynamicResource KuasTeksDua}">
-                        <Hyperlink Command="{Binding BootstrapCommand}">
-                            Database masih kosong? Buat admin pertama
-                        </Hyperlink>
-                    </TextBlock>
                 </StackPanel>
 
                 <StackPanel Visibility="{Binding LagiDaftar, Converter={StaticResource BoolKasus}}">

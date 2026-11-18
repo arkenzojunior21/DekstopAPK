@@ -45,8 +45,6 @@ public sealed class KlienApi
     /// <summary>Dipanggil saat sesi berakhir (401 yang tidak bisa disegarkan) supaya UI kembali ke login.</summary>
     public event Action? SesiBerakhir;
 
-    public void GantiServer(string basisUrl) => BasisUrl = basisUrl.TrimEnd('/');
-
     public void SimpanToken(string akses, string segar)
     {
         _tokenAkses = akses;
@@ -57,26 +55,6 @@ public sealed class KlienApi
     {
         _tokenAkses = null;
         _tokenSegar = null;
-    }
-
-    /// <summary>Cek koneksi ke server tanpa perlu token; dipakai di layar login.</summary>
-    public async Task<string> CekServerAsync(CancellationToken ct = default)
-    {
-        try
-        {
-            using var respons = await KirimSekaliAsync("health", HttpMethod.Get, null, ct, false);
-            return respons.StatusCode switch
-            {
-                HttpStatusCode.OK => $"Terhubung ke {BasisUrl}",
-                HttpStatusCode.ServiceUnavailable =>
-                    $"Server di {BasisUrl} hidup, tapi database-nya belum bisa dihubungi.",
-                _ => $"Server menjawab {(int)respons.StatusCode} dari {BasisUrl}",
-            };
-        }
-        catch (ApiException ex)
-        {
-            return ex.Message;
-        }
     }
 
     public async Task<T?> AmbilAsync<T>(string path, CancellationToken ct = default)

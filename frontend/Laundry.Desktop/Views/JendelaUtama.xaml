@@ -39,9 +39,6 @@
         <DataTemplate DataType="{x:Type vm:AuditViewModel}">
             <v:AuditView />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:SistemViewModel}">
-            <v:SistemView />
-        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:PesananSayaViewModel}">
             <v:PesananSayaView />
         </DataTemplate>

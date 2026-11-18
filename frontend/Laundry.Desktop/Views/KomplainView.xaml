@@ -46,7 +46,8 @@
             </Border>
         </DockPanel>
 
-        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}">
+        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}"
+                      HorizontalScrollBarVisibility="Auto">
             <StackPanel>
                 <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
                                 Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />

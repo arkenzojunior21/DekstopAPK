@@ -56,7 +56,7 @@ public partial class BerandaAdminViewModel(Konteks konteks) : ViewModelDasar(kon
     [RelayCommand]
     private void Buka(string judul) => Konteks.BukaMenu(judul);
 
-    /// <summary>Backup manual dari beranda: sama seperti lewat halaman Sistem, hanya lebih dekat.</summary>
+    /// <summary>Backup manual dari beranda, tanpa perlu membuka layar pengaturan.</summary>
     [RelayCommand]
     private Task BackupAsync(string target) => JalankanAsync(async () =>
     {

@@ -61,7 +61,6 @@ public partial class ShellViewModel : ObservableObject
         new("Komplain", "\uE8BD", "Tiket & balasan", () => new KomplainViewModel(App.Instance.Konteks)),
         new("Laporan", "\uE9D9", "Pendapatan, piutang, ekspor", () => new LaporanViewModel(App.Instance.Konteks)),
         new("Audit", "\uE7C3", "Jejak perubahan hanya-baca", () => new AuditViewModel(App.Instance.Konteks)),
-        new("Sistem", "\uE770", "Sinkronisasi, backup, provider", () => new SistemViewModel(App.Instance.Konteks)),
     ];
 
     private static ButirMenu[] MenuPelanggan() =>

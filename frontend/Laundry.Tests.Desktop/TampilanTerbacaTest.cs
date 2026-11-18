@@ -14,7 +14,7 @@ public sealed class TampilanTerbacaTest
     [
         "AuditView", "BerandaAdminView", "BerandaPelangganView", "KatalogView", "KomplainView",
         "LaporanView", "PelangganView", "PesanBaruView", "PesananSayaView", "PesananView",
-        "SistemView", "SlotView",
+        "SlotView",
     ];
 
     [Theory]

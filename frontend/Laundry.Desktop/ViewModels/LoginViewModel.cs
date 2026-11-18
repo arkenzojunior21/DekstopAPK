@@ -22,16 +22,11 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty] private string? _info;
     [ObservableProperty] private string? _pesanUmum;
     [ObservableProperty] private string? _kodeDev;
-    [ObservableProperty] private string _statusServer = "menyiapkan…";
     [ObservableProperty] private bool _sibuk;
 
     public string Sandi { get; set; } = "";
 
     public string SandiBaru { get; set; } = "";
-
-    /// <summary>Alamat API. Bisa disunting di layar login karena inilah satu-satunya tempat
-    /// pengguna bisa masuk saat server masih salah — tanpa sesi, layar Sistem tidak terjangkau.</summary>
-    [ObservableProperty] private string _server = App.Instance.Api.BasisUrl;
 
     public bool LagiMasuk => Mode == ModeMasuk;
 
@@ -57,35 +52,6 @@ public partial class LoginViewModel : ObservableObject
         Galat = null;
         Info = null;
         KodeDev = null;
-    }
-
-    [RelayCommand]
-    private async Task CekServerAsync()
-    {
-        StatusServer = "memeriksa…";
-        StatusServer = await App.Instance.Api.CekServerAsync();
-    }
-
-    /// <summary>Pindah alamat API dan simpan ke preferensi mesin ini, lalu langsung periksa hasilnya.</summary>
-    [RelayCommand]
-    private async Task SimpanServerAsync()
-    {
-        var tujuan = Server.Trim().TrimEnd('/');
-        if (!Uri.TryCreate(tujuan, UriKind.Absolute, out var uri)
-            || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
-            || string.IsNullOrEmpty(uri.Host))
-        {
-            Galat = "Alamat server harus lengkap dan diawali http:// atau https://.";
-            return;
-        }
-
-        Galat = null;
-        Server = tujuan;
-        App.Instance.Api.GantiServer(tujuan);
-        App.Instance.Preferensi.Server = tujuan;
-        App.Instance.Preferensi.Simpan();
-        StatusServer = "memeriksa…";
-        StatusServer = await App.Instance.Api.CekServerAsync();
     }
 
     [RelayCommand]
@@ -182,25 +148,6 @@ public partial class LoginViewModel : ObservableObject
                 new { challengeId = TantanganId, otp = KodeOtp.Trim(), newPassword = SandiBaru });
             Mode = ModeMasuk;
             Info = hasil?.Message ?? "Kata sandi diganti. Silakan masuk.";
-        });
-    }
-
-    /// <summary>Hanya berguna di database kosong: membuat admin pertama. Setelah itu server menolak 409.</summary>
-    [RelayCommand]
-    private async Task BootstrapAsync()
-    {
-        if (string.IsNullOrWhiteSpace(Nomor) || string.IsNullOrEmpty(Sandi))
-        {
-            Galat = "Isi nomor dan kata sandi admin pertama.";
-            return;
-        }
-
-        await JalankanAsync(async () =>
-        {
-            var tokens = await App.Instance.Api.KirimAsync<TokenResponse>("api/auth/bootstrap",
-                new { phone = Nomor.Trim(), password = Sandi });
-            Info = "Admin pertama dibuat.";
-            await SelesaiMasukAsync(tokens, Nomor.Trim());
         });
     }
 
