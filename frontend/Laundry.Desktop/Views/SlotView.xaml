@@ -5,7 +5,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="14" />
-            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="330" />
         </Grid.ColumnDefinitions>
 
         <DockPanel Grid.Column="0" LastChildFill="True">
@@ -17,15 +17,11 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="DARI" Style="{StaticResource TeksLabel}" />
-                        <DatePicker SelectedDate="{Binding Dari}" FontSize="12" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="SAMPAI" Style="{StaticResource TeksLabel}" />
-                        <DatePicker SelectedDate="{Binding Sampai}" FontSize="12" />
-                    </StackPanel>
-                    <Button Grid.Column="3" Content="Muat" Style="{StaticResource Tombol}" VerticalAlignment="Bottom"
+                    <DatePicker Grid.Column="0" Style="{StaticResource TanggalLabel}" Tag="DARI"
+                                SelectedDate="{Binding Dari}" />
+                    <DatePicker Grid.Column="2" Style="{StaticResource TanggalLabel}" Tag="SAMPAI"
+                                SelectedDate="{Binding Sampai}" />
+                    <Button Grid.Column="3" Content="Muat" Style="{StaticResource Tombol}" VerticalAlignment="Center"
                             Command="{Binding SegarkanCommand}" />
                 </Grid>
             </Border>
@@ -53,8 +49,7 @@
             </Border>
         </DockPanel>
 
-        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}"
-                      HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}">
         <StackPanel>
             <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
                             Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
@@ -63,11 +58,9 @@
 
             <Border Style="{StaticResource Kartu}">
                 <StackPanel>
-                    <TextBlock Text="SLOT BARU" Style="{StaticResource TeksLabel}" />
-                    <TextBlock Text="TANGGAL" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
-                    <DatePicker SelectedDate="{Binding TanggalBaru}" FontSize="12" />
-                    <TextBlock Text="JAM MULAI (HH:mm)" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
-                    <TextBox Style="{StaticResource KotakTeks}"
+                    <DatePicker Style="{StaticResource TanggalLabel}" Tag="TANGGAL BARU"
+                                SelectedDate="{Binding TanggalBaru}" />
+                    <TextBox Style="{StaticResource KotakLabel}" Tag="JAM MULAI (HH:mm)" Margin="0,10,0,0"
                              Text="{Binding JamMulai, UpdateSourceTrigger=PropertyChanged}" />
                     <Grid Margin="0,10,0,0">
                         <Grid.ColumnDefinitions>
@@ -75,18 +68,12 @@
                             <ColumnDefinition Width="10" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="DURASI (JAM)" Style="{StaticResource TeksLabel}" />
-                            <TextBox Style="{StaticResource KotakTeks}"
-                                     Text="{Binding DurasiJam, UpdateSourceTrigger=PropertyChanged}" />
-                        </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="KAPASITAS" Style="{StaticResource TeksLabel}" />
-                            <TextBox Style="{StaticResource KotakTeks}"
-                                     Text="{Binding Kapasitas, UpdateSourceTrigger=PropertyChanged}" />
-                        </StackPanel>
+                        <TextBox Grid.Column="0" Style="{StaticResource KotakLabel}" Tag="DURASI (JAM)"
+                                 Text="{Binding DurasiJam, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Grid.Column="2" Style="{StaticResource KotakLabel}" Tag="KAPASITAS"
+                                 Text="{Binding Kapasitas, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
-                    <Button Content="Tambah slot" Style="{StaticResource Tombol}" Margin="0,14,0,0" Height="34"
+                    <Button Content="Tambah slot" Style="{StaticResource Tombol}" Margin="0,14,0,0" Height="44"
                             Command="{Binding TambahCommand}" />
                     <TextBlock Style="{StaticResource TeksKecil}" Margin="0,10,0,0" TextWrapping="Wrap"
                                Text="Jam diketik apa adanya lalu disimpan sebagai UTC. Sistem belum membatasi jam operasional atau area layanan, jadi periksa kembali sebelum menyimpan." />

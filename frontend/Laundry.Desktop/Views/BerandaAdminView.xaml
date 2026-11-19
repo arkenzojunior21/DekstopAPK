@@ -10,21 +10,19 @@
             <ItemsControl ItemsSource="{Binding Kartu}" Margin="0,0,0,4">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel />
+                        <UniformGrid Columns="5" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Style="{StaticResource Kartu}" Width="212" Margin="0,0,12,12" Padding="14,12,14,12">
+                        <Border Style="{StaticResource Kartu}" Margin="0,0,12,12" Padding="18,16,18,16">
                             <StackPanel>
-                                <Border Width="34" Height="3" CornerRadius="2" Background="{Binding Aksen}"
-                                        HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding Judul}" Style="{StaticResource TeksLabel}"
+                                           FontSize="11" Margin="0,0,0,8" />
                                 <TextBlock Text="{Binding Nilai}" Style="{StaticResource TeksAngka}"
-                                           FontSize="21" Margin="0,8,0,0" />
-                                <TextBlock Text="{Binding Judul}" Style="{StaticResource TeksData}"
-                                           FontWeight="SemiBold" Margin="0,2,0,0" />
+                                           FontSize="36" />
                                 <TextBlock Text="{Binding Keterangan}" Style="{StaticResource TeksKecil}"
-                                           TextWrapping="Wrap" />
+                                           TextWrapping="Wrap" Margin="0,4,0,0" />
                             </StackPanel>
                         </Border>
                     </DataTemplate>

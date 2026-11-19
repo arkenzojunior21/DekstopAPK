@@ -34,6 +34,20 @@ public partial class LoginViewModel : ObservableObject
 
     public bool LagiLupa => Mode == ModeLupa;
 
+    public string JudulMode => Mode switch
+    {
+        ModeDaftar => "Daftar Akun",
+        ModeLupa => "Lupa Sandi",
+        _ => "Masuk Akun",
+    };
+
+    public string KeteranganMode => Mode switch
+    {
+        ModeDaftar => "Buat akun pelanggan dengan nomor WhatsApp aktif.",
+        ModeLupa => "Minta kode verifikasi untuk membuat kata sandi baru.",
+        _ => "Masukkan kredensial untuk memulai sesi operasional.",
+    };
+
     public bool PunyaTantangan => TantanganId.HasValue;
 
     private Guid? TantanganId { get; set; }
@@ -43,6 +57,8 @@ public partial class LoginViewModel : ObservableObject
         OnPropertyChanged(nameof(LagiMasuk));
         OnPropertyChanged(nameof(LagiDaftar));
         OnPropertyChanged(nameof(LagiLupa));
+        OnPropertyChanged(nameof(JudulMode));
+        OnPropertyChanged(nameof(KeteranganMode));
     }
 
     [RelayCommand]

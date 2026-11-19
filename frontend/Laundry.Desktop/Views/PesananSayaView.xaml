@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="390" />
+            <ColumnDefinition Width="420" />
             <ColumnDefinition Width="14" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
@@ -46,8 +46,7 @@
             </Border>
         </DockPanel>
 
-        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}"
-                      HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}">
             <StackPanel>
                 <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
                                 Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
@@ -144,16 +143,18 @@
                 <Border Style="{StaticResource Kartu}">
                     <StackPanel>
                         <TextBlock Text="PEMBATALAN" Style="{StaticResource TeksLabel}" />
-                        <TextBox Style="{StaticResource KotakTeksBesar}" Height="54" Margin="0,8,0,0" TextWrapping="Wrap"
-                                 AcceptsReturn="True" Tag="kenapa mau dibatalkan?"
+                        <TextBox Style="{StaticResource KotakLabelBesar}" Margin="0,8,0,0"
+                                 Tag="ALASAN PEMBATALAN"
                                  Text="{Binding AlasanBatal, UpdateSourceTrigger=PropertyChanged}" />
                         <Button Content="Ajukan pembatalan" Style="{StaticResource TombolBahaya}" Margin="0,8,0,0"
-                                Height="32" HorizontalAlignment="Left" Command="{Binding AjukanBatalCommand}"
+                                Height="44" HorizontalAlignment="Left" Command="{Binding AjukanBatalCommand}"
                                 Visibility="{Binding BisaAjukanBatal, Converter={StaticResource BoolKasus}}" />
                         <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
                                    Text="Pembatalan hanya bisa diajukan selama cucian belum masuk proses; admin toko yang menyetujui atau menolak, dan penolakannya ditampilkan di sini apa adanya." />
-                        <Separator />
-                        <TextBlock Text="PEMBAYARAN" Style="{StaticResource TeksLabel}" />
+                        <StackPanel Visibility="{Binding Pembayaran, Converter={StaticResource Kosong}}">
+                            <Separator />
+                            <TextBlock Text="PEMBAYARAN" Style="{StaticResource TeksLabel}" />
+                        </StackPanel>
                         <ItemsControl ItemsSource="{Binding Pembayaran}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>

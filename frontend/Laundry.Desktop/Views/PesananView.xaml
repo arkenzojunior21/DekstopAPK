@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="370" />
+            <ColumnDefinition Width="400" />
             <ColumnDefinition Width="14" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
@@ -17,11 +17,10 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Style="{StaticResource KotakTeks}"
-                                 Text="{Binding Cari, UpdateSourceTrigger=PropertyChanged}"
-                                 Tag="cari nomor pesanan" />
+                        <TextBox Grid.Column="0" Style="{StaticResource KotakLabel}" Tag="CARI NOMOR PESANAN"
+                                 Text="{Binding Cari, UpdateSourceTrigger=PropertyChanged}" />
                         <Button Grid.Column="1" Content="Cari" Style="{StaticResource Tombol}" Margin="8,0,0,0"
-                                Command="{Binding TerapkanFilterCommand}" />
+                                Height="56" Command="{Binding TerapkanFilterCommand}" />
                     </Grid>
                     <Grid Margin="0,10,0,0">
                         <Grid.ColumnDefinitions>
@@ -29,19 +28,14 @@
                             <ColumnDefinition Width="8" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="STATUS" Style="{StaticResource TeksLabel}" />
-                            <ComboBox Style="{StaticResource KotakPilih}" ItemsSource="{Binding SemuaStatus}"
-                                      SelectedItem="{Binding FilterStatus}" Tag="semua status"
-                                      ItemTemplate="{StaticResource TemplateEnum}" />
-                        </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="PEMBAYARAN" Style="{StaticResource TeksLabel}" />
-                            <ComboBox Style="{StaticResource KotakPilih}"
-                                      ItemsSource="{Binding SemuaStatusBayar}"
-                                      SelectedItem="{Binding FilterPembayaran}" Tag="semua pembayaran"
-                                      ItemTemplate="{StaticResource TemplateEnum}" />
-                        </StackPanel>
+                        <ComboBox Grid.Column="0" Style="{StaticResource KotakPilihLabel}" Tag="STATUS"
+                                  ItemsSource="{Binding SemuaStatus}"
+                                  SelectedItem="{Binding FilterStatus}"
+                                  ItemTemplate="{StaticResource TemplateEnum}" />
+                        <ComboBox Grid.Column="2" Style="{StaticResource KotakPilihLabel}" Tag="PEMBAYARAN"
+                                  ItemsSource="{Binding SemuaStatusBayar}"
+                                  SelectedItem="{Binding FilterPembayaran}"
+                                  ItemTemplate="{StaticResource TemplateEnum}" />
                     </Grid>
                     <Grid Margin="0,10,0,0">
                         <Grid.ColumnDefinitions>
@@ -50,16 +44,12 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="DARI" Style="{StaticResource TeksLabel}" />
-                            <DatePicker SelectedDate="{Binding Dari}" FontSize="12" />
-                        </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="SAMPAI" Style="{StaticResource TeksLabel}" />
-                            <DatePicker SelectedDate="{Binding Sampai}" FontSize="12" />
-                        </StackPanel>
+                        <DatePicker Grid.Column="0" Style="{StaticResource TanggalLabel}" Tag="DARI"
+                                    SelectedDate="{Binding Dari}" />
+                        <DatePicker Grid.Column="2" Style="{StaticResource TanggalLabel}" Tag="SAMPAI"
+                                    SelectedDate="{Binding Sampai}" />
                         <Button Grid.Column="3" Content="Reset" Style="{StaticResource TombolGaris}"
-                                VerticalAlignment="Bottom" Command="{Binding BersihkanFilterCommand}" />
+                                VerticalAlignment="Center" Command="{Binding BersihkanFilterCommand}" />
                     </Grid>
                 </StackPanel>
             </Border>
@@ -100,8 +90,7 @@
         </DockPanel>
 
         <!-- ==================== KANAN: detail & aksi ==================== -->
-        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}"
-                      HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}">
             <StackPanel>
                 <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
                                 Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
@@ -219,7 +208,7 @@
                             </DataGrid.Columns>
                         </DataGrid>
                         <Button Content="Simpan berat / jumlah aktual" Style="{StaticResource Tombol}"
-                                HorizontalAlignment="Left" Margin="0,10,0,0" Height="34"
+                                HorizontalAlignment="Left" Margin="0,10,0,0" Height="44"
                                 Command="{Binding SimpanActualCommand}" />
                     </StackPanel>
                 </Border>
@@ -234,11 +223,10 @@
                     <StackPanel Grid.Column="0">
                         <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
                             <StackPanel>
-                                <TextBlock Text="UBAH STATUS" Style="{StaticResource TeksLabel}" />
-                                <ComboBox Style="{StaticResource KotakPilih}" ItemsSource="{Binding LangkahBerikut}"
-                                          SelectedItem="{Binding StatusBaru}" Tag="pilih status berikutnya"
+                                <ComboBox Style="{StaticResource KotakPilihLabel}" Tag="UBAH STATUS" ItemsSource="{Binding LangkahBerikut}"
+                                          SelectedItem="{Binding StatusBaru}"
                                           ItemTemplate="{StaticResource TemplateEnum}" />
-                                <TextBox Style="{StaticResource KotakTeks}" Margin="0,10,0,0" Tag="catatan (opsional)"
+                                <TextBox Style="{StaticResource KotakLabel}" Tag="CATATAN (OPSIONAL)" Margin="0,10,0,0"
                                          Text="{Binding CatatanStatus, UpdateSourceTrigger=PropertyChanged}" />
                                 <Button Content="Simpan status" Style="{StaticResource Tombol}" Margin="0,10,0,0"
                                         Command="{Binding GantiStatusCommand}" />
@@ -249,11 +237,11 @@
 
                         <Border Style="{StaticResource Kartu}">
                             <StackPanel>
-                                <TextBlock Text="PERKIRAAN SELESAI" Style="{StaticResource TeksLabel}" />
-                                <DatePicker SelectedDate="{Binding EstimasiSelesai}" FontSize="12" />
-                                <TextBox Style="{StaticResource KotakTeks}" Margin="0,10,0,0"
+                                <DatePicker Style="{StaticResource TanggalLabel}" Tag="PERKIRAAN SELESAI"
+                                            SelectedDate="{Binding EstimasiSelesai}" />
+                                <TextBox Style="{StaticResource KotakLabel}" Margin="0,10,0,0"
                                          Text="{Binding CatatanEstimasi, UpdateSourceTrigger=PropertyChanged}"
-                                         Tag="alasan perkiraan (opsional)" />
+                                         Tag="ALASAN PERKIRAAN (OPSIONAL)" />
                                 <Button Content="Simpan perkiraan" Style="{StaticResource TombolGaris}"
                                         Margin="0,10,0,0" Command="{Binding SetEstimasiCommand}" />
                             </StackPanel>
@@ -263,21 +251,20 @@
                     <StackPanel Grid.Column="2">
                         <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
                             <StackPanel>
-                                <TextBlock Text="PEMBAYARAN" Style="{StaticResource TeksLabel}" />
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="8" />
-                                        <ColumnDefinition Width="130" />
+                                        <ColumnDefinition Width="120" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBox Grid.Column="0" Style="{StaticResource KotakTeks}" Tag="jumlah bayar"
+                                    <TextBox Grid.Column="0" Style="{StaticResource KotakLabel}" Tag="JUMLAH"
                                              Text="{Binding Jumlah, UpdateSourceTrigger=PropertyChanged}" />
-                                    <ComboBox Grid.Column="2" Style="{StaticResource KotakPilih}"
+                                    <ComboBox Grid.Column="2" Style="{StaticResource KotakPilihLabel}" Tag="JENIS"
                                               ItemsSource="{Binding SumberJenisBayar}"
                                               SelectedItem="{Binding JenisBayar}"
                                               ItemTemplate="{StaticResource TemplateEnum}" />
                                 </Grid>
-                                <TextBox Style="{StaticResource KotakTeks}" Margin="0,10,0,0" Tag="catatan (opsional)"
+                                <TextBox Style="{StaticResource KotakLabel}" Margin="0,10,0,0" Tag="CATATAN (OPSIONAL)"
                                          Text="{Binding CatatanBayar, UpdateSourceTrigger=PropertyChanged}" />
                                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                     <Button Content="Tunai" Style="{StaticResource TombolSukses}"
@@ -297,10 +284,9 @@
 
                         <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
                             <StackPanel>
-                                <TextBlock Text="REFUND" Style="{StaticResource TeksLabel}" />
-                                <TextBox Style="{StaticResource KotakTeks}"
+                                <TextBox Style="{StaticResource KotakLabel}" Tag="JUMLAH REFUND"
                                          Text="{Binding JumlahRefund, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBox Style="{StaticResource KotakTeks}" Margin="0,8,0,0" Tag="alasan refund"
+                                <TextBox Style="{StaticResource KotakLabel}" Margin="0,8,0,0" Tag="ALASAN REFUND"
                                          Text="{Binding AlasanRefund, UpdateSourceTrigger=PropertyChanged}" />
                                 <Button Content="Catat refund" Style="{StaticResource TombolBahaya}" Margin="0,8,0,0"
                                         Command="{Binding RefundCommand}" />
@@ -312,8 +298,7 @@
                         <Border Style="{StaticResource Kartu}"
                                 Visibility="{Binding BisaPutuskanBatal, Converter={StaticResource BoolKasus}}">
                             <StackPanel>
-                                <TextBlock Text="PERMINTAAN PEMBATALAN" Style="{StaticResource TeksLabel}" />
-                                <TextBox Style="{StaticResource KotakTeks}"
+                                <TextBox Style="{StaticResource KotakLabel}" Tag="ALASAN PEMBATALAN"
                                          Text="{Binding CatatanBatal, UpdateSourceTrigger=PropertyChanged}" />
                                 <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                                     <Button Content="Setujui" Style="{StaticResource TombolBahaya}" Margin="0,0,8,0"

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="370" />
+            <ColumnDefinition Width="450" />
             <ColumnDefinition Width="14" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
@@ -11,15 +11,16 @@
         <!-- Kiri: daftar layanan. -->
         <DockPanel Grid.Column="0" LastChildFill="True">
             <Border DockPanel.Dock="Top" Style="{StaticResource Kartu}" Padding="14,10,14,10" Margin="0,0,0,12">
-                <Grid>
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Baru" Style="{StaticResource TombolGaris}"
+                            VerticalAlignment="Top" Margin="10,0,0,0"
+                            Command="{Binding BaruCommand}" />
                     <StackPanel>
                         <TextBlock Text="LAYANAN" Style="{StaticResource TeksLabel}" />
                         <TextBlock Text="Tarif disimpan sebagai versi baru setiap kali diubah, jadi pesanan lama tetap memakai harga saat ia dibuat."
                                    Style="{StaticResource TeksKecil}" TextWrapping="Wrap" Margin="0,4,0,0" />
                     </StackPanel>
-                    <Button Content="Baru" Style="{StaticResource TombolGaris}" VerticalAlignment="Top"
-                            HorizontalAlignment="Right" Command="{Binding BaruCommand}" />
-                </Grid>
+                </DockPanel>
             </Border>
 
             <Border Style="{StaticResource Kartu}" Padding="0">
@@ -27,11 +28,11 @@
                     <DataGrid Style="{StaticResource TabelData}" ItemsSource="{Binding Daftar}"
                               SelectedItem="{Binding Terpilih}" BorderThickness="0">
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="Foto" Width="52">
+                            <DataGridTemplateColumn Header="Foto" Width="58">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Image Source="{Binding Nama, Converter={StaticResource FotoLayanan}}"
-                                               Width="32" Height="32" Stretch="UniformToFill">
+                                               Width="30" Height="30" Stretch="UniformToFill">
                                             <Image.Style>
                                                 <Style TargetType="Image">
                                                     <Style.Triggers>
@@ -46,14 +47,16 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Layanan" Binding="{Binding Nama}" Width="*" />
+                            <DataGridTextColumn Header="Layanan" Binding="{Binding Nama}" Width="*" MinWidth="130"
+                                                ElementStyle="{StaticResource SelPotong}" />
                             <DataGridTextColumn Header="Satuan"
-                                                Binding="{Binding UnitType, Converter={StaticResource Label}}" Width="84" />
+                                                Binding="{Binding UnitType, Converter={StaticResource Label}}" Width="76"
+                                                ElementStyle="{StaticResource SelPotong}" />
                             <DataGridTextColumn Header="Tarif"
-                                                Binding="{Binding CurrentPrice, Converter={StaticResource Rupiah}}" Width="92" />
+                                                Binding="{Binding CurrentPrice, Converter={StaticResource Rupiah}}" Width="78" />
                             <DataGridTextColumn Header="Status"
                                                 Binding="{Binding IsActive, Converter={StaticResource YaTidak}, ConverterParameter=Aktif|Nonaktif}"
-                                                Width="76" />
+                                                Width="78" ElementStyle="{StaticResource SelPotong}" />
                         </DataGrid.Columns>
                     </DataGrid>
                     <TextBlock Text="Belum ada layanan. Tambahkan lewat tombol Baru di atas, lalu isi nama, tarif, dan estimasinya di panel kanan."
@@ -64,8 +67,7 @@
         </DockPanel>
 
         <!-- Kanan: editor tarif + ongkos. -->
-        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}"
-                      HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}">
             <StackPanel>
                 <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
                                 Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
@@ -81,16 +83,11 @@
                                 <ColumnDefinition Width="10" />
                                 <ColumnDefinition Width="170" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="NAMA LAYANAN" Style="{StaticResource TeksLabel}" />
-                                <TextBox Style="{StaticResource KotakTeks}"
-                                         Text="{Binding Nama, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="SATUAN" Style="{StaticResource TeksLabel}" />
-                                <ComboBox Style="{StaticResource KotakPilih}" ItemsSource="{Binding SemuaSatuan}"
-                                          SelectedItem="{Binding Satuan}" ItemTemplate="{StaticResource TemplateEnum}" />
-                            </StackPanel>
+                            <TextBox Grid.Column="0" Style="{StaticResource KotakLabel}" Tag="NAMA LAYANAN"
+                                     Text="{Binding Nama, UpdateSourceTrigger=PropertyChanged}" />
+                            <ComboBox Grid.Column="2" Style="{StaticResource KotakPilihLabel}" Tag="SATUAN"
+                                      ItemsSource="{Binding SemuaSatuan}"
+                                      SelectedItem="{Binding Satuan}" ItemTemplate="{StaticResource TemplateEnum}" />
                         </Grid>
 
                         <Grid Margin="0,10,0,0">
@@ -101,21 +98,12 @@
                                 <ColumnDefinition Width="10" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="TARIF (RP)" Style="{StaticResource TeksLabel}" />
-                                <TextBox Style="{StaticResource KotakTeks}"
-                                         Text="{Binding Tarif, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="MINIMUM BERAT (KG)" Style="{StaticResource TeksLabel}" />
-                                <TextBox Style="{StaticResource KotakTeks}"
-                                         Text="{Binding MinimumBerat, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="4">
-                                <TextBlock Text="TAMBAHAN EXPRESS (RP)" Style="{StaticResource TeksLabel}" />
-                                <TextBox Style="{StaticResource KotakTeks}"
-                                         Text="{Binding TambahanExpress, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
+                            <TextBox Grid.Column="0" Style="{StaticResource KotakLabel}" Tag="TARIF (RP)"
+                                     Text="{Binding Tarif, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Grid.Column="2" Style="{StaticResource KotakLabel}" Tag="MINIMUM BERAT (KG)"
+                                     Text="{Binding MinimumBerat, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Grid.Column="4" Style="{StaticResource KotakLabel}" Tag="TAMBAHAN EXPRESS"
+                                     Text="{Binding TambahanExpress, UpdateSourceTrigger=PropertyChanged}" />
                         </Grid>
 
                         <Grid Margin="0,10,0,0">
@@ -125,38 +113,32 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="STANDAR (HARI)" Style="{StaticResource TeksLabel}" />
-                                <TextBox Style="{StaticResource KotakTeks}"
-                                         Text="{Binding HariStandar, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="EXPRESS (HARI)" Style="{StaticResource TeksLabel}" />
-                                <TextBox Style="{StaticResource KotakTeks}"
-                                         Text="{Binding HariExpress, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <CheckBox Grid.Column="3" Style="{StaticResource KotakCek}" Content="Aktif" Margin="12,18,0,0"
+                            <TextBox Grid.Column="0" Style="{StaticResource KotakLabel}" Tag="STANDAR (HARI)"
+                                     Text="{Binding HariStandar, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Grid.Column="2" Style="{StaticResource KotakLabel}" Tag="EXPRESS (HARI)"
+                                     Text="{Binding HariExpress, UpdateSourceTrigger=PropertyChanged}" />
+                            <CheckBox Grid.Column="3" Style="{StaticResource KotakCek}" Content="Aktif" Margin="12,26,0,0"
                                       VerticalAlignment="Top" IsChecked="{Binding Aktif}" />
                         </Grid>
 
                         <Button Content="Simpan layanan &amp; tarif" Style="{StaticResource Tombol}"
-                                HorizontalAlignment="Left" Margin="0,14,0,0" Height="34"
+                                HorizontalAlignment="Left" Margin="0,14,0,0" Height="44"
                                 Command="{Binding SimpanCommand}" />
                     </StackPanel>
                 </Border>
 
                 <Border Style="{StaticResource Kartu}">
                     <StackPanel>
-                        <TextBlock Text="ONGKOS ANTAR-JEMPUT" Style="{StaticResource TeksLabel}" />
-                        <Grid Margin="0,8,0,0">
+                        <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="170" />
+                                <ColumnDefinition Width="200" />
                                 <ColumnDefinition Width="10" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Style="{StaticResource KotakTeks}"
+                            <TextBox Grid.Column="0" Style="{StaticResource KotakLabel}" Tag="ONGKOS ANTAR-JEMPUT (RP)"
                                      Text="{Binding Ongkos, UpdateSourceTrigger=PropertyChanged}" />
                             <Button Grid.Column="2" Content="Simpan ongkos" Style="{StaticResource TombolGaris}"
+                                    VerticalAlignment="Center"
                                     Command="{Binding SimpanOngkosCommand}" />
                         </Grid>
                         <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"

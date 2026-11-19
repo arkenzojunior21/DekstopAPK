@@ -17,24 +17,21 @@
                         <ColumnDefinition Width="190" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
-                        <TextBlock Text="LAYANAN" Style="{StaticResource TeksLabel}" />
-                        <ComboBox Style="{StaticResource KotakPilih}" ItemsSource="{Binding LayananTersedia}"
-                                  SelectedItem="{Binding LayananDipilih}" Tag="pilih layanan">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock FontSize="12.5">
-                                        <Run Text="{Binding Nama, Mode=OneWay}" /><Run Text=" · " /><Run
-                                            Text="{Binding CurrentPrice, Converter={StaticResource Rupiah}, Mode=OneWay}" />
-                                    </TextBlock>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
-                    <Button Grid.Column="1" Content="+ Tambah" Style="{StaticResource Tombol}" Margin="0,18,8,0"
-                            VerticalAlignment="Top" Command="{Binding TambahCommand}" />
-                    <Button Grid.Column="2" Content="Kosongkan" Style="{StaticResource TombolHalus}" Margin="0,18,0,0"
-                            VerticalAlignment="Top" Command="{Binding KosongkanCommand}" />
+                    <ComboBox Grid.Column="0" Margin="0,0,12,0" Style="{StaticResource KotakPilihLabel}" Tag="LAYANAN"
+                              ItemsSource="{Binding LayananTersedia}" SelectedItem="{Binding LayananDipilih}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock FontSize="13">
+                                    <Run Text="{Binding Nama, Mode=OneWay}" /><Run Text=" · " /><Run
+                                        Text="{Binding CurrentPrice, Converter={StaticResource Rupiah}, Mode=OneWay}" />
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button Grid.Column="1" Content="+ Tambah" Style="{StaticResource Tombol}" Margin="0,0,8,0"
+                            Height="56" Command="{Binding TambahCommand}" />
+                    <Button Grid.Column="2" Content="Kosongkan" Style="{StaticResource TombolHalus}"
+                            Command="{Binding KosongkanCommand}" />
                 </Grid>
             </Border>
 
@@ -72,8 +69,7 @@
         </DockPanel>
 
         <!-- Kanan: pengantaran + kirim. -->
-        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}"
-                      HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}">
             <StackPanel>
                 <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
                                 Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
@@ -83,12 +79,11 @@
                 <Border Style="{StaticResource Kartu}" Margin="0,0,0,12"
                         Visibility="{Binding Admin, Converter={StaticResource BoolKasus}}">
                     <StackPanel>
-                        <TextBlock Text="PELANGGAN WALK-IN" Style="{StaticResource TeksLabel}" />
-                        <ComboBox Style="{StaticResource KotakPilih}" Margin="0,8,0,0" Tag="pilih / biarkan kosong"
+                        <ComboBox Style="{StaticResource KotakPilihLabel}" Tag="PELANGGAN WALK-IN"
                                   ItemsSource="{Binding PelangganTersimpan}" SelectedItem="{Binding PelangganDipilih}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock FontSize="12.5">
+                                    <TextBlock FontSize="13">
                                         <Run Text="{Binding Nama, Mode=OneWay}" /><Run Text=" · " /><Run
                                             Text="{Binding Phone, Mode=OneWay}" />
                                     </TextBlock>
@@ -103,52 +98,42 @@
                                 <ColumnDefinition Width="10" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="NAMA" Style="{StaticResource TeksLabel}" />
-                                <TextBox Style="{StaticResource KotakTeks}"
-                                         Text="{Binding WalkInNama, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="NOMOR" Style="{StaticResource TeksLabel}" />
-                                <TextBox Style="{StaticResource KotakTeks}"
-                                         Text="{Binding WalkInNomor, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
+                            <TextBox Grid.Column="0" Style="{StaticResource KotakLabel}" Tag="NAMA"
+                                     Text="{Binding WalkInNama, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Grid.Column="2" Style="{StaticResource KotakLabel}" Tag="NOMOR"
+                                     Text="{Binding WalkInNomor, UpdateSourceTrigger=PropertyChanged}" />
                         </Grid>
                     </StackPanel>
                 </Border>
 
                 <Border Style="{StaticResource Kartu}" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="PENGAMBILAN" Style="{StaticResource TeksLabel}" />
-                        <ComboBox Style="{StaticResource KotakPilih}" Margin="0,8,0,0"
+                        <ComboBox Style="{StaticResource KotakPilihLabel}" Tag="PENGAMBILAN"
                                   ItemsSource="{Binding SemuaPengambilan}" SelectedItem="{Binding Pengambilan}"
                                   ItemTemplate="{StaticResource TemplateEnum}" />
 
                         <StackPanel Margin="0,10,0,0" Visibility="{Binding PerluSlot, Converter={StaticResource BoolKasus}}">
-                            <TextBlock Text="SLOT ANTAR/JEMPUT" Style="{StaticResource TeksLabel}" />
-                            <ComboBox Style="{StaticResource KotakPilih}" ItemsSource="{Binding SlotTersedia}"
-                                      SelectedItem="{Binding SlotDipilih}" Tag="pilih slot">
+                            <ComboBox Style="{StaticResource KotakPilihLabel}" Tag="SLOT ANTAR/JEMPUT"
+                                      ItemsSource="{Binding SlotTersedia}" SelectedItem="{Binding SlotDipilih}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock FontSize="12.5">
+                                        <TextBlock FontSize="13">
                                             <Run Text="{Binding StartsAtUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap, Mode=OneWay}" /><Run
                                                 Text=" · sisa " /><Run Text="{Binding Kapasitas, Mode=OneWay}" />
                                         </TextBlock>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
-                            <TextBlock Text="ALAMAT" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
-                            <TextBox Style="{StaticResource KotakTeksBesar}" Height="60" TextWrapping="Wrap"
-                                     AcceptsReturn="True" Text="{Binding Alamat, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Style="{StaticResource KotakLabelBesar}" Tag="ALAMAT" Margin="0,10,0,0"
+                                     Text="{Binding Alamat, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock Style="{StaticResource TeksKecil}" Margin="0,6,0,0" TextWrapping="Wrap"
                                        Text="Slot yang sudah lewat atau penuh tidak ditampilkan. Ongkos antar-jemput memakai satu tarif flat dari katalog." />
                         </StackPanel>
 
                         <CheckBox Style="{StaticResource KotakCek}" Content="Express" Margin="0,12,0,0"
                                   IsChecked="{Binding Express}" />
-                        <TextBlock Text="CATATAN" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
-                        <TextBox Style="{StaticResource KotakTeksBesar}" Height="54" TextWrapping="Wrap"
-                                 AcceptsReturn="True" Text="{Binding Catatan, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Style="{StaticResource KotakLabelBesar}" Tag="CATATAN" Margin="0,10,0,0"
+                                 Height="84" Text="{Binding Catatan, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </Border>
 
@@ -158,7 +143,7 @@
                         <TextBlock Text="{Binding Perkiraan}" Style="{StaticResource TeksAngka}" />
                         <TextBlock Style="{StaticResource TeksKecil}" TextWrapping="Wrap"
                                    Text="Total resmi dihitung toko setelah berat aktual ditimbang; pembayaran hanya bisa dilunasi kalau total sudah ada." />
-                        <Button Content="Kirim pesanan" Style="{StaticResource Tombol}" Margin="0,12,0,0" Height="36"
+                        <Button Content="Kirim pesanan" Style="{StaticResource Tombol}" Margin="0,12,0,0" Height="48"
                                 Command="{Binding KirimCommand}" />
                         <TextBlock Text="{Binding NomorHasil}" Style="{StaticResource TeksKecil}" Margin="0,8,0,0"
                                    TextWrapping="Wrap" />

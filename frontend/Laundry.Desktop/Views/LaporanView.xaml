@@ -15,20 +15,14 @@
         <!-- Atas: filter tanggal + jenis + ekspor. -->
         <Border DockPanel.Dock="Top" Style="{StaticResource Kartu}" Padding="14,12,14,12" Margin="0,0,0,12">
             <WrapPanel>
-                <StackPanel Margin="0,0,12,0">
-                    <TextBlock Text="DARI" Style="{StaticResource TeksLabel}" />
-                    <DatePicker SelectedDate="{Binding Dari}" FontSize="12" />
-                </StackPanel>
-                <StackPanel Margin="0,0,12,0">
-                    <TextBlock Text="SAMPAI" Style="{StaticResource TeksLabel}" />
-                    <DatePicker SelectedDate="{Binding Sampai}" FontSize="12" />
-                </StackPanel>
-                <StackPanel Margin="0,0,12,0">
-                    <TextBlock Text="LAPORAN" Style="{StaticResource TeksLabel}" />
-                    <ComboBox Style="{StaticResource KotakPilih}" Width="170" ItemsSource="{Binding SemuaJenis}"
-                              SelectedItem="{Binding Jenis}" ItemTemplate="{StaticResource TemplateEnum}" />
-                </StackPanel>
-                <StackPanel VerticalAlignment="Bottom" Orientation="Horizontal">
+                <DatePicker Style="{StaticResource TanggalLabel}" Tag="DARI" Margin="0,0,12,0"
+                            SelectedDate="{Binding Dari}" />
+                <DatePicker Style="{StaticResource TanggalLabel}" Tag="SAMPAI" Margin="0,0,12,0"
+                            SelectedDate="{Binding Sampai}" />
+                <ComboBox Style="{StaticResource KotakPilihLabel}" Tag="LAPORAN" Width="200"
+                          Margin="0,0,12,0" ItemsSource="{Binding SemuaJenis}"
+                          SelectedItem="{Binding Jenis}" ItemTemplate="{StaticResource TemplateEnum}" />
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                     <Button Content="Muat" Style="{StaticResource Tombol}" Margin="0,0,8,0"
                             Command="{Binding SegarkanCommand}" />
                     <Button Content="PDF" Style="{StaticResource TombolGaris}" Margin="0,0,6,0"
@@ -134,7 +128,7 @@
 
         <!-- Tabel netral: jenis laporan terpilih. -->
         <Border Style="{StaticResource Kartu}" Padding="14,12,14,12">
-            <ScrollViewer Style="{StaticResource Gulir}" HorizontalScrollBarVisibility="Auto">
+            <ScrollViewer Style="{StaticResource Gulir}">
                 <StackPanel>
                     <TextBlock Text="{Binding Tabel.Judul}" Style="{StaticResource TeksBagian}" />
                     <TextBlock Text="{Binding Tabel.Subjudul}" Style="{StaticResource TeksKecil}" Margin="0,2,0,10" />

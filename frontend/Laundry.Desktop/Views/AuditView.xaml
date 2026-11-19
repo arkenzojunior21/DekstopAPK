@@ -10,36 +10,39 @@
 
         <DockPanel Grid.Column="0" LastChildFill="True">
             <Border DockPanel.Dock="Top" Style="{StaticResource Kartu}" Padding="14,12,14,12" Margin="0,0,0,12">
-                <WrapPanel>
-                    <StackPanel Margin="0,0,10,0">
-                        <TextBlock Text="KATA KUNCI" Style="{StaticResource TeksLabel}" />
-                        <TextBox Style="{StaticResource KotakTeks}" Width="190" Tag="mis. nama pelanggan"
-                                 Text="{Binding Cari, UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
-                    <StackPanel Margin="0,0,10,0">
-                        <TextBlock Text="ENTITAS" Style="{StaticResource TeksLabel}" />
-                        <TextBox Style="{StaticResource KotakTeks}" Width="130" Tag="mis. Order"
-                                 Text="{Binding Entitas, UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
-                    <StackPanel Margin="0,0,10,0">
-                        <TextBlock Text="DARI" Style="{StaticResource TeksLabel}" />
-                        <DatePicker SelectedDate="{Binding Dari}" FontSize="12" />
-                    </StackPanel>
-                    <StackPanel Margin="0,0,10,0">
-                        <TextBlock Text="SAMPAI" Style="{StaticResource TeksLabel}" />
-                        <DatePicker SelectedDate="{Binding Sampai}" FontSize="12" />
-                    </StackPanel>
-                    <StackPanel VerticalAlignment="Bottom" Orientation="Horizontal">
-                        <Button Content="Cari" Style="{StaticResource Tombol}" Margin="0,0,8,0"
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="150" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Style="{StaticResource KotakLabel}" Tag="KATA KUNCI"
+                             Text="{Binding Cari, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBox Grid.Column="2" Style="{StaticResource KotakLabel}" Tag="ENTITAS"
+                             Text="{Binding Entitas, UpdateSourceTrigger=PropertyChanged}" />
+                    <DatePicker Grid.Column="4" Style="{StaticResource TanggalLabel}" Tag="DARI"
+                                SelectedDate="{Binding Dari}" />
+                    <DatePicker Grid.Column="6" Style="{StaticResource TanggalLabel}" Tag="SAMPAI"
+                                SelectedDate="{Binding Sampai}" />
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="7" Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Content="Cari" Style="{StaticResource Tombol}" Height="44" Margin="0,0,8,0"
                                 Command="{Binding CariCommand}" />
-                        <Button Content="PDF" Style="{StaticResource TombolGaris}" Margin="0,0,6,0"
+                        <Button Content="PDF" Style="{StaticResource TombolGaris}" Height="44" Margin="0,0,6,0"
                                 Command="{Binding EksporCommand}" CommandParameter="pdf" />
-                        <Button Content="XLSX" Style="{StaticResource TombolGaris}" Margin="0,0,6,0"
+                        <Button Content="XLSX" Style="{StaticResource TombolGaris}" Height="44" Margin="0,0,6,0"
                                 Command="{Binding EksporCommand}" CommandParameter="xlsx" />
-                        <Button Content="CSV" Style="{StaticResource TombolGaris}"
+                        <Button Content="CSV" Style="{StaticResource TombolGaris}" Height="44"
                                 Command="{Binding EksporCommand}" CommandParameter="csv" />
                     </StackPanel>
-                </WrapPanel>
+                </Grid>
             </Border>
 
             <Border DockPanel.Dock="Top" Style="{StaticResource KartuLembut}" Padding="14,8,14,8" Margin="0,0,0,12"
@@ -77,12 +80,12 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Waktu"
                                                 Binding="{Binding AtUtc, Converter={StaticResource Tanggal}, ConverterParameter=lengkap}"
-                                                Width="170" />
-                            <DataGridTextColumn Header="Entitas" Binding="{Binding EntityType}" Width="110" />
-                            <DataGridTextColumn Header="Aksi" Binding="{Binding Action}" Width="110" />
-                            <DataGridTextColumn Header="Oleh" Binding="{Binding Actor}" Width="150" />
+                                                Width="160" />
+                            <DataGridTextColumn Header="Entitas" Binding="{Binding EntityType}" Width="96" />
+                            <DataGridTextColumn Header="Aksi" Binding="{Binding Action}" Width="90" />
+                            <DataGridTextColumn Header="Oleh" Binding="{Binding Actor}" Width="120" />
                             <DataGridTextColumn Header="Alasan" Binding="{Binding Reason}" Width="*" />
-                            <DataGridTextColumn Header="Asal" Binding="{Binding Source}" Width="80" />
+                            <DataGridTextColumn Header="Asal" Binding="{Binding Source}" Width="64" />
                         </DataGrid.Columns>
                     </DataGrid>
                     <TextBlock Text="Tidak ada baris audit pada rentang ini. Kosong berarti memang tidak ada perubahan, bukan gagal memuat."
