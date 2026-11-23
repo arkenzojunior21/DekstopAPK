@@ -3,6 +3,8 @@ namespace Laundry.Domain;
 public class Service
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public string Name { get; set; } = string.Empty;
     public ServiceUnitType UnitType { get; set; }
     public decimal? MinimumWeightKg { get; set; }
@@ -21,6 +23,7 @@ public class ServicePriceVersion
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid ServiceId { get; set; }
+    public Service? Service { get; set; }
     /// <summary>Harga per kg (unit PerKg) atau per item (PerItem) atau harga tetap paket.</summary>
     public decimal Price { get; set; }
     public int StandardDurationDays { get; set; } = 3;

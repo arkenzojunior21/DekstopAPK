@@ -3,6 +3,8 @@ namespace Laundry.Domain;
 public class PickupDeliverySlot
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public DateTime StartsAtUtc { get; set; }
     public DateTime EndsAtUtc { get; set; }
     public int Capacity { get; set; } = 1;
@@ -13,6 +15,8 @@ public class PickupDeliverySlot
 public class FulfillmentTask
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public Guid OrderId { get; set; }
     public Order? Order { get; set; }
     public FulfillmentMethod Method { get; set; }

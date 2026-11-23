@@ -3,6 +3,8 @@ namespace Laundry.Domain;
 public class Complaint
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public Guid OrderId { get; set; }
     public Guid CustomerId { get; set; }
     public string Category { get; set; } = string.Empty;
@@ -15,7 +17,10 @@ public class Complaint
 public class ComplaintMessage
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public Guid ComplaintId { get; set; }
+    public Complaint? Complaint { get; set; }
     public Guid SenderUserId { get; set; }
     public string Body { get; set; } = string.Empty;
     public DateTime SentAtUtc { get; set; }
@@ -24,6 +29,8 @@ public class ComplaintMessage
 public class ReceiptSnapshot
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public Guid OrderId { get; set; }
     public string ReceiptNumber { get; set; } = string.Empty;
     public int SchemaVersion { get; set; } = 1;
@@ -35,6 +42,8 @@ public class ReceiptSnapshot
 public class NotificationOutbox
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public string Channel { get; set; } = "whatsapp";
     public string TemplateKey { get; set; } = string.Empty;
     public string TargetPhone { get; set; } = string.Empty;

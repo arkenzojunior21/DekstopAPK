@@ -128,24 +128,24 @@ public sealed class CustomerService(LaundryDbContext db, EventWriter events) : I
         if (dup) throw new InvalidOperationException("Nomor sudah terdaftar sebagai akun pelanggan.");
 
         // Akun walk-in: belum bisa login (belum registrasi OTP) — PasswordHash kosong.
-        var user = new User
-        {
-            Role = UserRole.Pelanggan,
+        var customer = new User
+                    {
+                        Role = UserRole.Customer,
             NormalizedPhone = normalized,
             PasswordHash = string.Empty,
             CreatedAtUtc = DateTime.UtcNow,
             Profile = new CustomerProfile { Nama = nama.Trim(), Alamat = alamat?.Trim() },
         };
-        db.Users.Add(user);
+        db.Users.Add(customer);
         await db.SaveChangesAsync(ct);
-        events.EnqueueCustomer(user.Profile, user, OrderService.DeviceId);
+        events.EnqueueCustomer(customer.Profile, customer, OrderService.DeviceId);
         await db.SaveChangesAsync(ct);
-        return Map(user);
+        return Map(customer);
     }
 
     public async Task<List<CustomerDto>> SearchAsync(string? query, int page, int pageSize, CancellationToken ct)
     {
-        var q = db.Users.Include(u => u.Profile).Where(u => u.Role == UserRole.Pelanggan);
+        var q = db.Users.Include(u => u.Profile).Where(u => u.Role == UserRole.Customer);
         if (!string.IsNullOrWhiteSpace(query))
             q = q.Where(u => u.Profile!.Nama.ToLower().Contains(query.ToLower())
                 || u.NormalizedPhone.Contains(query));

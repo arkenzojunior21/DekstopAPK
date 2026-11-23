@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Laundry.Application.Abstractions;
 using Laundry.Domain;
@@ -11,14 +12,25 @@ public sealed class HttpCurrentUser(IHttpContextAccessor accessor) : ICurrentUse
 
     public Guid? UserId =>
         Guid.TryParse(Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-            ?? Principal?.FindFirst(JwtRegisteredClaimNameSub)?.Value, out var id) ? id : null;
+            ?? Principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value, out var id) ? id : null;
 
-    public string? Role => Principal?.IsInRole(nameof(UserRole.Admin)) == true
-        ? nameof(UserRole.Admin)
-        : Principal?.IsInRole(nameof(UserRole.Pelanggan)) == true ? nameof(UserRole.Pelanggan) : null;
+    public string? Role =>
+        Principal?.IsInRole(nameof(UserRole.PlatformAdmin)) == true ? nameof(UserRole.PlatformAdmin)
+        : Principal?.IsInRole(nameof(UserRole.StoreAdmin)) == true ? nameof(UserRole.StoreAdmin)
+        : Principal?.IsInRole(nameof(UserRole.Customer)) == true ? nameof(UserRole.Customer)
+        : null;
 
-    public bool IsAdmin => Role == nameof(UserRole.Admin);
+    public Guid? TenantId =>
+        Guid.TryParse(Principal?.FindFirst("tenant_id")?.Value, out var tid) ? tid : null;
+
+    public string? TenantCode => Principal?.FindFirst("tenant_code")?.Value;
+    public string? TenantNama => Principal?.FindFirst("tenant_nama")?.Value;
+
+    public bool IsPlatformAdmin => Role == nameof(UserRole.PlatformAdmin);
+    public bool IsStoreAdmin => Role == nameof(UserRole.StoreAdmin);
+    public bool IsCustomer => Role == nameof(UserRole.Customer);
+    public bool IsAdmin => IsPlatformAdmin || IsStoreAdmin;
 
     // MapInboundClaims aktif, tetapi jaga nama pendek bila mapping mati.
-    private const string JwtRegisteredClaimNameSub = "sub";
+    private const string JwtRegisteredClaimNamesSub = "sub";
 }

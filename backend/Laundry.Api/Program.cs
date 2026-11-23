@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Laundry.Application.Abstractions;
 using Laundry.Application.Auth;
 using Laundry.Application.Core;
+using Laundry.Domain;
 using Laundry.Infrastructure.Persistence;
 using Laundry.Infrastructure.Payments;
 using Laundry.Infrastructure.Security;
@@ -9,6 +10,7 @@ using Laundry.Infrastructure.Services;
 using Laundry.Infrastructure.Sync;
 using Laundry.Infrastructure.Whatsapp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -65,6 +67,8 @@ builder.Services.AddScoped<IAuthService>(sp => new AuthService(
     exposeOtpInResponse: EnvironmentConfig.Get("ENVIRONMENT", builder.Environment.EnvironmentName) == "Development"));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
+// ITenantContext untuk Global Query Filter dan tenant resolution
+builder.Services.AddScoped<ITenantContext, HttpTenantContext>();
 builder.Services.AddScoped<AuditWriter>();
 builder.Services.AddScoped<EventWriter>();
 builder.Services.AddScoped<SettingsStore>();
@@ -114,7 +118,28 @@ builder.Services
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    // PlatformAdmin: akses penuh, tidak terbatas tenant
+    options.AddPolicy("RequirePlatformAdmin", policy =>
+        policy.RequireRole(nameof(UserRole.PlatformAdmin)));
+
+    // StoreAdmin: akses tenant-nya sendiri
+    options.AddPolicy("RequireStoreAdmin", policy =>
+        policy.RequireRole(nameof(UserRole.StoreAdmin)));
+
+    // Customer: akses data miliknya (via TenantId + CustomerId)
+    options.AddPolicy("RequireCustomer", policy =>
+        policy.RequireRole(nameof(UserRole.Customer)));
+
+    // Semua role yang authenticated
+    options.AddPolicy("Authenticated", policy =>
+        policy.RequireAuthenticatedUser());
+
+    // PlatformAdmin OR StoreAdmin (untuk endpoint admin dashboard)
+    options.AddPolicy("RequireAdminOrStoreAdmin", policy =>
+        policy.RequireRole(nameof(UserRole.PlatformAdmin), nameof(UserRole.StoreAdmin)));
+});
 
 // Rate limiting sisi server, bukan hanya UI (PRD 6.1).
 // AUTH_RATE_LIMIT_PER_MENIT hanya untuk menurunkan batas di test integrasi.

@@ -3,6 +3,8 @@ namespace Laundry.Domain;
 public class Payment
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public Guid OrderId { get; set; }
     public Order? Order { get; set; }
     public Guid CustomerId { get; set; }
@@ -21,6 +23,8 @@ public class Payment
 public class Refund
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public Guid OrderId { get; set; }
     public Order? Order { get; set; }
     public Guid PaymentId { get; set; }
@@ -37,7 +41,10 @@ public class Refund
 public class CreditLedgerEntry
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public Guid CustomerId { get; set; }
+    public CustomerProfile? Customer { get; set; }
     /// <summary>Positif = kredit masuk (overpayment), negatif = dipakai.</summary>
     public decimal Delta { get; set; }
     public Guid? OrderId { get; set; }

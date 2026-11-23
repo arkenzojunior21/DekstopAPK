@@ -47,7 +47,7 @@ public sealed class OrderService(
         var normalized = Laundry.Application.Auth.PhoneNormalizer.Normalize(req.WalkInPhone)
             ?? throw new InvalidOperationException("Nomor WhatsApp tidak valid.");
         var existing = await db.Users.Include(u => u.Profile)
-            .FirstOrDefaultAsync(u => u.NormalizedPhone == normalized && u.Role == UserRole.Pelanggan, ct);
+            .FirstOrDefaultAsync(u => u.NormalizedPhone == normalized && u.Role == UserRole.Customer, ct);
         if (existing?.Profile is not null) return existing.Profile.Id;
         var created = await db.Users.Include(u => u.Profile)
             .FirstOrDefaultAsync(u => u.NormalizedPhone == normalized, ct);
@@ -55,7 +55,7 @@ public sealed class OrderService(
 
         var user = new User
         {
-            Role = UserRole.Pelanggan,
+            Role = UserRole.Customer,
             NormalizedPhone = normalized,
             PasswordHash = string.Empty,
             CreatedAtUtc = DateTime.UtcNow,

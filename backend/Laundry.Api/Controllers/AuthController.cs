@@ -73,13 +73,21 @@ public class AuthController(IAuthService auth) : ControllerBase
         return r.Success ? Ok(new { message = "Password berhasil diganti." }) : Unauthorized(new { error = r.Error });
     }
 
-    /// <summary>Contoh endpoint terproteksi role — dipakai test eskalasi role.</summary>
+    /// <summary>Profil pengguna login termasuk info tenant.</summary>
     [HttpGet("me")]
     [Authorize]
     public IActionResult Me([FromServices] ICurrentUser me) =>
-        Ok(new { userId = me.UserId, role = me.Role, isAdmin = me.IsAdmin });
+        Ok(new
+        {
+            userId = me.UserId,
+            role = me.Role,
+            isPlatformAdmin = me.IsPlatformAdmin,
+            isStoreAdmin = me.IsStoreAdmin,
+            isCustomer = me.IsCustomer,
+            tenantId = me.TenantId
+        });
 
     [HttpGet("admin-only")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "PlatformAdmin")]
     public IActionResult AdminOnly() => Ok(new { ok = true });
 }

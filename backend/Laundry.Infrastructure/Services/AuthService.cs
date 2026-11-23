@@ -34,7 +34,7 @@ public sealed class AuthService(
         return new string(chars);
     }
 
-    private async Task<(AuthTokens Tokens, Guid UserId)> IssueSessionAsync(Guid userId, string role, CancellationToken ct)
+    private async Task<(AuthTokens Tokens, Guid UserId)> IssueSessionAsync(Guid userId, string role, Guid? tenantId = null, string? tenantCode = null, string? tenantNama = null, CancellationToken ct = default)
     {
         var (refresh, refreshHash) = tokens.CreateRefreshToken();
         db.RefreshTokens.Add(new RefreshToken
@@ -44,7 +44,7 @@ public sealed class AuthService(
             ExpiresAtUtc = DateTime.UtcNow.AddDays(30),
         });
         await db.SaveChangesAsync(ct);
-        return (new AuthTokens(tokens.CreateAccessToken(userId, role), refresh, JwtTokenService.AccessMinutes * 60), userId);
+        return (new AuthTokens(tokens.CreateAccessToken(userId, role, tenantId, tenantCode, tenantNama), refresh, JwtTokenService.AccessMinutes * 60), userId);
     }
 
     public async Task<AuthResult> BootstrapAdminAsync(string phone, string password, CancellationToken ct = default)
@@ -53,19 +53,19 @@ public sealed class AuthService(
         if (normalized is null) return new AuthResult(false, "Nomor WhatsApp tidak valid.");
         if (!PhoneNormalizer.IsPasswordAcceptable(password))
             return new AuthResult(false, "Password minimal 8 karakter.");
-        if (await db.Users.AnyAsync(u => u.Role == UserRole.Admin, ct))
+        if (await db.Users.AnyAsync(u => u.Role == UserRole.PlatformAdmin, ct))
             return new AuthResult(false, "Admin sudah ada; bootstrap ditutup.");
 
         var admin = new User
         {
-            Role = UserRole.Admin,
+            Role = UserRole.PlatformAdmin,
             NormalizedPhone = normalized,
             PasswordHash = hasher.Hash(password),
             CreatedAtUtc = DateTime.UtcNow,
         };
         db.Users.Add(admin);
         await db.SaveChangesAsync(ct);
-        var session = await IssueSessionAsync(admin.Id, nameof(UserRole.Admin), ct);
+        var session = await IssueSessionAsync(admin.Id, nameof(UserRole.PlatformAdmin), ct: ct);
         return new AuthResult(true, null, session.Tokens, session.UserId);
     }
 
@@ -99,7 +99,7 @@ public sealed class AuthService(
 
         var user = new User
         {
-            Role = UserRole.Pelanggan,
+            Role = UserRole.Customer,
             NormalizedPhone = challenge.TargetPhone,
             PasswordHash = hasher.Hash(password),
             CreatedAtUtc = DateTime.UtcNow,
@@ -110,7 +110,7 @@ public sealed class AuthService(
         await db.SaveChangesAsync(ct);
         events.EnqueueCustomer(user.Profile, user, OrderService.DeviceId);
         await db.SaveChangesAsync(ct);
-        var session = await IssueSessionAsync(user.Id, nameof(UserRole.Pelanggan), ct);
+        var session = await IssueSessionAsync(user.Id, nameof(UserRole.Customer), ct: ct);
         return new AuthResult(true, null, session.Tokens, session.UserId);
     }
 
@@ -138,7 +138,21 @@ public sealed class AuthService(
         user.FailedLoginCount = 0;
         user.LockoutUntilUtc = null;
         await db.SaveChangesAsync(ct);
-        var session = await IssueSessionAsync(user.Id, user.Role.ToString(), ct);
+        
+        Guid? tenantId = user.TenantId;
+        string? tenantCode = null;
+        string? tenantNama = null;
+        if (tenantId.HasValue)
+        {
+            var tenant = await db.Tenants.FirstOrDefaultAsync(t => t.Id == tenantId.Value, ct);
+            if (tenant != null)
+            {
+                tenantCode = tenant.Code;
+                tenantNama = tenant.Nama;
+            }
+        }
+        
+        var session = await IssueSessionAsync(user.Id, user.Role.ToString(), tenantId, tenantCode, tenantNama, ct);
         return new AuthResult(true, null, session.Tokens, session.UserId);
     }
 
@@ -162,9 +176,23 @@ public sealed class AuthService(
             ExpiresAtUtc = DateTime.UtcNow.AddDays(30),
         });
         await db.SaveChangesAsync(ct);
+        
+        Guid? tenantId = stored.User.TenantId;
+        string? tenantCode = null;
+        string? tenantNama = null;
+        if (tenantId.HasValue)
+        {
+            var tenant = await db.Tenants.FirstOrDefaultAsync(t => t.Id == tenantId.Value, ct);
+            if (tenant != null)
+            {
+                tenantCode = tenant.Code;
+                tenantNama = tenant.Nama;
+            }
+        }
+        
         var role = stored.User.Role.ToString();
         return new AuthResult(true, null,
-            new AuthTokens(tokens.CreateAccessToken(stored.UserId, role), newToken, JwtTokenService.AccessMinutes * 60),
+            new AuthTokens(tokens.CreateAccessToken(stored.UserId, role, tenantId, tenantCode, tenantNama), newToken, JwtTokenService.AccessMinutes * 60),
             stored.UserId);
     }
 

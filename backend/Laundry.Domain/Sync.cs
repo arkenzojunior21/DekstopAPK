@@ -15,6 +15,8 @@ public class SyncEventEnvelope
 public class SyncOutbox
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public string EventId { get; set; } = string.Empty;
     public long Sequence { get; set; }
     public string AggregateType { get; set; } = string.Empty;
@@ -41,6 +43,8 @@ public class SyncOutbox
 public class SyncInbox
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public string EventId { get; set; } = string.Empty;
     public long Sequence { get; set; }
     public string AggregateType { get; set; } = string.Empty;
@@ -60,6 +64,8 @@ public class SyncInbox
 public class SyncCheckpoint
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public string Direction { get; set; } = string.Empty; // admin_ke_cloud | cloud_ke_admin
     public long LastSequence { get; set; }
     public DateTime? LastSuccessAtUtc { get; set; }
@@ -68,6 +74,8 @@ public class SyncCheckpoint
 public class SyncConflict
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public string AggregateType { get; set; } = string.Empty;
     public Guid AggregateId { get; set; }
     public string Detail { get; set; } = string.Empty;

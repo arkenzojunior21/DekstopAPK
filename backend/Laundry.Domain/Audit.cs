@@ -4,6 +4,8 @@ namespace Laundry.Domain;
 public class TransactionAuditLog
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public string EntityType { get; set; } = string.Empty;
     public Guid EntityId { get; set; }
     public string Action { get; set; } = string.Empty;
@@ -20,6 +22,8 @@ public class TransactionAuditLog
 public class AppSetting
 {
     public string Key { get; set; } = string.Empty;
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public string ValueJson { get; set; } = string.Empty;
     public DateTime UpdatedAtUtc { get; set; }
 }
@@ -27,6 +31,8 @@ public class AppSetting
 public class BackupHistory
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public string Target { get; set; } = "admin"; // admin | cloud
     public string FilePath { get; set; } = string.Empty;
     public bool IsVerified { get; set; }

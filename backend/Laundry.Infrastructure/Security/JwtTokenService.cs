@@ -28,17 +28,28 @@ public sealed class JwtTokenService : ITokenService
         _key = new SymmetricSecurityKey(bytes);
     }
 
-    public string CreateAccessToken(Guid userId, string role)
+    public string CreateAccessToken(Guid userId, string role, Guid? tenantId = null, string? tenantCode = null, string? tenantNama = null)
     {
         var now = DateTime.UtcNow;
+        var claims = new List<Claim>
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Role, role),
+        };
+
+        if (tenantId.HasValue)
+        {
+            claims.Add(new Claim("tenant_id", tenantId.Value.ToString()));
+            if (!string.IsNullOrEmpty(tenantCode))
+                claims.Add(new Claim("tenant_code", tenantCode));
+            if (!string.IsNullOrEmpty(tenantNama))
+                claims.Add(new Claim("tenant_nama", tenantNama));
+        }
+
         var descriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, role),
-            }),
+            Subject = new ClaimsIdentity(claims),
             Issuer = Issuer,
             Audience = Audience,
             NotBefore = now,

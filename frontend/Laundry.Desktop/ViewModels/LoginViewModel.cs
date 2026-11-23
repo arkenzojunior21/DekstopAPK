@@ -22,13 +22,9 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty] private string? _info;
     [ObservableProperty] private string? _pesanUmum;
     [ObservableProperty] private string? _kodeDev;
-        [ObservableProperty] private bool _sibuk;
+    [ObservableProperty] private bool _sibuk;
 
-        [ObservableProperty] private bool _sandiTersembunyi = true;
-        [ObservableProperty] private bool _sandiBaruTersembunyi = true;
-        [ObservableProperty] private bool _sandiResetTersembunyi = true;
-
-        public string Sandi { get; set; } = "";
+    public string Sandi { get; set; } = "";
 
     public string SandiBaru { get; set; } = "";
 
@@ -180,7 +176,7 @@ public partial class LoginViewModel : ObservableObject
         }
 
         App.Instance.Api.SimpanToken(tokens.AccessToken, tokens.RefreshToken);
-        var saya = await App.Instance.Api.AmbilAsync<ProfilHasil>("api/auth/me");
+        var saya = await App.Instance.Api.AmbilAsync<ProfilHasil>("/api/auth/me");
         if (saya is null)
         {
             Galat = "Identitas tidak dapat dibaca dari server.";
@@ -188,7 +184,7 @@ public partial class LoginViewModel : ObservableObject
         }
 
         var sesi = App.Instance.Sesi;
-        sesi.Isi(tokens, nama: null, peran: saya.Role, nomor: nomor);
+        sesi.Isi(tokens, nama: saya.Nama, peran: saya.Role, nomor: nomor, tenantId: saya.TenantId, tenantCode: saya.TenantCode, tenantNama: saya.TenantNama);
         App.Instance.Preferensi.NomorTerakhir = nomor;
         App.Instance.Preferensi.Simpan();
         App.Instance.BukaUtama();
@@ -224,5 +220,5 @@ public partial class LoginViewModel : ObservableObject
 
     private sealed record ResetMulaiHasil(bool Sent, Guid? ChallengeId, string? DevCode, string? Message);
 
-    private sealed record ProfilHasil(Guid? UserId, string? Role, bool IsAdmin);
+    private sealed record ProfilHasil(Guid? UserId, string? Role, string? Nama, Guid? TenantId, string? TenantCode, string? TenantNama);
 }

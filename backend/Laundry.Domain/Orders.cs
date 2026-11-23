@@ -3,6 +3,8 @@ namespace Laundry.Domain;
 public class Order
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     /// <summary>Nomor pesanan unik global, sama saat disinkronkan.</summary>
     public string OrderNumber { get; set; } = string.Empty;
     public Guid CustomerId { get; set; }
@@ -56,6 +58,7 @@ public class OrderStatusHistory
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid OrderId { get; set; }
+    public Order? Order { get; set; }
     public OrderStatus FromStatus { get; set; }
     public OrderStatus ToStatus { get; set; }
     public Guid ActorUserId { get; set; }

@@ -108,7 +108,7 @@ public sealed class EventWriter(LaundryDbContext db)
     /// </summary>
     public static OrderEvent BuildOrder(Order o) => new(
         o.Id, o.OrderNumber, o.CustomerId, o.Customer?.Nama ?? "", o.Customer?.Alamat,
-        o.Customer?.User?.NormalizedPhone, o.Customer?.User?.Role ?? UserRole.Pelanggan,
+        o.Customer?.User?.NormalizedPhone, o.Customer?.User?.Role ?? UserRole.Customer,
         o.Status, o.PaymentStatus, o.Express, o.Fulfillment, o.EstimatedTotal, o.ActualWeightKg,
         o.ActualItemCount, o.FinalTotal, o.DeliveryFee, o.AppliedCredit, o.ExpressSurchargeSnapshot,
         o.Source, o.IsCancelled, o.CancelRequestedAtUtc, o.CancelReason, o.CreatedAtUtc,
@@ -144,7 +144,7 @@ public sealed class EventWriter(LaundryDbContext db)
         CancellationToken ct)
     {
         var telepon = await db.Users
-            .Where(u => u.Role == UserRole.Admin && u.IsActive)
+            .Where(u => u.Role == UserRole.PlatformAdmin && u.IsActive)
             .Select(u => u.NormalizedPhone).ToListAsync(ct);
         foreach (var nomor in telepon) EnqueueNotification(templateKey, nomor, $"{eventId}:{nomor}", payload);
     }

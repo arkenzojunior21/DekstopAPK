@@ -10,6 +10,15 @@ public interface ICatalogService
     Task SetDeliveryFeeAsync(decimal fee, CancellationToken ct);
 }
 
+public interface ITenantService
+{
+    Task<List<TenantDto>> ListAsync(CancellationToken ct);
+    Task<TenantDto> GetAsync(Guid id, CancellationToken ct);
+    Task<TenantDto> CreateAsync(CreateTenantRequest req, CancellationToken ct);
+    Task<TenantDto> UpdateAsync(Guid id, UpdateTenantRequest req, CancellationToken ct);
+    Task<TenantDto> SetStatusAsync(Guid id, TenantStatus status, CancellationToken ct);
+}
+
 public interface ICustomerService
 {
     Task<CustomerDto> GetOrCreateAsync(Guid? customerId, string? nama, string? phone, string? alamat,

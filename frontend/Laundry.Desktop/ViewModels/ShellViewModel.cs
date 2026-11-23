@@ -7,8 +7,10 @@ namespace Laundry.Desktop.ViewModels;
 public sealed record ButirMenu(string Judul, string Ikon, string Keterangan, Func<ViewModelDasar> Buat);
 
 /// <summary>
-/// Kerangka jendela utama setelah login. Menu yang muncul ditentukan peran yang dikembalikan server:
-/// admin melihat operasional + laporan + sistem, pelanggan hanya melihat miliknya sendiri.
+/// Kerangka jendela utama setelah login. Menu yang muncul ditentukan peran dari server:
+/// - PlatformAdmin: kelola platform multi-tenant (tenant, keuangan, analytics, pengguna, audit, sistem, sinkronisasi)
+/// - StoreAdmin: operasional toko (pesanan, katalog, pelanggan, slot, komplain, laporan, pengaturan, sinkronisasi)
+/// - Customer: data sendiri (beranda, pesan, pesanan, komplain) — prioritas pakai Web PWA
 /// </summary>
 public partial class ShellViewModel : ObservableObject
 {
@@ -32,7 +34,7 @@ public partial class ShellViewModel : ObservableObject
         {
             if (MenuAktif is { } butir) await MuatHalamanAsync(butir);
         };
-        Menu = _konteks.Sesi.Admin ? MenuAdmin() : MenuPelanggan();
+        Menu = BangunMenu(_konteks.Sesi);
         _konteks.Navigasi = judul =>
         {
             var butir = Menu.FirstOrDefault(m => m.Judul == judul);
@@ -50,24 +52,45 @@ public partial class ShellViewModel : ObservableObject
 
     public string Versi => "v" + typeof(ShellViewModel).Assembly.GetName().Version?.ToString(3);
 
-    private static ButirMenu[] MenuAdmin() =>
+    private static IReadOnlyList<ButirMenu> BangunMenu(Services.Sesi sesi)
+    {
+        if (sesi.PlatformAdmin) return MenuPlatformAdmin();
+        if (sesi.StoreAdmin) return MenuStoreAdmin();
+        return MenuCustomer(); // fallback, Customer seharusnya pakai Web PWA
+    }
+
+    private static ButirMenu[] MenuPlatformAdmin() =>
     [
-        new("Beranda", "\uE80F", "Ringkasan hari ini", () => new BerandaAdminViewModel(App.Instance.Konteks)),
-        new("Pesanan", "\uE7B8", "Walk-in, online, status, pembayaran", () => new PesananViewModel(App.Instance.Konteks)),
-        new("Buat Pesanan", "\uE710", "Transaksi baru di kasir", () => new PesanBaruViewModel(App.Instance.Konteks)),
-        new("Katalog", "\uE8FD", "Layanan & tarif", () => new KatalogViewModel(App.Instance.Konteks)),
-        new("Pelanggan", "\uE716", "Data pelanggan & saldo kredit", () => new PelangganViewModel(App.Instance.Konteks)),
-        new("Slot", "\uE787", "Jadwal antar-jemput", () => new SlotViewModel(App.Instance.Konteks)),
-        new("Komplain", "\uE8BD", "Tiket & balasan", () => new KomplainViewModel(App.Instance.Konteks)),
-        new("Laporan", "\uE9D9", "Pendapatan, piutang, ekspor", () => new LaporanViewModel(App.Instance.Konteks)),
-        new("Audit", "\uE7C3", "Jejak perubahan hanya-baca", () => new AuditViewModel(App.Instance.Konteks)),
+        new("Dashboard Platform", "\uE80F", "Ringkasan platform: GMV, tenant, komisi", () => new BerandaAdminViewModel(App.Instance.Konteks)),
+        new("Kelola Tenant", "\uE716", "CRUD tenant, verifikasi, suspend, reset password", () => new BerandaAdminViewModel(App.Instance.Konteks)), // placeholder
+        new("Keuangan Platform", "\uE7B8", "Invoice komisi, pencatatan pembayaran", () => new BerandaAdminViewModel(App.Instance.Konteks)), // placeholder
+        new("Analytics", "\uE9D9", "GMV trend, top tenant, retensi, churn", () => new BerandaAdminViewModel(App.Instance.Konteks)), // placeholder
+        new("Pengguna Platform", "\uE7C3", "CRUD PlatformAdmin, role, 2FA", () => new BerandaAdminViewModel(App.Instance.Konteks)), // placeholder
+        new("Audit Trail", "\uE8BD", "Jejak perubahan seluruh platform", () => new AuditViewModel(App.Instance.Konteks)),
+        new("Pengaturan Sistem", "\uE713", "Default komisi, fee, SLA, sync, backup", () => new BerandaAdminViewModel(App.Instance.Konteks)), // placeholder
+        new("Sinkronisasi", "\uE895", "Monitor & trigger sync semua tenant", () => new BerandaAdminViewModel(App.Instance.Konteks)), // placeholder
     ];
 
-    private static ButirMenu[] MenuPelanggan() =>
+    private static ButirMenu[] MenuStoreAdmin() =>
     [
-        new("Beranda", "\uE80F", "Pesanan aktif & saldo", () => new BerandaPelangganViewModel(App.Instance.Konteks)),
-        new("Pesan", "\uE710", "Buat pesanan online", () => new PesanBaruViewModel(App.Instance.Konteks)),
-        new("Pesanan saya", "\uE7B8", "Status & tagihan", () => new PesananSayaViewModel(App.Instance.Konteks)),
+        new("Beranda", "\uE80F", "KPI harian: pesanan baru, diproses, siap, omzet, piutang", () => new BerandaAdminViewModel(App.Instance.Konteks)),
+        new("Pesanan", "\uE7B8", "Walk-in, online, status flow, pembayaran", () => new PesananViewModel(App.Instance.Konteks)),
+        new("Buat Pesanan", "\uE710", "Transaksi walk-in baru di kasir", () => new PesanBaruViewModel(App.Instance.Konteks)),
+        new("Katalog", "\uE8FD", "Layanan, harga berlaku, versi harga, express", () => new KatalogViewModel(App.Instance.Konteks)),
+        new("Slot", "\uE787", "Jadwal antar-jemput per hari, kuota", () => new SlotViewModel(App.Instance.Konteks)),
+        new("Pelanggan", "\uE716", "Data pelanggan, saldo kredit, riwayat", () => new PelangganViewModel(App.Instance.Konteks)),
+        new("Pembayaran", "\uE7B7", "Tunai, QRIS, kredit, refund kasir", () => new BerandaAdminViewModel(App.Instance.Konteks)), // placeholder
+        new("Komplain", "\uE8BD", "Tiket masuk, balas, ubah status", () => new KomplainViewModel(App.Instance.Konteks)),
+        new("Laporan", "\uE9D9", "7 jenis laporan + ekspor PDF/Excel/CSV", () => new LaporanViewModel(App.Instance.Konteks)),
+        new("Pengaturan Toko", "\uE713", "Profil toko, jam, radius, delivery fee, printer, template", () => new BerandaAdminViewModel(App.Instance.Konteks)), // placeholder
+        new("Sinkronisasi", "\uE895", "Status sync tenant, trigger manual, coba ulang gagal", () => new BerandaAdminViewModel(App.Instance.Konteks)), // placeholder
+    ];
+
+    private static ButirMenu[] MenuCustomer() =>
+    [
+        new("Beranda", "\uE80F", "Pesanan aktif, saldo kredit, promo", () => new BerandaPelangganViewModel(App.Instance.Konteks)),
+        new("Pesan", "\uE710", "Buat pesanan online (prioritas pakai Web PWA)", () => new PesanBaruViewModel(App.Instance.Konteks)),
+        new("Pesanan Saya", "\uE7B8", "Status, tagihan, struk, batalkan", () => new PesananSayaViewModel(App.Instance.Konteks)),
         new("Komplain", "\uE8BD", "Ajukan & pantau tiket", () => new KomplainViewModel(App.Instance.Konteks)),
     ];
 
@@ -87,10 +110,10 @@ public partial class ShellViewModel : ObservableObject
         await halaman.MuatAsync();
     }
 
-    /// <summary>Status sinkronisasi hanya dibaca admin; pelanggan tidak perlu tahu kondisi worker.</summary>
+    /// <summary>Status sinkronisasi dibaca PlatformAdmin & StoreAdmin; Customer tidak perlu tahu.</summary>
     public async Task StatusAsync()
     {
-        if (!_konteks.Sesi.Admin || SedangMuatStatus) return;
+        if ((!_konteks.Sesi.PlatformAdmin && !_konteks.Sesi.StoreAdmin) || SedangMuatStatus) return;
         SedangMuatStatus = true;
         try
         {

@@ -28,6 +28,9 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("UpdatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
@@ -36,6 +39,8 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Key");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("AppSettings");
                 });
@@ -66,7 +71,12 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("BackupHistories");
                 });
@@ -98,7 +108,12 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Complaints");
                 });
@@ -122,9 +137,14 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("SentAtUtc")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ComplaintId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("ComplaintMessages");
                 });
@@ -164,12 +184,17 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("RefundId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("IdempotencyKey")
                         .IsUnique();
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("CreditLedger");
                 });
@@ -237,9 +262,14 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("FulfillmentTasks");
                 });
@@ -289,10 +319,15 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EventId")
                         .IsUnique();
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("NotificationOutbox");
                 });
@@ -368,12 +403,17 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("OrderNumber")
                         .IsUnique();
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Orders");
                 });
@@ -542,12 +582,17 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdempotencyKey")
                         .IsUnique();
 
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Payments");
                 });
@@ -573,7 +618,12 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("StartsAtUtc")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("PickupDeliverySlots");
                 });
@@ -601,10 +651,15 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                     b.Property<int>("SchemaVersion")
                         .HasColumnType("integer");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ReceiptNumber")
                         .IsUnique();
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("ReceiptSnapshots");
                 });
@@ -675,6 +730,9 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdempotencyKey")
@@ -683,6 +741,8 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                     b.HasIndex("OrderId");
 
                     b.HasIndex("PaymentId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Refunds");
                 });
@@ -706,11 +766,16 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("UnitType")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Services");
                 });
@@ -762,10 +827,15 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                     b.Property<DateTime?>("LastSuccessAtUtc")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Direction")
                         .IsUnique();
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("SyncCheckpoints");
                 });
@@ -794,7 +864,14 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("AggregateType");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("SyncConflicts");
                 });
@@ -846,12 +923,17 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EventId")
                         .IsUnique();
 
                     b.HasIndex("Sequence");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("SyncInbox");
                 });
@@ -909,6 +991,9 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EventId")
@@ -916,7 +1001,64 @@ namespace Laundry.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Sequence");
 
+                    b.HasIndex("TenantId");
+
                     b.ToTable("SyncOutbox");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.Tenant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Alamat")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ExpiredAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("LogoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Nama")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Telepon")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TemaWarna")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Tenants");
                 });
 
             modelBuilder.Entity("Laundry.Domain.TransactionAuditLog", b =>
@@ -961,7 +1103,12 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.HasIndex("EntityType", "EntityId");
 
@@ -998,21 +1145,88 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedPhone")
                         .IsUnique();
 
+                    b.HasIndex("TenantId");
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.AppSetting", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.BackupHistory", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.Complaint", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Laundry.Domain.ComplaintMessage", b =>
                 {
-                    b.HasOne("Laundry.Domain.Complaint", null)
+                    b.HasOne("Laundry.Domain.Complaint", "Complaint")
                         .WithMany("Messages")
                         .HasForeignKey("ComplaintId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Complaint");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.CreditLedgerEntry", b =>
+                {
+                    b.HasOne("Laundry.Domain.CustomerProfile", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Laundry.Domain.CustomerProfile", b =>
@@ -1034,7 +1248,26 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Order");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.NotificationOutbox", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Laundry.Domain.Order", b =>
@@ -1045,7 +1278,15 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Laundry.Domain.OrderItem", b =>
@@ -1061,11 +1302,13 @@ namespace Laundry.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Laundry.Domain.OrderStatusHistory", b =>
                 {
-                    b.HasOne("Laundry.Domain.Order", null)
+                    b.HasOne("Laundry.Domain.Order", "Order")
                         .WithMany("StatusHistory")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Laundry.Domain.Payment", b =>
@@ -1076,7 +1319,37 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Order");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.PickupDeliverySlot", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.ReceiptSnapshot", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Laundry.Domain.RefreshToken", b =>
@@ -1104,18 +1377,104 @@ namespace Laundry.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Order");
 
                     b.Navigation("OriginPayment");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.Service", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Laundry.Domain.ServicePriceVersion", b =>
                 {
-                    b.HasOne("Laundry.Domain.Service", null)
+                    b.HasOne("Laundry.Domain.Service", "Service")
                         .WithMany("PriceVersions")
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.SyncCheckpoint", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.SyncConflict", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.SyncInbox", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.SyncOutbox", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.TransactionAuditLog", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.User", b =>
+                {
+                    b.HasOne("Laundry.Domain.Tenant", "Tenant")
+                        .WithMany("Users")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Laundry.Domain.Complaint", b =>
@@ -1139,6 +1498,11 @@ namespace Laundry.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Laundry.Domain.Service", b =>
                 {
                     b.Navigation("PriceVersions");
+                });
+
+            modelBuilder.Entity("Laundry.Domain.Tenant", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Laundry.Domain.User", b =>

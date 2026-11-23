@@ -1,5 +1,4 @@
 using System.Windows;
-using System.Windows.Controls;
 using Laundry.Desktop.Services;
 using Laundry.Desktop.ViewModels;
 
@@ -39,14 +38,4 @@ public partial class JendelaLogin : Window
 
     private void KotakSandiReset_Changed(object sender, RoutedEventArgs e) =>
         ((LoginViewModel)DataContext).SandiBaru = KotakSandiReset.Password;
-
-    // TextBox untuk mode tampil sandi - sinkronkan ke ViewModel
-    private void KotakSandiTampil_TextChanged(object sender, TextChangedEventArgs e) =>
-        ((LoginViewModel)DataContext).Sandi = KotakSandiTampil.Text;
-
-    private void KotakSandiBaruTampil_TextChanged(object sender, TextChangedEventArgs e) =>
-        ((LoginViewModel)DataContext).SandiBaru = KotakSandiBaruTampil.Text;
-
-    private void KotakSandiResetTampil_TextChanged(object sender, TextChangedEventArgs e) =>
-        ((LoginViewModel)DataContext).SandiBaru = KotakSandiResetTampil.Text;
 }

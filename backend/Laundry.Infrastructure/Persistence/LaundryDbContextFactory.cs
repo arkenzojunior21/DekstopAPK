@@ -1,18 +1,32 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Laundry.Application.Abstractions;
 
 namespace Laundry.Infrastructure.Persistence;
+
+/// <summary>Null tenant context for design-time (migrations).</summary>
+internal sealed class DesignTimeTenantContext : ITenantContext
+{
+    public Guid? TenantId => null;
+    public string? TenantCode => null;
+    public string? TenantNama => null;
+    public bool IsPlatformAdmin => true;
+    public bool IsStoreAdmin => false;
+    public bool IsCustomer => false;
+    public void SetTenant(Guid tenantId, string tenantCode, string tenantNama) { }
+    public void ClearTenant() { }
+}
 
 public class LaundryDbContextFactory : IDesignTimeDbContextFactory<LaundryDbContext>
 {
     public LaundryDbContext CreateDbContext(string[] args)
     {
         var conn = EnvironmentConfig.GetKoneksi("CONN_ADMIN",
-            "Host=localhost;Port=5433;Database=laundry_admin;Username=laundry;Password=laundry_dev_2026");
+            "Host=localhost;Port=5433;Database=laundry_admin;Username=laundry;Password=***");
         var options = new DbContextOptionsBuilder<LaundryDbContext>()
             .UseNpgsql(conn)
             .Options;
-        return new LaundryDbContext(options);
+        return new LaundryDbContext(options, new DesignTimeTenantContext());
     }
 }
 
@@ -34,7 +48,7 @@ public class CloudDbContextFactory : IDesignTimeDbContextFactory<CloudDbContext>
         var options = new DbContextOptionsBuilder<CloudDbContext>()
             .UseNpgsql(conn)
             .Options;
-        return new CloudDbContext(options);
+        return new CloudDbContext(options, new DesignTimeTenantContext());
     }
 }
 

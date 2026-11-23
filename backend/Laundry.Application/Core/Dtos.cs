@@ -93,3 +93,14 @@ public record AdminDashboardDto(
     int AntrianSync, int SyncGagal, DateTime? SinkronTerakhirBerhasil);
 
 public record CustomerDashboardDto(List<OrderListItem> PesananAktif, decimal SaldoKredit, decimal TotalTagihan);
+
+// ---------- Tenant ----------
+public record TenantDto(Guid Id, string Code, string Nama, string? Alamat, double? Latitude, double? Longitude,
+    string? Telepon, string? Email, string? LogoUrl, string? TemaWarna, TenantStatus Status,
+    DateTime CreatedAtUtc, DateTime? ExpiredAtUtc);
+
+public record CreateTenantRequest(string Code, string Nama, string? Alamat, double? Latitude, double? Longitude,
+    string? Telepon, string? Email, string? LogoUrl, string? TemaWarna, DateTime? ExpiredAtUtc);
+
+public record UpdateTenantRequest(string Nama, string? Alamat, double? Latitude, double? Longitude,
+    string? Telepon, string? Email, string? LogoUrl, string? TemaWarna, DateTime? ExpiredAtUtc);

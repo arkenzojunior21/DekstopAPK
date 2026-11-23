@@ -2,8 +2,9 @@ namespace Laundry.Domain;
 
 public enum UserRole
 {
-    Admin,
-    Pelanggan,
+    PlatformAdmin,
+    StoreAdmin,
+    Customer,
 }
 
 public enum OrderStatus

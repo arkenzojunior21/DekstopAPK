@@ -1,5 +1,18 @@
 namespace Laundry.Application.Abstractions;
 
+/// <summary>Konteks tenant untuk multi-tenancy (EF Core Global Query Filter + middleware).</summary>
+public interface ITenantContext
+{
+    Guid? TenantId { get; }
+    string? TenantCode { get; }
+    string? TenantNama { get; }
+    bool IsPlatformAdmin { get; }
+    bool IsStoreAdmin { get; }
+    bool IsCustomer { get; }
+    void SetTenant(Guid tenantId, string tenantCode, string tenantNama);
+    void ClearTenant();
+}
+
 /// <summary>Hash password PBKDF2-SHA256. Tidak pernah plaintext (PRD 6.1).</summary>
 public interface IPasswordHasher
 {
@@ -16,7 +29,7 @@ public record OtpChallengeResult(bool Success, string? Error, Guid? ChallengeId,
 /// <summary>Token akses JWT + refresh token acak yang bisa dicabut dan dirotasi.</summary>
 public interface ITokenService
 {
-    string CreateAccessToken(Guid userId, string role);
+    string CreateAccessToken(Guid userId, string role, Guid? tenantId = null, string? tenantCode = null, string? tenantNama = null);
     (string Token, string TokenHash) CreateRefreshToken();
 }
 
@@ -31,5 +44,11 @@ public interface ICurrentUser
 {
     Guid? UserId { get; }
     string? Role { get; }
-    bool IsAdmin { get; }
+    Guid? TenantId { get; }
+    string? TenantCode { get; }
+    string? TenantNama { get; }
+    bool IsPlatformAdmin { get; }
+    bool IsStoreAdmin { get; }
+    bool IsCustomer { get; }
+    bool IsAdmin { get; } // compat: PlatformAdmin | StoreAdmin
 }
