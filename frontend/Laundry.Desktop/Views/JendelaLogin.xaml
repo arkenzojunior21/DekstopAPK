@@ -1,130 +1,598 @@
 <Window x:Class="Laundry.Desktop.Views.JendelaLogin"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:svc="clr-namespace:Laundry.Desktop.Services"
-        Title="Laundry — Masuk" Height="640" Width="960" MinHeight="520" MinWidth="820"
+        Title="Laundry Desk — Masuk"
+        Width="960" Height="600"
         WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResizeWithGrip"
+        MinWidth="880" MinHeight="540"
         Background="{DynamicResource KuasLatar}"
-        FontFamily="{StaticResource FontUtama}">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="340" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        Foreground="{DynamicResource KuasTeks}"
+        FontFamily="{DynamicResource FontUtama}">
 
-        <!-- Panel kiri: identitas aplikasi saja. Pengaturan server tidak ditampilkan
-             di sini — alamat API diatur lewat variabel lingkungan API_URL atau
-             berkas preferensi sebelum aplikasi dibuka. -->
-        <Border Grid.Column="0" Padding="34,32,34,26">
-            <Border.Background>
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Laundry.Desktop;component/Themes/Kontrol.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="InputLabel" TargetType="TextBlock">
+                            <Setter Property="FontSize" Value="12" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="Foreground" Value="{DynamicResource KuasTeksDua}" />
+                            <Setter Property="Margin" Value="0,0,0,6" />
+                            <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+                        </Style>
+
+            <Style x:Key="InputBox" TargetType="TextBox" BasedOn="{StaticResource KotakTeks}">
+                <Setter Property="Height" Value="44" />
+                <Setter Property="Padding" Value="12,0" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="BorderThickness" Value="1.5" />
+                <Setter Property="BorderBrush" Value="{StaticResource KuasGaris}" />
+                <Setter Property="Background" Value="{StaticResource KuasPermukaan}" />
+                <Setter Property="Foreground" Value="{StaticResource KuasTeks}" />
+                <Setter Property="CaretBrush" Value="{StaticResource KuasAksen}" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8"
+                                    SnapsToDevicePixels="True">
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Focusable="False"
+                                              HorizontalScrollBarVisibility="Hidden"
+                                              VerticalScrollBarVisibility="Hidden" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource KuasAksenLembut}" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource KuasAksen}" />
+                                    <Setter TargetName="Border" Property="BorderThickness" Value="2" />
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource KuasPermukaanDua}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource KuasPermukaan}" />
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource KuasGaris}" />
+                                    <Setter Property="Foreground" Value="{StaticResource KuasTeksDua}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="PasswordBoxStyle" TargetType="PasswordBox" BasedOn="{StaticResource KotakSandi}">
+                <Setter Property="Height" Value="44" />
+                <Setter Property="Padding" Value="12,0" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="BorderThickness" Value="1.5" />
+                <Setter Property="BorderBrush" Value="{StaticResource KuasGaris}" />
+                <Setter Property="Background" Value="{StaticResource KuasPermukaan}" />
+                <Setter Property="Foreground" Value="{StaticResource KuasTeks}" />
+                <Setter Property="CaretBrush" Value="{StaticResource KuasAksen}" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="PasswordBox">
+                            <Border x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8"
+                                    SnapsToDevicePixels="True">
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Focusable="False"
+                                              HorizontalScrollBarVisibility="Hidden"
+                                              VerticalScrollBarVisibility="Hidden" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource KuasAksenLembut}" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource KuasAksen}" />
+                                    <Setter TargetName="Border" Property="BorderThickness" Value="2" />
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource KuasPermukaanDua}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource KuasPermukaan}" />
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource KuasGaris}" />
+                                    <Setter Property="Foreground" Value="{StaticResource KuasTeksDua}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource Tombol}">
+                <Setter Property="Height" Value="48" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8"
+                                    SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  RecognizesAccessKey="True" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource KuasAksenLembut}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource KuasAksenGelap}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource KuasAksenGelap}" />
+                                    <Setter Property="Foreground" Value="{StaticResource KuasTeksDua}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="LinkButton" TargetType="Button" BasedOn="{StaticResource TombolDasar}">
+                <Setter Property="Foreground" Value="{StaticResource KuasAksen}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <TextBlock x:Name="Text"
+                                       Text="{TemplateBinding Content}"
+                                       TextDecorations="Underline"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       VerticalAlignment="Center" />
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Text" Property="Foreground" Value="{StaticResource KuasAksenLembut}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="FooterText" TargetType="TextBlock" BasedOn="{StaticResource TeksKecil}">
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="Foreground" Value="{StaticResource KuasTeksDua}" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
+                        <svc:NegasiConverter x:Key="NegasiConverter" />
+                        <svc:KosongConverter x:Key="KosongConverter" />
+                    </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+            <!-- Background decorative elements -->
+            <Grid.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#FF0F1B2D" Offset="0" />
-                    <GradientStop Color="#FF1B3A6B" Offset="1" />
+                    <GradientStop Color="#0D1B2A" Offset="0" />
+                    <GradientStop Color="#1B2A4A" Offset="0.5" />
+                    <GradientStop Color="#0D1B2A" Offset="1" />
                 </LinearGradientBrush>
-            </Border.Background>
-            <StackPanel VerticalAlignment="Center">
-                <Grid Width="46" Height="46">
-                    <!-- Huruf "L" jadi cadangan bila Aset/logo.png belum ada. -->
-                    <Border CornerRadius="12" Background="#FF2563EB">
-                        <TextBlock Text="L" Foreground="White" FontSize="24" FontWeight="Bold"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <Image Source="{Binding Converter={StaticResource AsetGambar}, ConverterParameter=logo.png}"
-                           Width="46" Height="46" Stretch="UniformToFill">
-                        <Image.Style>
-                            <Style TargetType="Image">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source, RelativeSource={RelativeSource Self}}"
-                                                 Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Image.Style>
-                    </Image>
-                </Grid>
-                <TextBlock Text="Laundry Desk" Foreground="White" FontSize="26" FontWeight="Bold" Margin="0,18,0,4" />
-                <TextBlock Text="Kasir, pesanan, dan laporan dalam satu jendela. Bekerja offline, data tetap tersimpan."
-                           Foreground="#FFB9C8E2" FontSize="13" TextWrapping="Wrap" />
-            </StackPanel>
+            </Grid.Background>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="400" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="380" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Subtle decorative circles -->
+            <Ellipse Width="320" Height="320" Fill="#103A5C" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-160,-160,0,0" Opacity="0.3" />
+            <Ellipse Width="240" Height="240" Fill="#1E5A8A" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-120,-120" Opacity="0.2" />
+
+            <!-- LEFT PANEL - Branding -->
+        <Border Grid.Column="0" Background="Transparent" Padding="48,40">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Logo &amp; App Name -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,24">
+                    <Image Source="pack://application:,,,/Aset/logo.png" Width="64" Height="64"
+                           RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,0,16" />
+                    <TextBlock Text="Laundry Desk"
+                               FontSize="32" FontWeight="Bold"
+                               Foreground="White"
+                               TextOptions.TextFormattingMode="Display" />
+                    <TextBlock Text="Aplikasi operasional harian untuk penerimaan cucian, pelacakan proses, dan pencatatan kasir."
+                               FontSize="14"
+                               Foreground="#94A3B8"
+                               TextWrapping="Wrap"
+                               Margin="0,12,0,0"
+                               LineHeight="22" />
+                </StackPanel>
+
+                <!-- Feature highlights -->
+                <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,24,0,0">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                        <Border Width="40" Height="40" CornerRadius="10" Background="#0E7490" Margin="0,0,12,0">
+                            <TextBlock Text="📥" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Penerimaan Cucian" FontSize="14" FontWeight="SemiBold" Foreground="White" />
+                            <TextBlock Text="Catat pesanan walk-in &amp; online" FontSize="12" Foreground="#94A3B8" />
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                        <Border Width="40" Height="40" CornerRadius="10" Background="#0E7490" Margin="0,0,12,0">
+                            <TextBlock Text="🔄" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Pelacakan Proses" FontSize="14" FontWeight="SemiBold" Foreground="White" />
+                            <TextBlock Text="Status real-time: cuci → setrika → siap" FontSize="12" Foreground="#94A3B8" />
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                        <Border Width="40" Height="40" CornerRadius="10" Background="#0E7490" Margin="0,0,12,0">
+                            <TextBlock Text="💰" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Pencatatan Kasir" FontSize="14" FontWeight="SemiBold" Foreground="White" />
+                            <TextBlock Text="Transaksi, piutang, &amp; laporan harian" FontSize="12" Foreground="#94A3B8" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Version footer -->
+                <TextBlock Grid.Row="2" Style="{StaticResource FooterText}"
+                           Text="Versi 2.4  ·  Database Lokal Aktif" />
+            </Grid>
         </Border>
 
-        <!-- Panel kanan: form. -->
-        <Grid Grid.Column="1" Margin="40,0">
-            <StackPanel VerticalAlignment="Center" MaxWidth="400">
-                <TextBlock Text="Masuk ke akun kamu" Style="{StaticResource TeksJudul}" FontSize="24" />
-                <TextBlock Text="{Binding PesanUmum}" Style="{StaticResource TeksSub}" Margin="0,6,0,0"
-                           Visibility="{Binding PesanUmum, Converter={StaticResource Kosong}}" />
+        <!-- DIVIDER -->
+        <Border Grid.Column="1" Width="1" Background="#1E3A5F" Margin="0,40" />
 
-                <Border Style="{StaticResource KartuLembut}" Padding="4" Margin="0,18,0,18">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Content="Masuk" Command="{Binding PilihModeCommand}"
-                                CommandParameter="Masuk" Style="{StaticResource TombolHalus}" />
-                        <Button Grid.Column="1" Content="Daftar" Command="{Binding PilihModeCommand}"
-                                CommandParameter="Daftar" Style="{StaticResource TombolHalus}" />
-                        <Button Grid.Column="2" Content="Lupa sandi" Command="{Binding PilihModeCommand}"
-                                CommandParameter="Lupa" Style="{StaticResource TombolHalus}" />
-                    </Grid>
-                </Border>
+        <!-- RIGHT PANEL - Login Form -->
+        <Border Grid.Column="2" Background="{StaticResource KuasPermukaan}" CornerRadius="0,16,16,0" Padding="40,48" Margin="0,24,24,24">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="40" ShadowDepth="0" Color="#000000" Opacity="0.3" />
+            </Border.Effect>
 
-                <ContentControl Visibility="{Binding Galat, Converter={StaticResource Kosong}}"
-                                Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}" />
-                <ContentControl Visibility="{Binding Info, Converter={StaticResource Kosong}}"
-                                Content="{Binding Info}" ContentTemplate="{StaticResource BarisHasil}" />
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                          FocusVisualStyle="{x:Null}" Padding="0,0,8,0">
+                <StackPanel Width="360">
 
-                <TextBlock Text="NOMOR TELEPON" Style="{StaticResource TeksLabel}" />
-                <TextBox Style="{StaticResource KotakTeks}" Margin="0,0,0,12"
-                         Text="{Binding Nomor, UpdateSourceTrigger=PropertyChanged}" />
+                    <!-- Header -->
+                    <StackPanel Margin="0,0,0,8">
+                                            <TextBlock Text="Masuk Akun"
+                                                       FontSize="26" FontWeight="Bold"
+                                                       Foreground="{StaticResource KuasTeks}"
+                                                       TextOptions.TextFormattingMode="Display" />
+                                            <TextBlock Text="Masukkan kredensial kasir untuk memulai sesi operasional."
+                                                       FontSize="13"
+                                                       Foreground="{StaticResource KuasTeksDua}"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,6,0,0"
+                                                       LineHeight="20" />
+                                        </StackPanel>
 
-                <StackPanel Visibility="{Binding LagiMasuk, Converter={StaticResource BoolKasus}}">
-                    <TextBlock Text="KATA SANDI" Style="{StaticResource TeksLabel}" />
-                    <PasswordBox x:Name="KotakSandi" Style="{StaticResource KotakSandi}" Margin="0,0,0,6"
-                                 PasswordChanged="KotakSandi_Changed" />
-                    <Button Content="Masuk" Style="{StaticResource Tombol}" Command="{Binding MasukCommand}"
-                            Margin="0,12,0,0" Height="40" IsDefault="True" />
+                    <!-- Phone Field -->
+                    <StackPanel Margin="0,28,0,0">
+                        <TextBlock Text="NOMOR TELEPON" Style="{StaticResource InputLabel}" />
+                        <TextBox x:Name="KotakNomor"
+                                 Style="{StaticResource InputBox}"
+                                 Text="{Binding Nomor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Tag="0812-3456-7890"
+                                 FontFamily="Consolas" />
+                    </StackPanel>
+
+                    <!-- Password Field -->
+                                        <StackPanel Margin="0,20,0,0">
+                                            <TextBlock Text="KATA SANDI" Style="{StaticResource InputLabel}" />
+                                            <Grid>
+                                                <PasswordBox x:Name="KotakSandi"
+                                                             Style="{StaticResource PasswordBoxStyle}"
+                                                             PasswordChanged="KotakSandi_Changed"
+                                                             Tag="••••••••"
+                                                             Visibility="{Binding SandiTersembunyi, Converter={StaticResource BoolToVis}}" />
+                                                <TextBox x:Name="KotakSandiTampil"
+                                                                                     Style="{StaticResource InputBox}"
+                                                                                     Text="{Binding Sandi, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                     Tag="••••••••"
+                                                                                     FontFamily="Consolas"
+                                                                                     Visibility="{Binding SandiTersembunyi, Converter={StaticResource NegasiConverter}}"
+                                                                                     TextChanged="KotakSandiTampil_TextChanged" />
+                                                <ToggleButton x:Name="BtnTampilSandi"
+                                                              Style="{StaticResource ToggleButtonIcon}"
+                                                              HorizontalAlignment="Right"
+                                                              VerticalAlignment="Center"
+                                                              Margin="0,0,8,0"
+                                                              Width="32" Height="32"
+                                                              IsChecked="{Binding SandiTersembunyi, Mode=TwoWay}"
+                                                              ToolTip="Tampilkan/Sembunyikan kata sandi">
+                                                    <TextBlock x:Name="IkonTampilSandi" Text="👁" FontSize="14" />
+                                                </ToggleButton>
+                                            </Grid>
+                                        </StackPanel>
+
+                    <!-- Forgot Password Link (shown only in Login mode) -->
+                    <Button x:Name="BtnLupaSandi"
+                            Style="{StaticResource LinkButton}"
+                            Content="Lupa Sandi?"
+                            HorizontalAlignment="Right"
+                            Margin="0,10,0,0"
+                            Command="{Binding PilihModeCommand}"
+                            CommandParameter="Lupa"
+                            Visibility="{Binding LagiMasuk, Converter={StaticResource BoolToVis}}" />
+
+                    <!-- Loket Kasir Siap Section -->
+                    <Border Margin="0,24,0,0" Padding="16,12" Background="#0B1D3A" CornerRadius="8" BorderThickness="1" BorderBrush="#1E3A5F">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="36" Height="36" CornerRadius="8" Background="#0E7490" Margin="0,0,12,0" VerticalAlignment="Center">
+                                <TextBlock Text="🏪" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Loket Kasir Siap"
+                                           FontSize="14" FontWeight="SemiBold" Foreground="White" />
+                                <TextBlock Text="Buka shift kasir sebelum memproses nota pelanggan baru."
+                                           FontSize="11" Foreground="#94A3B8" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Error Message -->
+                                        <TextBlock x:Name="TxtGalat"
+                                                   Text="{Binding Galat}"
+                                                   Foreground="#EF4444"
+                                                   FontSize="12"
+                                                   FontWeight="Medium"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,16,0,0"
+                                                   Visibility="{Binding Galat, Converter={StaticResource KosongConverter}, ConverterParameter=balik}" />
+
+                                        <!-- Info Message -->
+                                        <TextBlock x:Name="TxtInfo"
+                                                   Text="{Binding Info}"
+                                                   Foreground="#38BDF8"
+                                                   FontSize="12"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,16,0,0"
+                                                   Visibility="{Binding Info, Converter={StaticResource KosongConverter}, ConverterParameter=balik}" />
+
+                    <!-- Dev Code (for testing) -->
+                    <Border x:Name="BdrKodeDev"
+                            Background="#1E3A5F" CornerRadius="6" Padding="10,8"
+                            Margin="0,12,0,0"
+                            Visibility="{Binding KodeDev, Converter={StaticResource BoolToVis}}">
+                        <StackPanel>
+                            <TextBlock Text="KODE PENGEMBANGAN (tidak dikirim lewat WhatsApp):"
+                                       FontSize="11" Foreground="#94A3B8" Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding KodeDev}"
+                                       FontSize="14" FontWeight="Bold" Foreground="#FBBF24"
+                                       FontFamily="Consolas" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Login Button -->
+                                        <Button x:Name="BtnMasuk"
+                                                Style="{StaticResource PrimaryButton}"
+                                                Content="Masuk ke Sistem"
+                                                Margin="0,28,0,0"
+                                                Command="{Binding MasukAsync}"
+                                                IsEnabled="{Binding Sibuk, Converter={StaticResource NegasiConverter}}"
+                                                Visibility="{Binding LagiMasuk, Converter={StaticResource BoolToVis}}">
+                                            <Button.ContentTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="Masuk ke Sistem" VerticalAlignment="Center" />
+                                                        <Border x:Name="Spinner" Width="20" Height="20" Margin="10,0,0,0"
+                                                                Visibility="Collapsed"
+                                                                BorderBrush="White" BorderThickness="2"
+                                                                CornerRadius="10" RenderTransformOrigin="0.5,0.5">
+                                                            <Border.RenderTransform>
+                                                                <RotateTransform Angle="0" />
+                                                            </Border.RenderTransform>
+                                                        </Border>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </Button.ContentTemplate>
+                                        </Button>
+
+                    <!-- Register Form (when in Daftar mode) -->
+                                        <StackPanel x:Name="PanelDaftar"
+                                                    Visibility="{Binding LagiDaftar, Converter={StaticResource BoolToVis}}"
+                                                    Margin="0,28,0,0">
+                                            <!-- Step 1: Enter phone and send code -->
+                                                                    <StackPanel x:Name="PanelDaftarLangkah1" Visibility="{Binding PunyaTantangan, Converter={StaticResource NegasiConverter}}">
+                                                <TextBlock Text="NOMOR TELEPON" Style="{StaticResource InputLabel}" />
+                                                <TextBox x:Name="KotakNomorDaftar"
+                                                         Style="{StaticResource InputBox}"
+                                                         Text="{Binding Nomor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         Tag="0812-3456-7890" />
+                                                <TextBlock Text="{Binding Galat}" Foreground="#EF4444" FontSize="12" FontWeight="Medium"
+                                                                                                           Margin="0,16,0,0" Visibility="{Binding Galat, Converter={StaticResource KosongConverter}, ConverterParameter=balik}" />
+                                                                                                <TextBlock Text="{Binding Info}" Foreground="#38BDF8" FontSize="12"
+                                                                                                           Margin="0,16,0,0" Visibility="{Binding Info, Converter={StaticResource KosongConverter}, ConverterParameter=balik}" />
+                                                <Button Style="{StaticResource PrimaryButton}"
+                                                        Content="Kirim Kode Verifikasi"
+                                                        Margin="0,28,0,0"
+                                                        Command="{Binding DaftarMulaiAsync}"
+                                                        IsEnabled="{Binding Sibuk, Converter={StaticResource NegasiConverter}}" />
+                                            </StackPanel>
+
+                                            <!-- Step 2: Enter code, name, and new password -->
+                                            <StackPanel x:Name="PanelDaftarLangkah2" Visibility="{Binding PunyaTantangan, Converter={StaticResource BoolToVis}}" Margin="0,28,0,0">
+                                                <StackPanel>
+                                                    <TextBlock Text="NAMA LENGKAP" Style="{StaticResource InputLabel}" />
+                                                    <TextBox Style="{StaticResource InputBox}"
+                                                             Text="{Binding Nama, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                             Tag="Nama lengkap" />
+                                                </StackPanel>
+                                                <StackPanel Margin="0,20,0,0">
+                                                    <TextBlock Text="KODE VERIFIKASI" Style="{StaticResource InputLabel}" />
+                                                    <TextBox Style="{StaticResource InputBox}"
+                                                             Text="{Binding KodeOtp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                             Tag="123456"
+                                                             FontFamily="Consolas"
+                                                             MaxLength="6" />
+                                                </StackPanel>
+                                                <StackPanel Margin="0,20,0,0">
+                                                                                                    <TextBlock Text="KATA SANDI BARU" Style="{StaticResource InputLabel}" />
+                                                                                                    <Grid>
+                                                                                                        <PasswordBox x:Name="KotakSandiBaru"
+                                                                                                                     Style="{StaticResource PasswordBoxStyle}"
+                                                                                                                     PasswordChanged="KotakSandiBaru_Changed"
+                                                                                                                     Tag="••••••••"
+                                                                                                                     Visibility="{Binding SandiBaruTersembunyi, Converter={StaticResource BoolToVis}}" />
+                                                                                                        <TextBox x:Name="KotakSandiBaruTampil"
+                                                                                                                                                                         Style="{StaticResource InputBox}"
+                                                                                                                                                                         Text="{Binding SandiBaru, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                                                                                                         Tag="••••••••"
+                                                                                                                                                                         FontFamily="Consolas"
+                                                                                                                                                                         Visibility="{Binding SandiBaruTersembunyi, Converter={StaticResource NegasiConverter}}"
+                                                                                                                                                                         TextChanged="KotakSandiBaruTampil_TextChanged" />
+                                                                                                        <ToggleButton Style="{StaticResource ToggleButtonIcon}"
+                                                                                                                      HorizontalAlignment="Right"
+                                                                                                                      VerticalAlignment="Center"
+                                                                                                                      Margin="0,0,8,0"
+                                                                                                                      Width="32" Height="32"
+                                                                                                                      IsChecked="{Binding SandiBaruTersembunyi, Mode=TwoWay}"
+                                                                                                                      ToolTip="Tampilkan/Sembunyikan kata sandi">
+                                                                                                            <TextBlock Text="👁" FontSize="14" />
+                                                                                                        </ToggleButton>
+                                                                                                    </Grid>
+                                                                                                </StackPanel>
+                                                <TextBlock Text="{Binding Galat}" Foreground="#EF4444" FontSize="12" FontWeight="Medium"
+                                                                                                           Margin="0,16,0,0" Visibility="{Binding Galat, Converter={StaticResource KosongConverter}, ConverterParameter=balik}" />
+                                                                                                <TextBlock Text="{Binding Info}" Foreground="#38BDF8" FontSize="12"
+                                                                                                           Margin="0,16,0,0" Visibility="{Binding Info, Converter={StaticResource KosongConverter}, ConverterParameter=balik}" />
+                                                <Button Style="{StaticResource PrimaryButton}"
+                                                        Content="Daftar dan Masuk"
+                                                        Margin="0,28,0,0"
+                                                        Command="{Binding DaftarSelesaiAsync}"
+                                                        IsEnabled="{Binding Sibuk, Converter={StaticResource NegasiConverter}}" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                    <!-- Forgot Password Form (when in Lupa mode) -->
+                    <StackPanel x:Name="PanelLupa"
+                                Visibility="{Binding LagiLupa, Converter={StaticResource BoolToVis}}"
+                                Margin="0,28,0,0">
+                        <!-- Step 1: Enter phone and send reset code -->
+                        <StackPanel x:Name="PanelLupaLangkah1" Visibility="{Binding PunyaTantangan, Converter={StaticResource NegasiConverter}}">
+                            <TextBlock Text="NOMOR TELEPON" Style="{StaticResource InputLabel}" />
+                            <TextBox x:Name="KotakNomorLupa"
+                                     Style="{StaticResource InputBox}"
+                                     Text="{Binding Nomor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Tag="0812-3456-7890" />
+                            <TextBlock Text="{Binding Galat}" Foreground="#EF4444" FontSize="12" FontWeight="Medium"
+                                                                                       Margin="0,16,0,0" Visibility="{Binding Galat, Converter={StaticResource KosongConverter}, ConverterParameter=balik}" />
+                                                                            <TextBlock Text="{Binding Info}" Foreground="#38BDF8" FontSize="12"
+                                                                                       Margin="0,16,0,0" Visibility="{Binding Info, Converter={StaticResource KosongConverter}, ConverterParameter=balik}" />
+                            <Button Style="{StaticResource PrimaryButton}"
+                                    Content="Kirim Kode Reset"
+                                    Margin="0,28,0,0"
+                                    Command="{Binding LupaMulaiAsync}"
+                                    IsEnabled="{Binding Sibuk, Converter={StaticResource NegasiConverter}}" />
+                        </StackPanel>
+
+                        <!-- Step 2: Enter reset code and new password -->
+                        <StackPanel x:Name="PanelLupaLangkah2" Visibility="{Binding PunyaTantangan, Converter={StaticResource BoolToVis}}" Margin="0,28,0,0">
+                            <StackPanel>
+                                <TextBlock Text="KODE RESET" Style="{StaticResource InputLabel}" />
+                                <TextBox Style="{StaticResource InputBox}"
+                                         Text="{Binding KodeOtp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Tag="123456"
+                                         FontFamily="Consolas"
+                                         MaxLength="6" />
+                            </StackPanel>
+                            <StackPanel Margin="0,20,0,0">
+                                                            <TextBlock Text="KATA SANDI BARU" Style="{StaticResource InputLabel}" />
+                                                            <Grid>
+                                                                <PasswordBox x:Name="KotakSandiReset"
+                                                                             Style="{StaticResource PasswordBoxStyle}"
+                                                                             PasswordChanged="KotakSandiReset_Changed"
+                                                                             Tag="••••••••"
+                                                                             Visibility="{Binding SandiResetTersembunyi, Converter={StaticResource BoolToVis}}" />
+                                                                <TextBox x:Name="KotakSandiResetTampil"
+                                                                                                             Style="{StaticResource InputBox}"
+                                                                                                             Text="{Binding SandiBaru, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                                             Tag="••••••••"
+                                                                                                             FontFamily="Consolas"
+                                                                                                             Visibility="{Binding SandiResetTersembunyi, Converter={StaticResource NegasiConverter}}"
+                                                                                                             TextChanged="KotakSandiResetTampil_TextChanged" />
+                                                                <ToggleButton Style="{StaticResource ToggleButtonIcon}"
+                                                                              HorizontalAlignment="Right"
+                                                                              VerticalAlignment="Center"
+                                                                              Margin="0,0,8,0"
+                                                                              Width="32" Height="32"
+                                                                              IsChecked="{Binding SandiResetTersembunyi, Mode=TwoWay}"
+                                                                              ToolTip="Tampilkan/Sembunyikan kata sandi">
+                                                                    <TextBlock Text="👁" FontSize="14" />
+                                                                </ToggleButton>
+                                                            </Grid>
+                                                        </StackPanel>
+                            <TextBlock Text="{Binding Galat}" Foreground="#EF4444" FontSize="12" FontWeight="Medium"
+                                                                                       Margin="0,16,0,0" Visibility="{Binding Galat, Converter={StaticResource KosongConverter}, ConverterParameter=balik}" />
+                                                                            <TextBlock Text="{Binding Info}" Foreground="#38BDF8" FontSize="12"
+                                                                                       Margin="0,16,0,0" Visibility="{Binding Info, Converter={StaticResource KosongConverter}, ConverterParameter=balik}" />
+                            <Button Style="{StaticResource PrimaryButton}"
+                                    Content="Ganti Kata Sandi"
+                                    Margin="0,28,0,0"
+                                    Command="{Binding LupaSelesaiAsync}"
+                                    IsEnabled="{Binding Sibuk, Converter={StaticResource NegasiConverter}}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Footer Links -->
+                    <StackPanel Margin="0,8,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <TextBlock Text="Belum terdaftar? "
+                                                       FontSize="13" Foreground="{StaticResource KuasTeksDua}" VerticalAlignment="Center" />
+                                            <Button Style="{StaticResource LinkButton}"
+                                                    Content="Daftar"
+                                                    Command="{Binding PilihModeCommand}"
+                                                    CommandParameter="Daftar"
+                                                    Visibility="{Binding LagiMasuk, Converter={StaticResource BoolToVis}}" />
+                                            <Button Style="{StaticResource LinkButton}"
+                                                    Content="Kembali ke Masuk"
+                                                    Command="{Binding PilihModeCommand}"
+                                                    CommandParameter="Masuk"
+                                                    Visibility="{Binding LagiDaftar, Converter={StaticResource BoolToVis}}" />
+                                        </StackPanel>
+
+                                        <StackPanel Margin="0,8,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <TextBlock Text="Sudah punya akun? "
+                                                       FontSize="13" Foreground="{StaticResource KuasTeksDua}" VerticalAlignment="Center"
+                                                       Visibility="{Binding LagiLupa, Converter={StaticResource BoolToVis}}" />
+                                            <Button Style="{StaticResource LinkButton}"
+                                                    Content="Masuk"
+                                                    Command="{Binding PilihModeCommand}"
+                                                    CommandParameter="Masuk"
+                                                    Visibility="{Binding LagiLupa, Converter={StaticResource BoolToVis}}" />
+                                        </StackPanel>
                 </StackPanel>
-
-                <StackPanel Visibility="{Binding LagiDaftar, Converter={StaticResource BoolKasus}}">
-                    <TextBlock Text="NAMA USAHA / NAMA KAMU" Style="{StaticResource TeksLabel}" />
-                    <TextBox Style="{StaticResource KotakTeks}" Margin="0,0,0,12"
-                             Text="{Binding Nama, UpdateSourceTrigger=PropertyChanged}" />
-                    <Button Content="Kirim kode verifikasi" Style="{StaticResource TombolGaris}"
-                            Command="{Binding DaftarMulaiCommand}" Margin="0,0,0,12" />
-                    <TextBlock Text="KODE DARI WHATSAPP" Style="{StaticResource TeksLabel}" />
-                    <TextBox Style="{StaticResource KotakTeks}" Margin="0,0,0,6"
-                             Text="{Binding KodeOtp, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Text="{Binding KodeDev, StringFormat=Kode pengembangan: {0}}" Style="{StaticResource TeksKecil}"
-                               Visibility="{Binding KodeDev, Converter={StaticResource Kosong}}" Margin="0,0,0,6" />
-                    <TextBlock Text="KATA SANDI BARU" Style="{StaticResource TeksLabel}" Margin="0,6,0,0" />
-                    <PasswordBox x:Name="KotakSandiBaru" Style="{StaticResource KotakSandi}"
-                                 PasswordChanged="KotakSandiBaru_Changed" />
-                    <Button Content="Selesaikan pendaftaran" Style="{StaticResource Tombol}"
-                            Command="{Binding DaftarSelesaiCommand}" Margin="0,14,0,0" Height="40" IsDefault="True" />
-                </StackPanel>
-
-                <StackPanel Visibility="{Binding LagiLupa, Converter={StaticResource BoolKasus}}">
-                    <Button Content="Kirim kode reset" Style="{StaticResource TombolGaris}"
-                            Command="{Binding LupaMulaiCommand}" Margin="0,0,0,12" />
-                    <TextBlock Text="KODE RESET" Style="{StaticResource TeksLabel}" />
-                    <TextBox Style="{StaticResource KotakTeks}" Margin="0,0,0,6"
-                             Text="{Binding KodeOtp, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Text="{Binding KodeDev, StringFormat=Kode pengembangan: {0}}" Style="{StaticResource TeksKecil}"
-                               Visibility="{Binding KodeDev, Converter={StaticResource Kosong}}" Margin="0,0,0,6" />
-                    <TextBlock Text="KATA SANDI BARU" Style="{StaticResource TeksLabel}" Margin="0,6,0,0" />
-                    <PasswordBox x:Name="KotakSandiReset" Style="{StaticResource KotakSandi}"
-                                 PasswordChanged="KotakSandiReset_Changed" />
-                    <Button Content="Ganti kata sandi" Style="{StaticResource Tombol}"
-                            Command="{Binding LupaSelesaiCommand}" Margin="0,14,0,0" Height="40" IsDefault="True" />
-                </StackPanel>
-
-                <ProgressBar Margin="0,18,0,0" Width="120" HorizontalAlignment="Left" Style="{StaticResource Progres}"
-                             Visibility="{Binding Sibuk, Converter={StaticResource BoolKasus}}" />
-            </StackPanel>
-        </Grid>
+            </ScrollViewer>
+        </Border>
     </Grid>
 </Window>

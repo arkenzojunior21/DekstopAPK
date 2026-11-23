@@ -22,9 +22,13 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty] private string? _info;
     [ObservableProperty] private string? _pesanUmum;
     [ObservableProperty] private string? _kodeDev;
-    [ObservableProperty] private bool _sibuk;
+        [ObservableProperty] private bool _sibuk;
 
-    public string Sandi { get; set; } = "";
+        [ObservableProperty] private bool _sandiTersembunyi = true;
+        [ObservableProperty] private bool _sandiBaruTersembunyi = true;
+        [ObservableProperty] private bool _sandiResetTersembunyi = true;
+
+        public string Sandi { get; set; } = "";
 
     public string SandiBaru { get; set; } = "";
 
