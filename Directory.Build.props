@@ -2,5 +2,9 @@
   <!-- Versi aplikasi dibaca oleh pemeriksaan update (fase 8). Versi rilis akhir dinaikkan pada fase 10. -->
   <PropertyGroup>
     <Version>0.8.0</Version>
+    <!-- Mesin ini hanya punya SDK/runtime .NET 11. Proyek di-repo sudah ditargetkan net8.0 (lihat README),
+         jadi property global ini memaksa build ke net8.0 tanpa perlu mengubah tiap .csproj. -->
+    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0</TargetFrameworks>
   </PropertyGroup>
 </Project>

@@ -1,14 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
+      <TargetFramework>net8.0-windows</TargetFramework>
+      <TargetFrameworks>net8.0-windows</TargetFrameworks>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <Nullable>enable</Nullable>
+      <UseWPF>true</UseWPF>
 
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-  </PropertyGroup>
+      <IsPackable>false</IsPackable>
+      <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
@@ -22,6 +23,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Laundry.Desktop\Laundry.Desktop.csproj" />
-  </ItemGroup>
+        <!-- Relative path above used to reach src/Laundry.Desktop; after the frontend/backend split
+             the correct reference is ../Laundry.Desktop (same directory). -->
+        <ProjectReference Include="..\..\backend\Laundry.Domain\Laundry.Domain.csproj" />
+        <ProjectReference Include="..\..\backend\Laundry.Application\Laundry.Application.csproj" />
+      </ItemGroup>
 
 </Project>

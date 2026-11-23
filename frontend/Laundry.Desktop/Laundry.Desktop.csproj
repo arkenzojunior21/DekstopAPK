@@ -10,12 +10,17 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
-  </PropertyGroup>
+      <OutputType>WinExe</OutputType>
+      <TargetFramework>net8.0-windows</TargetFramework>
+      <Nullable>enable</Nullable>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <UseWPF>true</UseWPF>
+      <!-- Directory.Build.props already sets TargetFramework=net8.0 globally; this local
+           declaration is what makes the restore assets file contain the net8.0-windows target.
+           Without it, the SDK resolves the global override to plain net8.0 and the WPF
+           assets (Microsoft.WindowsDesktop.App) are missing from the resolved graph. -->
+      <TargetFrameworks>net8.0-windows</TargetFrameworks>
+    </PropertyGroup>
 
   <!-- Aset yang bisa diganti admin tanpa build ulang: logo.png di root Aset,
        foto layanan di Aset/Layanan/<nama-layanan-slug>.png. -->
