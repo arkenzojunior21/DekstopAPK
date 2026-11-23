@@ -15,11 +15,10 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Style="{StaticResource KotakTeks}"
-                             Text="{Binding Cari, UpdateSourceTrigger=PropertyChanged}"
-                             Tag="cari nama / nomor" />
+                    <TextBox Grid.Column="0" Style="{StaticResource KotakLabel}" Tag="CARI NAMA / NOMOR"
+                             Text="{Binding Cari, UpdateSourceTrigger=PropertyChanged}" />
                     <Button Grid.Column="1" Content="Cari" Style="{StaticResource Tombol}" Margin="8,0,0,0"
-                            Command="{Binding CariCommand}" />
+                            Height="56" Command="{Binding CariCommand}" />
                 </Grid>
             </Border>
 
@@ -56,8 +55,7 @@
             </Border>
         </DockPanel>
 
-        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}"
-                      HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}">
             <StackPanel>
                 <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
                                 Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
@@ -69,19 +67,17 @@
                         <TextBlock Text="{Binding Terpilih.Nama, FallbackValue=Pelanggan baru}" Style="{StaticResource TeksBagian}" />
                         <StackPanel Margin="0,10,0,0"
                                     Visibility="{Binding SedangMemperbaiki, Converter={StaticResource BoolKasus}}">
-                            <TextBlock Text="NAMA" Style="{StaticResource TeksLabel}" />
-                            <TextBox Style="{StaticResource KotakTeks}"
+                            <TextBox Style="{StaticResource KotakLabel}" Tag="NAMA"
                                      Text="{Binding Nama, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Text="NOMOR HP (tetap — dipakai untuk login OTP)" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
-                            <TextBox Style="{StaticResource KotakTeks}" Text="{Binding Nomor}" IsReadOnly="True" />
-                            <TextBlock Text="ALAMAT" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
-                            <TextBox Style="{StaticResource KotakTeksBesar}" Height="60" TextWrapping="Wrap"
-                                     AcceptsReturn="True" Text="{Binding Alamat, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Style="{StaticResource KotakLabel}" Tag="NOMOR HP (TETAP)"
+                                     Margin="0,10,0,0" Text="{Binding Nomor}" IsReadOnly="True" />
+                            <TextBox Style="{StaticResource KotakLabelBesar}" Tag="ALAMAT" Margin="0,10,0,0"
+                                     Text="{Binding Alamat, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock Style="{StaticResource TeksKecil}" Margin="0,10,0,0"
                                        Text="{Binding Saldo, StringFormat=Saldo kredit: {0}}" />
                             <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
                                 <Button Content="Simpan perubahan" Style="{StaticResource Tombol}" Margin="0,0,8,0"
-                                        Height="34" Command="{Binding SimpanCommand}" />
+                                        Height="44" Command="{Binding SimpanCommand}" />
                                 <Button Content="Aktif / nonaktif" Style="{StaticResource TombolGaris}"
                                         Command="{Binding GantiAktifCommand}" />
                             </StackPanel>
@@ -89,19 +85,16 @@
 
                         <StackPanel Margin="0,10,0,0"
                                     Visibility="{Binding SedangMemperbaiki, Converter={StaticResource BoolKasus}, ConverterParameter=balik}">
-                            <TextBlock Text="NAMA" Style="{StaticResource TeksLabel}" />
-                            <TextBox Style="{StaticResource KotakTeks}"
+                            <TextBox Style="{StaticResource KotakLabel}" Tag="NAMA"
                                      Text="{Binding Nama, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Text="NOMOR HP (628…)" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
-                            <TextBox Style="{StaticResource KotakTeks}"
+                            <TextBox Style="{StaticResource KotakLabel}" Tag="NOMOR HP" Margin="0,10,0,0"
                                      Text="{Binding Nomor, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Text="ALAMAT" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
-                            <TextBox Style="{StaticResource KotakTeksBesar}" Height="60" TextWrapping="Wrap"
-                                     AcceptsReturn="True" Text="{Binding Alamat, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Style="{StaticResource KotakLabelBesar}" Tag="ALAMAT" Margin="0,10,0,0"
+                                     Text="{Binding Alamat, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
                                        Text="Nomor sama yang dipakai akun pelanggan terdaftar; sistem mencocokkan lewat nomor, bukan nama." />
                             <Button Content="Simpan pelanggan" Style="{StaticResource Tombol}" Margin="0,14,0,0"
-                                    Height="34" Command="{Binding SimpanCommand}" />
+                                    Height="44" Command="{Binding SimpanCommand}" />
                         </StackPanel>
                     </StackPanel>
                 </Border>

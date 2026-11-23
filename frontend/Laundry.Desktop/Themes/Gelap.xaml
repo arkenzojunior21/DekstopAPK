@@ -1,21 +1,22 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Palet gelap. Nama kunci sama persis dengan Terang.xaml: yang boleh berbeda hanya nilainya. -->
-    <Color x:Key="WarnaLatar">#FF0A1120</Color>
-    <Color x:Key="WarnaPermukaan">#FF141E30</Color>
-    <Color x:Key="WarnaPermukaanDua">#FF1B273D</Color>
-    <Color x:Key="WarnaSisi">#FF060C17</Color>
-    <Color x:Key="WarnaSisiTeks">#FFC7D4E6</Color>
-    <Color x:Key="WarnaGaris">#FF27364F</Color>
-    <Color x:Key="WarnaTeks">#FFEAF1FA</Color>
-    <Color x:Key="WarnaTeksDua">#FF9AA9BF</Color>
-    <Color x:Key="WarnaAksen">#FF6BA1FA</Color>
-    <Color x:Key="WarnaAksenGelap">#FF93B8FC</Color>
-    <Color x:Key="WarnaSukses">#FF41D4A5</Color>
-    <Color x:Key="WarnaProses">#FFF5B94C</Color>
-    <Color x:Key="WarnaBahaya">#FFF07575</Color>
-    <Color x:Key="WarnaNetral">#FF9AA9BF</Color>
+    <!-- Palet gelap. Nama kunci sama persis dengan Terang.xaml: yang boleh berbeda hanya nilainya.
+         Warna mengikuti keluarga hijau yang sama supaya ganti tema tidak terasa seperti aplikasi lain. -->
+    <Color x:Key="WarnaLatar">#FF0F1513</Color>
+    <Color x:Key="WarnaPermukaan">#FF18201D</Color>
+    <Color x:Key="WarnaPermukaanDua">#FF1F2A26</Color>
+    <Color x:Key="WarnaSisi">#FF0E3B33</Color>
+    <Color x:Key="WarnaSisiTeks">#FFBFD8D1</Color>
+    <Color x:Key="WarnaGaris">#FF2C3A35</Color>
+    <Color x:Key="WarnaTeks">#FFEDF2F0</Color>
+    <Color x:Key="WarnaTeksDua">#FF9AABA5</Color>
+    <Color x:Key="WarnaAksen">#FF4FC3AE</Color>
+    <Color x:Key="WarnaAksenGelap">#FF7DD8C6</Color>
+    <Color x:Key="WarnaSukses">#FF46D3B4</Color>
+    <Color x:Key="WarnaProses">#FFE8B45A</Color>
+    <Color x:Key="WarnaBahaya">#FFF08A80</Color>
+    <Color x:Key="WarnaNetral">#FF9AABA5</Color>
 
     <SolidColorBrush x:Key="KuasLatar" Color="{StaticResource WarnaLatar}" />
     <SolidColorBrush x:Key="KuasPermukaan" Color="{StaticResource WarnaPermukaan}" />
@@ -32,15 +33,21 @@
     <SolidColorBrush x:Key="KuasBahaya" Color="{StaticResource WarnaBahaya}" />
     <SolidColorBrush x:Key="KuasNetral" Color="{StaticResource WarnaNetral}" />
 
-    <SolidColorBrush x:Key="KuasSuksesLembut" Color="#FF12312A" />
-    <SolidColorBrush x:Key="KuasProsesLembut" Color="#FF33270F" />
-    <SolidColorBrush x:Key="KuasBahayaLembut" Color="#FF3A1C1C" />
-    <SolidColorBrush x:Key="KuasAksenLembut" Color="#FF182A4A" />
+    <SolidColorBrush x:Key="KuasSuksesLembut" Color="#FF12332C" />
+    <SolidColorBrush x:Key="KuasProsesLembut" Color="#FF332811" />
+    <SolidColorBrush x:Key="KuasBahayaLembut" Color="#FF3A1D19" />
+    <SolidColorBrush x:Key="KuasAksenLembut" Color="#FF14332D" />
 
     <!-- Tinta gelap untuk teks di atas isian terang (tombol primer/sukses/bahaya di tema gelap),
          supaya kontrasnya lolos AA; tema terang memakai putih karena isiannya gelap. -->
-    <SolidColorBrush x:Key="KuasAksenTinta" Color="#FF0A1120" />
-    <SolidColorBrush x:Key="KuasSuksesTinta" Color="#FF0A1120" />
-    <SolidColorBrush x:Key="KuasBahayaTinta" Color="#FF0A1120" />
+    <SolidColorBrush x:Key="KuasAksenTinta" Color="#FF0F1513" />
+    <SolidColorBrush x:Key="KuasSuksesTinta" Color="#FF0F1513" />
+    <SolidColorBrush x:Key="KuasBahayaTinta" Color="#FF0F1513" />
+
+    <!-- Kuas khusus contoh desain. -->
+    <SolidColorBrush x:Key="KuasSisiAktif" Color="#FF1B2622" />
+    <SolidColorBrush x:Key="KuasIsian" Color="#FF1A231F" />
+    <SolidColorBrush x:Key="KuasIlustrasi" Color="#FF2A241C" />
+    <SolidColorBrush x:Key="KuasPanelLembut" Color="#FF1D2925" />
 
 </ResourceDictionary>

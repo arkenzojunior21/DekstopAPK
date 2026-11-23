@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="370" />
+            <ColumnDefinition Width="420" />
             <ColumnDefinition Width="14" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
@@ -16,14 +16,12 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="STATUS" Style="{StaticResource TeksLabel}" />
-                        <ComboBox Style="{StaticResource KotakPilih}" ItemsSource="{Binding SemuaStatus}"
-                                  SelectedItem="{Binding FilterStatus}" Tag="semua status"
-                                  ItemTemplate="{StaticResource TemplateEnum}" />
-                    </StackPanel>
+                    <ComboBox Grid.Column="0" Style="{StaticResource KotakPilihLabel}" Tag="STATUS"
+                              ItemsSource="{Binding SemuaStatus}"
+                              SelectedItem="{Binding FilterStatus}"
+                              ItemTemplate="{StaticResource TemplateEnum}" />
                     <Button Grid.Column="1" Content="Filter" Style="{StaticResource TombolGaris}"
-                            VerticalAlignment="Bottom" Margin="10,0,0,0" Command="{Binding TerapkanFilterCommand}" />
+                            VerticalAlignment="Center" Margin="10,0,0,0" Command="{Binding TerapkanFilterCommand}" />
                 </Grid>
             </Border>
 
@@ -46,8 +44,7 @@
             </Border>
         </DockPanel>
 
-        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}"
-                      HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="2" Style="{StaticResource Gulir}">
             <StackPanel>
                 <ContentControl Content="{Binding Galat}" ContentTemplate="{StaticResource BarisGalat}"
                                 Visibility="{Binding Galat, Converter={StaticResource Kosong}}" />
@@ -58,27 +55,22 @@
                 <Border Style="{StaticResource Kartu}" Margin="0,0,0,12"
                         Visibility="{Binding Admin, Converter={StaticResource BoolKasus}, ConverterParameter=balik}">
                     <StackPanel>
-                        <TextBlock Text="KOMPLAIN BARU" Style="{StaticResource TeksLabel}" />
-                        <TextBlock Text="PESANAN" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
-                        <ComboBox Style="{StaticResource KotakPilih}" ItemsSource="{Binding PesananAktif}"
-                                  SelectedItem="{Binding PesananDipilih}" Tag="pilih pesanan">
+                        <ComboBox Style="{StaticResource KotakPilihLabel}" Tag="PESANAN" ItemsSource="{Binding PesananAktif}"
+                                  SelectedItem="{Binding PesananDipilih}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock FontSize="12.5">
+                                    <TextBlock FontSize="13">
                                         <Run Text="{Binding OrderNumber, Mode=OneWay}" /><Run Text=" · " /><Run
                                             Text="{Binding Status, Converter={StaticResource Label}, Mode=OneWay}" />
                                     </TextBlock>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <TextBlock Text="KATEGORI" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
-                        <TextBox Style="{StaticResource KotakTeks}" Tag="mis. Kualitas"
+                        <TextBox Style="{StaticResource KotakLabel}" Tag="KATEGORI" Margin="0,10,0,0"
                                  Text="{Binding Kategori, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Text="JELASKAN KEJADIANNYA" Style="{StaticResource TeksLabel}" Margin="0,10,0,0" />
-                        <TextBox Style="{StaticResource KotakTeksBesar}" Height="72" TextWrapping="Wrap"
-                                 Tag="apa yang terjadi?" AcceptsReturn="True"
+                        <TextBox Style="{StaticResource KotakLabelBesar}" Tag="JELASKAN KEJADIANNYA" Margin="0,10,0,0"
                                  Text="{Binding IsiKomplain, UpdateSourceTrigger=PropertyChanged}" />
-                        <Button Content="Kirim komplain" Style="{StaticResource Tombol}" Margin="0,12,0,0" Height="34"
+                        <Button Content="Kirim komplain" Style="{StaticResource Tombol}" Margin="0,12,0,0" Height="44"
                                 HorizontalAlignment="Left" Command="{Binding BuatCommand}" />
                         <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
                                    Text="Hanya pesanan milik sendiri yang muncul di daftar ini; server yang membatasi aksesnya." />
@@ -138,10 +130,10 @@
                                    Text="Tidak ada balasan."
                                    Visibility="{Binding Terpilih.Pesan.Count, Converter={StaticResource Kosong}, ConverterParameter=balik, FallbackValue=Collapsed}" />
 
-                        <TextBox Style="{StaticResource KotakTeksBesar}" Height="60" TextWrapping="Wrap"
-                                 AcceptsReturn="True" Margin="0,10,0,0" Tag="tulis balasan…"
+                        <TextBox Style="{StaticResource KotakLabelBesar}" Margin="0,10,0,0" Height="84"
+                                 Tag="TULIS BALASAN"
                                  Text="{Binding Balasan, UpdateSourceTrigger=PropertyChanged}" />
-                        <Button Content="Kirim balasan" Style="{StaticResource Tombol}" Margin="0,10,0,0" Height="34"
+                        <Button Content="Kirim balasan" Style="{StaticResource Tombol}" Margin="0,10,0,0" Height="44"
                                 HorizontalAlignment="Left" Command="{Binding BalasCommand}" />
                     </StackPanel>
                 </Border>
@@ -150,17 +142,16 @@
                 <Border Style="{StaticResource Kartu}"
                         Visibility="{Binding BisaUbahStatus, Converter={StaticResource BoolKasus}}">
                     <StackPanel>
-                        <TextBlock Text="STATUS TIKET" Style="{StaticResource TeksLabel}" />
-                        <Grid Margin="0,8,0,0">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <ComboBox Grid.Column="0" Style="{StaticResource KotakPilih}"
+                            <ComboBox Grid.Column="0" Style="{StaticResource KotakPilihLabel}" Tag="STATUS TIKET"
                                       ItemsSource="{Binding SemuaStatus}" SelectedItem="{Binding StatusBaru}"
                                       ItemTemplate="{StaticResource TemplateEnum}" />
                             <Button Grid.Column="1" Content="Simpan status" Style="{StaticResource Tombol}"
-                                    Margin="10,0,0,0" Command="{Binding GantiStatusCommand}" />
+                                    Margin="10,0,0,0" VerticalAlignment="Center" Command="{Binding GantiStatusCommand}" />
                         </Grid>
                         <TextBlock Style="{StaticResource TeksKecil}" Margin="0,8,0,0" TextWrapping="Wrap"
                                    Text="Setiap perubahan status tercatat sebagai baris audit baru dan tidak bisa dihapus dari aplikasi." />

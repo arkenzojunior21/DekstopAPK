@@ -19,39 +19,40 @@
 
     <FontFamily x:Key="FontUtama">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="FontIkon">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
-    <CornerRadius x:Key="Radius">10</CornerRadius>
-    <CornerRadius x:Key="RadiusKecil">7</CornerRadius>
-    <Thickness x:Key="IsiKartu">18</Thickness>
-    <Thickness x:Key="JarakForm">0,0,0,12</Thickness>
+    <CornerRadius x:Key="Radius">8</CornerRadius>
+    <CornerRadius x:Key="RadiusKecil">6</CornerRadius>
+    <Thickness x:Key="IsiKartu">20</Thickness>
+    <Thickness x:Key="JarakForm">0,0,0,14</Thickness>
 
     <!-- ============================ Teks ============================ -->
     <Style x:Key="TeksJudul" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeks}" />
-        <Setter Property="FontSize" Value="21" />
-        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
     <Style x:Key="TeksBagian" TargetType="TextBlock" BasedOn="{StaticResource TeksJudul}">
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="Bold" />
     </Style>
     <Style x:Key="TeksSub" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeksDua}" />
-        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     <Style x:Key="TeksLabel" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeksDua}" />
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Margin" Value="0,0,0,4" />
+        <Setter Property="FontSize" Value="10.5" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Margin" Value="0,0,0,6" />
     </Style>
     <Style x:Key="TeksData" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeks}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="13.5" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
     <Style x:Key="TeksKecil" TargetType="TextBlock" BasedOn="{StaticResource TeksData}">
@@ -59,7 +60,7 @@
         <Setter Property="Foreground" Value="{DynamicResource KuasTeksDua}" />
     </Style>
     <Style x:Key="TeksAngka" TargetType="TextBlock" BasedOn="{StaticResource TeksJudul}">
-        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontSize" Value="32" />
         <Setter Property="FontWeight" Value="Bold" />
     </Style>
     <Style x:Key="TeksIkon" TargetType="TextBlock">
@@ -78,20 +79,20 @@
         <Setter Property="Padding" Value="{StaticResource IsiKartu}" />
     </Style>
     <Style x:Key="KartuLembut" TargetType="Border" BasedOn="{StaticResource Kartu}">
-        <Setter Property="Background" Value="{DynamicResource KuasPermukaanDua}" />
+        <Setter Property="Background" Value="{DynamicResource KuasPanelLembut}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
     <Style x:Key="KartuAksen" TargetType="Border" BasedOn="{StaticResource Kartu}">
         <Setter Property="Background" Value="{DynamicResource KuasAksenLembut}" />
         <Setter Property="BorderBrush" Value="{DynamicResource KuasAksen}" />
     </Style>
     <Style x:Key="Lencana" TargetType="Border">
-        <Setter Property="CornerRadius" Value="11" />
-        <Setter Property="Padding" Value="9,3,9,3" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="10,4,10,4" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Background" Value="{DynamicResource KuasPermukaanDua}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource KuasGaris}" />
-        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource KuasAksenLembut}" />
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
     <Style x:Key="TeksLencana" TargetType="TextBlock" BasedOn="{StaticResource TeksKecil}">
         <Setter Property="FontWeight" Value="SemiBold" />
@@ -101,14 +102,14 @@
     <!-- ============================ Tombol ============================ -->
     <Style x:Key="TombolDasar" TargetType="Button">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="13.5" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <!-- Tinta, bukan putih: putih di atas aksen terang tema gelap hanya ~2,6:1. -->
         <Setter Property="Foreground" Value="{DynamicResource KuasAksenTinta}" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Background" Value="{DynamicResource KuasAksen}" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="16,9,16,9" />
+        <Setter Property="Padding" Value="18,11,18,11" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -140,7 +141,7 @@
     </Style>
     <Style x:Key="Tombol" TargetType="Button" BasedOn="{StaticResource TombolDasar}" />
     <Style x:Key="TombolGaris" TargetType="Button" BasedOn="{StaticResource TombolDasar}">
-        <Setter Property="Background" Value="{DynamicResource KuasPermukaan}" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeks}" />
         <Setter Property="BorderBrush" Value="{DynamicResource KuasGaris}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -200,13 +201,13 @@
         <!-- ============================ Masukan ============================ -->
     <Style TargetType="TextBox" x:Key="KotakTeks">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="13.5" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeks}" />
         <Setter Property="CaretBrush" Value="{DynamicResource KuasTeks}" />
-        <Setter Property="Background" Value="{DynamicResource KuasPermukaan}" />
+        <Setter Property="Background" Value="{DynamicResource KuasIsian}" />
         <Setter Property="BorderBrush" Value="{DynamicResource KuasGaris}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="10,8,10,8" />
+        <Setter Property="Padding" Value="14,10,14,10" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
@@ -216,9 +217,10 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{StaticResource RadiusKecil}">
                         <Grid>
-                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"
+                            <!-- Margin hanya untuk petunjuk; teksnya sendiri sudah diberi jarak
+                                 oleh Padding TextBox. Dua-duanya dipasang = teks terpotong. -->
+                            <ScrollViewer x:Name="PART_ContentHost"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                            <!-- Petunjuk dari Tag: kotak kosong tanpa label terlihat membingungkan. -->
                             <TextBlock x:Name="Petunjuk" Text="{TemplateBinding Tag}" IsHitTestVisible="False"
                                        Margin="{TemplateBinding Padding}"
                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -244,18 +246,106 @@
     <Style x:Key="KotakTeksBesar" TargetType="TextBox" BasedOn="{StaticResource KotakTeks}">
         <Setter Property="AcceptsReturn" Value="True" />
         <Setter Property="TextWrapping" Value="Wrap" />
-        <Setter Property="Height" Value="72" />
+        <Setter Property="Height" Value="84" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
     </Style>
-    <Style TargetType="PasswordBox" x:Key="KotakSandi">
+
+    <!-- Isian berlabel di dalam kotak: label kecil di atas, nilai di bawah.
+         Tinggi 56 supaya sejajar dengan kotak pilih dan tanggal berlabel. -->
+    <Style TargetType="TextBox" x:Key="KotakLabel">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="13.5" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeks}" />
-        <Setter Property="Background" Value="{DynamicResource KuasPermukaan}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource KuasTeks}" />
+        <Setter Property="Background" Value="{DynamicResource KuasIsian}" />
         <Setter Property="BorderBrush" Value="{DynamicResource KuasGaris}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="10,8,10,8" />
+        <Setter Property="Height" Value="56" />
+        <!-- Padding dikosongkan: WPF sudah memakai Padding di dalam kotak teks, jadi
+             menambahkannya lagi lewat margin membuat baris nilai terpotong. -->
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource RadiusKecil}">
+                        <Grid Margin="14,8,14,8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="16" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="{TemplateBinding Tag}" FontSize="10" FontWeight="Bold"
+                                       Foreground="{DynamicResource KuasTeksDua}" VerticalAlignment="Bottom"
+                                       TextTrimming="CharacterEllipsis" />
+                            <ScrollViewer x:Name="PART_ContentHost" Grid.Row="1"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource KuasAksen}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="KotakLabelBesar" TargetType="TextBox" BasedOn="{StaticResource KotakLabel}">
+        <Setter Property="AcceptsReturn" Value="True" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Height" Value="96" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+    </Style>
+
+    <Style TargetType="PasswordBox" x:Key="KotakSandi">
+        <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
+        <Setter Property="FontSize" Value="13.5" />
+        <Setter Property="Foreground" Value="{DynamicResource KuasTeks}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource KuasTeks}" />
+        <Setter Property="Background" Value="{DynamicResource KuasIsian}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource KuasGaris}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Height" Value="56" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="PasswordBox">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource RadiusKecil}">
+                        <Grid Margin="14,8,14,8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="16" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="{TemplateBinding Tag}" FontSize="10" FontWeight="Bold"
+                                       Foreground="{DynamicResource KuasTeksDua}" VerticalAlignment="Bottom"
+                                       TextTrimming="CharacterEllipsis" />
+                            <ScrollViewer x:Name="PART_ContentHost" Grid.Row="1"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource KuasAksen}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
     <!-- ============================ Kotak pilih ============================ -->
     <!-- Item dropdown digambar sendiri: bawaan Windows terbaca buruk di tema gelap. -->
@@ -288,11 +378,11 @@
                           IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                 <ToggleButton.Template>
                     <ControlTemplate TargetType="ToggleButton">
-                        <Border x:Name="Kulit" Background="{DynamicResource KuasPermukaan}"
+                        <Border x:Name="Kulit" Background="{DynamicResource KuasIsian}"
                                 BorderBrush="{DynamicResource KuasGaris}" BorderThickness="1"
                                 CornerRadius="{StaticResource RadiusKecil}">
                             <Path x:Name="Panah" Data="M 0 0 L 4 4 L 8 0 Z" Fill="{DynamicResource KuasTeksDua}"
-                                  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,14,0" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -334,12 +424,12 @@
 
     <Style TargetType="ComboBox" x:Key="KotakPilih">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="13.5" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeks}" />
-        <Setter Property="Background" Value="{DynamicResource KuasPermukaan}" />
+        <Setter Property="Background" Value="{DynamicResource KuasIsian}" />
         <Setter Property="BorderBrush" Value="{DynamicResource KuasGaris}" />
-        <Setter Property="Padding" Value="10,7,10,7" />
-        <Setter Property="Height" Value="35" />
+        <Setter Property="Padding" Value="14,8,14,8" />
+        <Setter Property="Height" Value="40" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource ItemDrop}" />
         <Setter Property="Template" Value="{StaticResource WajahKotakPilih}" />
     </Style>
@@ -348,6 +438,66 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="FontSize" Value="12.5" />
     </Style>
+
+    <!-- Kotak pilih berlabel di dalam kotak, sejajar dengan KotakLabel. -->
+    <ControlTemplate x:Key="WajahKotakPilihLabel" TargetType="ComboBox">
+        <Grid>
+            <ToggleButton x:Name="Tombol" Focusable="False" ClickMode="Press"
+                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                <ToggleButton.Template>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Kulit" Background="{DynamicResource KuasIsian}"
+                                BorderBrush="{DynamicResource KuasGaris}" BorderThickness="1"
+                                CornerRadius="{StaticResource RadiusKecil}">
+                            <Path x:Name="Panah" Data="M 0 0 L 4 4 L 8 0 Z" Fill="{DynamicResource KuasTeksDua}"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,14,0" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Kulit" Property="BorderBrush" Value="{DynamicResource KuasAksen}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </ToggleButton.Template>
+            </ToggleButton>
+            <Grid Margin="{TemplateBinding Padding}" IsHitTestVisible="False">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="{TemplateBinding Tag}" FontSize="10" FontWeight="Bold"
+                           Foreground="{DynamicResource KuasTeksDua}" VerticalAlignment="Bottom"
+                           TextTrimming="CharacterEllipsis" />
+                <ContentPresenter x:Name="Konten" Grid.Row="1" VerticalAlignment="Center" Margin="0,0,20,0"
+                                  Content="{TemplateBinding SelectionBoxItem}"
+                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                  ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" />
+            </Grid>
+            <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom" Focusable="False"
+                   IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="Fade">
+                <Border Background="{DynamicResource KuasPermukaan}" BorderBrush="{DynamicResource KuasGaris}"
+                        BorderThickness="1" CornerRadius="{StaticResource RadiusKecil}" Margin="0,3,0,0"
+                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                        MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                    <ScrollViewer Padding="0,3,0,3">
+                        <ItemsPresenter />
+                    </ScrollViewer>
+                </Border>
+            </Popup>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.55" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="ComboBox" x:Key="KotakPilihLabel" BasedOn="{StaticResource KotakPilih}">
+        <Setter Property="Height" Value="56" />
+        <Setter Property="Padding" Value="14,8,14,8" />
+        <Setter Property="Template" Value="{StaticResource WajahKotakPilihLabel}" />
+    </Style>
+
     <Style TargetType="ComboBox" BasedOn="{StaticResource KotakPilih}" />
     <Style TargetType="ComboBoxItem" BasedOn="{StaticResource ItemDrop}" />
 
@@ -381,11 +531,11 @@
     </Style>
     <Style TargetType="DatePicker">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
-        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontSize" Value="13.5" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeks}" />
-        <Setter Property="Background" Value="{DynamicResource KuasPermukaan}" />
+        <Setter Property="Background" Value="{DynamicResource KuasIsian}" />
         <Setter Property="BorderBrush" Value="{DynamicResource KuasGaris}" />
-        <Setter Property="Height" Value="35" />
+        <Setter Property="Height" Value="40" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="DatePicker">
@@ -396,9 +546,9 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <DatePickerTextBox x:Name="PART_TextBox" Grid.Column="0" Padding="10,0,0,0"
+                            <DatePickerTextBox x:Name="PART_TextBox" Grid.Column="0" Padding="14,0,0,0"
                                                VerticalAlignment="Center" FontSize="{TemplateBinding FontSize}" />
-                            <Button x:Name="PART_Button" Grid.Column="1" Width="30" Focusable="False"
+                            <Button x:Name="PART_Button" Grid.Column="1" Width="34" Focusable="False"
                                     Background="Transparent" BorderThickness="0" Cursor="Hand"
                                     Content="&#xE787;" FontFamily="{StaticResource FontIkon}" FontSize="14"
                                     Foreground="{DynamicResource KuasTeksDua}" />
@@ -422,6 +572,59 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!-- Tanggal berlabel di dalam kotak, sejajar dengan KotakLabel. -->
+    <ControlTemplate x:Key="WajahTanggalLabel" TargetType="DatePicker">
+        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="1" CornerRadius="{StaticResource RadiusKecil}">
+            <Grid x:Name="PART_Root" Margin="{TemplateBinding Padding}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.ColumnSpan="2" Text="{TemplateBinding Tag}" FontSize="10" FontWeight="Bold"
+                           Foreground="{DynamicResource KuasTeksDua}" VerticalAlignment="Bottom"
+                           TextTrimming="CharacterEllipsis" />
+                <DatePickerTextBox x:Name="PART_TextBox" Grid.Row="1" Grid.Column="0"
+                                   VerticalAlignment="Center" FontSize="{TemplateBinding FontSize}">
+                    <!-- Label sudah ada di baris atas; petunjuk kosong tidak perlu digambar lagi. -->
+                    <DatePickerTextBox.Template>
+                        <ControlTemplate TargetType="DatePickerTextBox">
+                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" />
+                        </ControlTemplate>
+                    </DatePickerTextBox.Template>
+                </DatePickerTextBox>
+                <Button x:Name="PART_Button" Grid.Row="1" Grid.Column="1" Width="34" Focusable="False"
+                        Background="Transparent" BorderThickness="0" Cursor="Hand"
+                        Content="&#xE787;" FontFamily="{StaticResource FontIkon}" FontSize="14"
+                        Foreground="{DynamicResource KuasTeksDua}" />
+                <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom"
+                       PlacementTarget="{Binding ElementName=PART_TextBox}" StaysOpen="False">
+                    <Border Background="{DynamicResource KuasPermukaan}"
+                            BorderBrush="{DynamicResource KuasGaris}" BorderThickness="1"
+                            CornerRadius="{StaticResource RadiusKecil}" Margin="0,3,0,0">
+                        <Calendar x:Name="PART_Calendar" BorderThickness="0"
+                                  Background="{DynamicResource KuasPermukaan}" />
+                    </Border>
+                </Popup>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.55" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="DatePicker" x:Key="TanggalLabel" BasedOn="{StaticResource {x:Type DatePicker}}">
+        <Setter Property="Height" Value="56" />
+        <Setter Property="Padding" Value="14,8,14,8" />
+        <Setter Property="Template" Value="{StaticResource WajahTanggalLabel}" />
+    </Style>
     <Style TargetType="CheckBox" x:Key="KotakCek">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
         <Setter Property="FontSize" Value="13" />
@@ -441,20 +644,20 @@
     <Style x:Key="KepalaTabel" TargetType="DataGridColumnHeader">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
         <Setter Property="FontSize" Value="11" />
-        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeksDua}" />
-        <Setter Property="Background" Value="{DynamicResource KuasPermukaanDua}" />
-        <Setter Property="Padding" Value="12,9,12,9" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="14,10,14,10" />
         <Setter Property="BorderBrush" Value="{DynamicResource KuasGaris}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
     </Style>
     <Style x:Key="SelTabel" TargetType="DataGridCell">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
-        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeks}" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="12,8,12,8" />
+        <Setter Property="Padding" Value="14,10,14,10" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="DataGridCell">
@@ -478,24 +681,18 @@
         <Setter Property="ToolTip" Value="{Binding Text, RelativeSource={RelativeSource Self}}" />
     </Style>
     <Style x:Key="BarisTabel" TargetType="DataGridRow">
-        <Setter Property="Background" Value="{DynamicResource KuasPermukaan}" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="{DynamicResource KuasGaris}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
-        <Style.Triggers>
-            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                <Setter Property="Background" Value="{DynamicResource KuasPermukaanDua}" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
     <Style x:Key="TabelData" TargetType="DataGrid">
         <Setter Property="FontFamily" Value="{StaticResource FontUtama}" />
-        <Setter Property="Background" Value="{DynamicResource KuasPermukaan}" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource KuasTeks}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource KuasGaris}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="RowBackground" Value="{DynamicResource KuasPermukaan}" />
-        <Setter Property="AlternatingRowBackground" Value="{DynamicResource KuasPermukaanDua}" />
-        <Setter Property="AlternationCount" Value="2" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="RowBackground" Value="Transparent" />
+        <Setter Property="AlternatingRowBackground" Value="Transparent" />
         <Setter Property="GridLinesVisibility" Value="None" />
         <Setter Property="HeadersVisibility" Value="Column" />
         <Setter Property="AutoGenerateColumns" Value="False" />
@@ -503,8 +700,8 @@
         <Setter Property="CanUserResizeRows" Value="False" />
         <Setter Property="IsReadOnly" Value="True" />
         <Setter Property="SelectionMode" Value="Single" />
-        <Setter Property="RowHeight" Value="38" />
-        <Setter Property="ColumnHeaderHeight" Value="34" />
+        <Setter Property="RowHeight" Value="44" />
+        <Setter Property="ColumnHeaderHeight" Value="38" />
         <Setter Property="ColumnHeaderStyle" Value="{StaticResource KepalaTabel}" />
         <Setter Property="CellStyle" Value="{StaticResource SelTabel}" />
         <Setter Property="RowStyle" Value="{StaticResource BarisTabel}" />
@@ -513,8 +710,9 @@
     </Style>
 
     <!-- ============================ Menu sisi ============================ -->
+    <!-- Menu sisi: blok penuh selebar sidebar, item aktif berlatar gelap.
+         Ikon hanya dipakai saat sidebar menyempit jadi rel. -->
     <Style x:Key="MenuSisi" TargetType="ListBoxItem">
-        <Setter Property="Margin" Value="10,2,10,2" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <!-- Tanpa ini nama otomasi item jadi ToString record (ButirMenu { Judul = ... }). -->
@@ -522,24 +720,16 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                    <Grid>
-                        <!-- Penanda aktif: garis aksen kiri, bukan kotak aksen penuh —
-                             latar aksen terang membuat teks putih sulit dibaca. -->
-                        <Border x:Name="GarisAksen" Width="3" CornerRadius="2" Margin="2,6,0,6"
-                                Background="{DynamicResource KuasAksen}" HorizontalAlignment="Left"
-                                Visibility="Collapsed" />
-                        <Border x:Name="Kulit" Background="Transparent" CornerRadius="{StaticResource RadiusKecil}"
-                                Padding="12,10,12,10">
-                            <ContentPresenter />
-                        </Border>
-                    </Grid>
+                    <Border x:Name="Kulit" Background="Transparent" Padding="24,13,20,13">
+                        <ContentPresenter />
+                    </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Kulit" Property="Background" Value="#22FFFFFF" />
+                            <Setter TargetName="Kulit" Property="Background" Value="#14FFFFFF" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Kulit" Property="Background" Value="{DynamicResource KuasAksenLembut}" />
-                            <Setter TargetName="GarisAksen" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="Kulit" Property="Background"
+                                    Value="{DynamicResource KuasSisiAktif}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

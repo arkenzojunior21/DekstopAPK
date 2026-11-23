@@ -52,11 +52,11 @@
         <!-- Sisi kiri: menu sesuai peran. Menyempit jadi rel ikon saat jendela sempit. -->
         <Border Grid.Column="0" Background="{DynamicResource KuasSisi}">
             <DockPanel LastChildFill="True">
-                <StackPanel DockPanel.Dock="Top" Margin="20,18,20,10" Orientation="Horizontal"
+                <StackPanel DockPanel.Dock="Top" Margin="26,28,22,22" Orientation="Horizontal"
                             x:Name="BarisLogo">
                     <Grid Width="30" Height="30">
                         <!-- Huruf "L" jadi cadangan bila Aset/logo.png belum ada. -->
-                        <Border CornerRadius="8" Background="{DynamicResource KuasAksen}">
+                        <Border CornerRadius="8" Background="#22FFFFFF">
                             <TextBlock Text="L" Foreground="White" FontWeight="Bold" FontSize="16"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
@@ -74,17 +74,20 @@
                             </Image.Style>
                         </Image>
                     </Grid>
-                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center"
+                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center"
                                 Visibility="{Binding DataContext.Sempit, RelativeSource={RelativeSource AncestorType=Window},
                                              Converter={StaticResource BoolKasus}, ConverterParameter=balik}">
-                        <TextBlock Text="Laundry Desk" Foreground="White" FontSize="14" FontWeight="Bold" />
+                        <TextBlock Text="Laundry Desk" Foreground="White" FontSize="22" FontWeight="Bold" />
                         <TextBlock Text="{Binding Sesi.Peran}" Foreground="{DynamicResource KuasSisiTeks}"
-                                   FontSize="11" />
+                                   FontSize="11.5" Margin="0,3,0,0" />
                     </StackPanel>
                 </StackPanel>
 
-                <StackPanel DockPanel.Dock="Bottom" Margin="16,10,16,16">
-                    <Separator Background="#33FFFFFF" />
+                <StackPanel DockPanel.Dock="Bottom" Margin="26,10,18,22">
+                    <TextBlock Text="{Binding StatusSinkron}" Foreground="{DynamicResource KuasSisiTeks}"
+                               FontSize="11.5" Margin="0,0,0,10" TextTrimming="CharacterEllipsis"
+                               Visibility="{Binding StatusSinkron, Converter={StaticResource Kosong}}" />
+                    <Border Height="1" Background="#2EFFFFFF" Margin="0,0,0,12" />
                     <Button Command="{Binding GantiTemaCommand}" Style="{StaticResource TombolHalus}"
                             Foreground="{DynamicResource KuasSisiTeks}" HorizontalContentAlignment="Left"
                             ToolTip="Ganti tema tampilan">
@@ -105,7 +108,7 @@
                                                     Converter={StaticResource BoolKasus}, ConverterParameter=balik}" />
                         </StackPanel>
                     </Button>
-                    <TextBlock Text="{Binding Versi}" Foreground="#66B9C8E2" FontSize="10.5" Margin="12,8,0,0"
+                    <TextBlock Text="{Binding Versi}" Foreground="#80CFE4DE" FontSize="10.5" Margin="12,8,0,0"
                                Visibility="{Binding DataContext.Sempit, RelativeSource={RelativeSource AncestorType=Window},
                                             Converter={StaticResource BoolKasus}, ConverterParameter=balik}" />
                 </StackPanel>
@@ -117,19 +120,36 @@
                          ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
+                            <Grid>
+                                <!-- Rel ikon: hanya ikon yang tampil. -->
                                 <TextBlock Text="{Binding Ikon}" FontFamily="{StaticResource FontIkon}"
-                                           FontSize="15" Width="22" Foreground="{DynamicResource KuasSisiTeks}" />
-                                <StackPanel
-                                    Visibility="{Binding DataContext.Sempit, RelativeSource={RelativeSource AncestorType=Window},
-                                                 Converter={StaticResource BoolKasus}, ConverterParameter=balik}">
-                                    <TextBlock Text="{Binding Judul}" Foreground="White" FontSize="13"
+                                           FontSize="16" HorizontalAlignment="Left"
+                                           Foreground="{DynamicResource KuasSisiTeks}"
+                                           Visibility="{Binding DataContext.Sempit, RelativeSource={RelativeSource AncestorType=Window},
+                                                        Converter={StaticResource BoolKasus}}" />
+                                <StackPanel Orientation="Horizontal"
+                                            Visibility="{Binding DataContext.Sempit, RelativeSource={RelativeSource AncestorType=Window},
+                                                         Converter={StaticResource BoolKasus}, ConverterParameter=balik}">
+                                    <!-- Titik penanda item aktif, seperti contoh desain. -->
+                                    <TextBlock Text="&#x2022;" Foreground="White" FontSize="15" Width="18"
+                                               VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Hidden" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected,
+                                                                   RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                                                 Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding Judul}" Foreground="White" FontSize="14.5"
                                                FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                                    <TextBlock Text="{Binding Keterangan}" Foreground="{DynamicResource KuasSisiTeks}"
-                                               FontSize="10.5" TextTrimming="CharacterEllipsis"
-                                               ToolTip="{Binding Keterangan}" />
                                 </StackPanel>
-                            </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -144,21 +164,21 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" Background="{DynamicResource KuasPermukaan}"
-                    BorderBrush="{DynamicResource KuasGaris}" BorderThickness="0,0,0,1" Padding="24,14,24,14">
+            <!-- Judul halaman menempel di latar, dipisah garis tipis seperti contoh desain. -->
+            <Border Grid.Row="0" Background="Transparent" BorderBrush="{DynamicResource KuasGaris}"
+                    BorderThickness="0,0,0,1" Padding="32,26,32,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="{Binding MenuAktif.Judul}" Style="{StaticResource TeksJudul}" />
-                        <TextBlock Text="{Binding MenuAktif.Keterangan}" Style="{StaticResource TeksSub}" />
+                        <TextBlock Text="{Binding MenuAktif.Judul}" Style="{StaticResource TeksJudul}"
+                                   FontSize="32" />
+                        <TextBlock Text="{Binding MenuAktif.Keterangan}" Style="{StaticResource TeksSub}"
+                                   FontSize="13.5" Margin="0,5,0,0" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding StatusSinkron}" Style="{StaticResource TeksKecil}"
-                                   VerticalAlignment="Center" Margin="0,0,14,0"
-                                   Visibility="{Binding StatusSinkron, Converter={StaticResource Kosong}}" />
                         <Border Style="{StaticResource Lencana}">
                             <TextBlock Style="{StaticResource TeksLencana}"
                                        Text="{Binding Sesi.Sapaan, StringFormat={}{0}}" />
@@ -167,7 +187,7 @@
                 </Grid>
             </Border>
 
-            <ContentControl Grid.Row="1" Content="{Binding Halaman}" Margin="24,20,24,12"
+            <ContentControl Grid.Row="1" Content="{Binding Halaman}" Margin="32,20,32,12"
                             VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" />
 
             <!-- Toast: hasil/galat terakhir dari aksi apa pun. -->
